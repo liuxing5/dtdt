@@ -1,0 +1,10 @@
+dubbo:
+  provider:
+    appname: dtdt-service
+    filternames: simpleproviderfilter
+    group: elf
+    
+app:
+  config:
+    export-properties:
+      biz-rule-prefix: bizbiz

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: dtdt-service
+  cloud:
+    zookeeper:
+      enabled: true
+      connect-string: zookeeper1.dubbo.com:10011,zookeeper1.dubbo.com:10012,zookeeper1.dubbo.com:10013
+

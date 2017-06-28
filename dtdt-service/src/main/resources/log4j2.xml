@@ -1,0 +1,74 @@
+<Configuration status="WARN" monitorInterval="30" packages="com.asiainfo.awim.dubbo.trace.simple.log">
+    <Properties>
+        <Property name="instance">dtdt-service</Property>
+        <Property name="log.dir">log</Property>
+        <Property name="file.parttern">
+            [%date{yyyyMMdd HHmmss SSS}][%level][%trace][%thread][%class.%method][%line]:%message%n
+        </Property>
+        <Property name="console.parttern">
+            [%date{yyyyMMdd HHmmss SSS}][%level][%trace][%thread][%class.%method][%line]:%message%n
+        </Property>
+    </Properties>
+    <Appenders>
+        <!--<Kafka name="Kafka" topic="test-test">-->
+            <!--<KafkaLayout/>-->
+            <!--<Property name="bootstrap.servers">10.1.248.48:10021,10.1.248.48:10022,10.1.248.48:10023</Property>-->
+        <!--</Kafka>-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${console.parttern}"/>
+        </Console>
+        <RollingRandomAccessFile name="infoLog" fileName="${log.dir}/${instance}-info.log"
+                                 filePattern="${log.dir}/%d{yyyy-MM}/${instance}-info-%d{yyyy-MM-dd-HH}-%i.log.gz"
+                                 append="true">
+            <PatternLayout pattern="${file.parttern}"/>
+            <Filters>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="warnLog" fileName="${log.dir}/${instance}-warn.log"
+                                 filePattern="${log.dir}/%d{yyyy-MM}/${instance}-warn-%d{yyyy-MM-dd-HH}-%i.log.gz"
+                                 append="true">
+            <Filters>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${file.parttern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="errorLog" fileName="${log.dir}/${instance}-error.log"
+                                 filePattern="${log.dir}/%d{yyyy-MM}/${instance}-error-%d{yyyy-MM-dd-HH}-%i.log.gz"
+                                 append="true">
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${file.parttern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <logger name="org.apache.zookeeper" level="error" additivity="false">
+            <AppenderRef ref="errorLog"/>
+        </logger>
+        <!-- root logger 配置 -->
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="infoLog"/>
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="warnLog"/>
+            <AppenderRef ref="errorLog"/>
+            <!--<AppenderRef ref="Kafka"/>-->
+        </Root>
+    </Loggers>
+</Configuration>

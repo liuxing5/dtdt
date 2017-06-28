@@ -1,0 +1,12 @@
+dubbo:
+  consumer:
+    appname: dtdt-rest
+spring:
+  http:
+    encoding:
+      enabled: true
+      charset: utf-8
+      force: true
+server:
+  context-path: /dtdt-rest
+  port: 8083
