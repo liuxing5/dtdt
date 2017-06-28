@@ -1,0 +1,4 @@
+.settings/
+dtdt-interface/target/
+dtdt-rest/target/
+dtdt-service/target/
