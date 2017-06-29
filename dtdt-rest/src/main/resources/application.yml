@@ -1,6 +1,7 @@
 dubbo:
   consumer:
     appname: dtdt-rest
+    group: elf
 spring:
   http:
     encoding:
