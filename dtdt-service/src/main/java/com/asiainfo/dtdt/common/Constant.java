@@ -10,33 +10,43 @@ package com.asiainfo.dtdt.common;
 public class Constant {
 
 	/**处理成功码**/
-	public static final String SUCCESS_CODE	= "00000";
+	public static final String SUCCESS_CODE			= "00000";
 	/**处理成功描述**/
-	public static final String SUCCESS_MSG	= "成功";
+	public static final String SUCCESS_MSG			= "成功";
 	
 	/**参数为空错误码**/
-	public static final String PARAM_NULL_CODE	= "10000";
+	public static final String PARAM_NULL_CODE		= "10000";
 	/**参数为空错误描述**/
-	public static final String PARAM_NULL_MSG	= "为空";
+	public static final String PARAM_NULL_MSG		= "为空";
 	
 	/**参数错误码**/
-	public static final String PARAM_ERROR_CODE	= "20000";
+	public static final String PARAM_ERROR_CODE		= "20000";
 	/**参数错误描述**/
-	public static final String PARAM_ERROR_MSG	= "参数错误";
+	public static final String PARAM_ERROR_MSG		= "参数错误";
 	
 	/**签名错误码**/
-	public static final String SIGN_ERROR_CODE	= "99998";
+	public static final String SIGN_ERROR_CODE		= "99998";
 	/**签名错误描述**/
-	public static final String SIGN_ERROR_MSG	= "签名错误";
+	public static final String SIGN_ERROR_MSG		= "签名错误";
 	
 	/**系统异常错误码**/
-	public static final String ERROR_CODE	= "99999";
+	public static final String ERROR_CODE			= "99999";
 	/**系统异常错误描述**/
-	public static final String ERROR_MSG	= "异常";
+	public static final String ERROR_MSG			= "异常";
 	
 	/**沃家总管订购退订接口**/
-	public static final String ORDER_URL  = "http://<url>/<path>/order";
+	public static final String ORDER_URL  			= "http://<url>/<path>/order";
 	/**沃家总管查询订购信息接口**/
-	public static final String QUERYORDER_URL  = "http://<url>/<path>/queryorder";
+	public static final String QUERYORDER_URL  		= "http://<url>/<path>/queryorder";
+	
+	/**非联通号码**/
+	public static final String NOT_UNICOM_CODE 		= "20001";
+	/**非联通号码描述**/
+	public static final String NOT_UNICOM_MSG 		= "非联通号码";
+	
+	/**发送短信异常码**/
+	public static final String SENDSMS_ERROR_CODE	= "30000";
+	/**发送短信异常描述**/
+	public static final String SENDSMS_ERROR_MSG	= "发送短信异常";
 	
 }

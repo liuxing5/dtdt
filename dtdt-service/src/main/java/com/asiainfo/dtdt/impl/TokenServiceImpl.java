@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ai.paas.cache.ICache;
+import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.interfaces.ITokenService;
 
@@ -22,16 +23,16 @@ public class TokenServiceImpl implements ITokenService {
 		
 		//参数校验
 		if (StringUtils.isEmpty(partnerCode)) {
-			ReturnUtil.returnJsonError("00101", "partnerCode is null", null);
+			ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isEmpty(appKey)) {
-			ReturnUtil.returnJsonError("00103", "appKey is null", null);
+			ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey" + Constant.PARAM_NULL_MSG, null);
 		}
 		
-		//获取token：T_partnerCode值_appkey值
+		//获取token
 		String token = null;
 		try {
-			Object obj = cache.getItem("T_" + partnerCode + appKey);
+			Object obj = cache.getItem("T_" + partnerCode + appKey);//格式：T_partnerCode_appKey
 			if (obj != null){
 				token = (String) obj;
 			} else {
@@ -41,9 +42,10 @@ public class TokenServiceImpl implements ITokenService {
 			}
 		} catch (Exception e) {
 			logger.error("Exception e=" + e);
-			return ReturnUtil.returnJsonInfo("99999", "error", e.toString());
+			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, e.toString());
 		}
-		return ReturnUtil.returnJsonInfo("00000", "success", token);
+		logger.info("token=" + token);
+		return ReturnUtil.returnJsonInfo(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, token);
 	}
 
 }

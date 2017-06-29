@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ai.paas.cache.ICache;
+import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
@@ -23,19 +24,25 @@ public class CodeServiceImpl implements ICodeService {
 	@Autowired
 	private ICache cache;
 	
-	public String getCode(String phone) {
-		logger.info("CodeServiceImpl getCode() phone=" + phone);
+	public String getCode(String partnerCode, String appKey, String phone) {
+		logger.info("CodeServiceImpl getCode() partnerCode=" + partnerCode + " appKey=" + appKey + " phone=" + phone);
 		
 		//参数校验
+		if (StringUtils.isEmpty(partnerCode)) {
+			ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode" + Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isEmpty(appKey)) {
+			ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey" + Constant.PARAM_NULL_MSG, null);
+		}
 		if (StringUtils.isEmpty(phone)) {
-			ReturnUtil.returnJsonError("00105", "phone is null", null);
+			ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (!IsMobileNo.isMobile(phone)) {
-			return ReturnUtil.returnJsonInfo("00105", "phone is wrong", null);
+			return ReturnUtil.returnJsonError(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
 		}
 		
 		try {
-			Object obj = cache.getItem(phone + "_phone_code_count");
+			Object obj = cache.getItem("Y_" + partnerCode + appKey + phone + "_count");
 			int phoneCodeCountInt = 0;
 			if (null != obj) {
 				phoneCodeCountInt = (Integer) obj;
@@ -51,21 +58,22 @@ public class CodeServiceImpl implements ICodeService {
 			//发短信
 			try {
 				String msgContent = Config.SMSMESAGECODE.replace(Config.PHONENUMMODE, String.valueOf(code));
-				SGIPSendMSGUtil.CONF_PATH = Config.path + "/properties/conf.properties";
+				SGIPSendMSGUtil.CONF_PATH = Config.path + "/properties/conf.properties";//TODO 参数读取
 				SGIPSendMSGUtil.sendMsg(phone, msgContent);
 			} catch (Exception e) {
 				logger.error("发送短信错误！", e);
-				return ReturnUtil.returnJsonError("00106", "send message wrong", null);
+				return ReturnUtil.returnJsonError(Constant.SENDSMS_ERROR_CODE, Constant.SENDSMS_ERROR_MSG, null);
 			}
+			
 			//设置_code时效 300s；设置发短信次数一天内5次
-			cache.addItem(phone + "_phone_code", String.valueOf(code), Integer.valueOf(Config.SMSTIMER));
-			cache.addItem(phone + "_phone_code_count", ++phoneCodeCountInt, 
-							DateUtil.getSecondsNowToNDateAfter(new Date(), Integer.valueOf(Config.SMSCOUNTTIMER)));
-			return ReturnUtil.returnJsonInfo("00000", "ok", String.valueOf(code));
+			cache.addItem("Y_" + partnerCode + appKey + phone, String.valueOf(code), Integer.valueOf(Config.SMSTIMER));
+			cache.addItem("Y_" + partnerCode + appKey + phone + "_count", ++phoneCodeCountInt, DateUtil.getSecondsNowToNDateAfter(new Date(), Integer.valueOf(Config.SMSCOUNTTIMER)));
+			return ReturnUtil.returnJsonInfo(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, String.valueOf(code));
+		
 		} catch (Exception e)
 		{
 			logger.error("获取验证码错误！", e);
-			return ReturnUtil.returnJsonError("00107", "getCode wrong", null);
+			return ReturnUtil.returnJsonError(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 	}
 

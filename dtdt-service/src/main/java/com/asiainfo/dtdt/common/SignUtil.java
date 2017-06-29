@@ -45,7 +45,7 @@ public class SignUtil {
 				sb.append(k + "=" + v + "&");
 			}
 		}
-		sb.append("key=" + "appKey");//appKey
+		sb.append("key=" + "appSecret");//appSecret:本地的
 		//3.MD5加密，大写
 		String sign = MD5Util.MD5Encode(sb.toString(), characterEncoding).toUpperCase();
 		return sign;

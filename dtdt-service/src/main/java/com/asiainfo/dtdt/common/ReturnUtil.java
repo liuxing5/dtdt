@@ -30,7 +30,7 @@ public class ReturnUtil {
 	public static String returnJsonError(Object code, String msg, String data)
 	{
 		JSONObject json = new JSONObject();
-		if("00000".equals(code)){
+		if(Constant.SUCCESS_CODE.equals(code)){
 			json.put("code", code);
 		}else{
 			json.put("code", code+"");
@@ -57,7 +57,7 @@ public class ReturnUtil {
 	public static String returnJsonInfo(Object code, String msg, String data)
 	{	
 		JSONObject json = new JSONObject();
-		if("00000".equals(code)){
+		if(Constant.SUCCESS_CODE.equals(code)){
 			json.put("code", code);
 		}else{
 			json.put("code", code+"");
@@ -86,7 +86,7 @@ public class ReturnUtil {
 	{
 		initDate();
 		JSONObject json = new JSONObject();
-		if("00000".equals(code)){
+		if(Constant.SUCCESS_CODE.equals(code)){
 			json.put("code", code);
 		}else{
 			json.put("code", code+"");
