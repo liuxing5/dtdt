@@ -14,8 +14,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ai.paas.cache.ICache;
+import com.alibaba.fastjson.JSONObject;
 
-import net.sf.json.JSONObject;
 /**
 * @Description: 拦截器：校验token是否存在；合作方验证；应用验证；
 * @author liuxing5

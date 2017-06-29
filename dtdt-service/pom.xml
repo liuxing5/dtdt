@@ -197,13 +197,13 @@
       		<systemPath>D:/Software/WorkSoftware/workspace_yaxin_1/DTDT/dtdt-interface/target/dtdt-interface-0.0.1-SNAPSHOT.jar</systemPath>
         </dependency>
         
-<!-- 		<dependency>
+		<dependency>
 		    <groupId>net.sf.json-lib</groupId>
 		    <artifactId>json-lib</artifactId>
 		    <version>2.4</version>
 		    <scope>system</scope>
-      		<systemPath>D:/gradle-3.0-rc-2-all/gradle-3.0-rc-2/caches/modules-2/files-2.1/net.sf.json-lib/json-lib/2.4/136743e0d12df4e785e62b48618cee169b2ae546/json-lib-2.4-jdk15.jar</systemPath>
-		</dependency> -->
+      		<systemPath>D:/Software/Cache_data/MavenRep/MavenRep/net/sf/json-lib/json-lib/2.4/json-lib-2.4-jdk15.jar</systemPath>
+		</dependency>
         
 		<dependency>
             <groupId>com.ai.bdx.itpl.uni.paasframe</groupId>
