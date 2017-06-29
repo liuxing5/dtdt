@@ -45,6 +45,7 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
+        
         <dependency>
             <groupId>com.asiainfo.aiwm</groupId>
             <artifactId>spring-cloud-zk-center</artifactId>

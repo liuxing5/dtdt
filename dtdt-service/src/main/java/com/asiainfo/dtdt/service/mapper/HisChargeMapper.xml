@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.dao.HisChargeMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.HisCharge" >
+    <result column="charge_id" property="chargeId" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="recharge_parent_id" property="rechargeParentId" jdbcType="VARCHAR" />
+    <result column="recharge_phone_num" property="rechargePhoneNum" jdbcType="VARCHAR" />
+    <result column="recharge_money" property="rechargeMoney" jdbcType="INTEGER" />
+    <result column="rechage_time" property="rechageTime" jdbcType="TIMESTAMP" />
+    <result column="rechage_num" property="rechageNum" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="VARCHAR" />
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="return_time" property="returnTime" jdbcType="TIMESTAMP" />
+    <result column="charge_sys_username" property="chargeSysUsername" jdbcType="VARCHAR" />
+    <result column="charge_sys_pwd" property="chargeSysPwd" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="copy_time" property="copyTime" jdbcType="TIMESTAMP" />
+    <result column="copy_remark" property="copyRemark" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.HisCharge" >
+    insert into t_s_his_charge (charge_id, order_id, recharge_parent_id, 
+      recharge_phone_num, recharge_money, rechage_time, 
+      rechage_num, state, result, 
+      return_time, charge_sys_username, charge_sys_pwd, 
+      remark, copy_time, copy_remark
+      )
+    values (#{chargeId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{rechargeParentId,jdbcType=VARCHAR}, 
+      #{rechargePhoneNum,jdbcType=VARCHAR}, #{rechargeMoney,jdbcType=INTEGER}, #{rechageTime,jdbcType=TIMESTAMP}, 
+      #{rechageNum,jdbcType=INTEGER}, #{state,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, 
+      #{returnTime,jdbcType=TIMESTAMP}, #{chargeSysUsername,jdbcType=VARCHAR}, #{chargeSysPwd,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{copyTime,jdbcType=TIMESTAMP}, #{copyRemark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.HisCharge" >
+    insert into t_s_his_charge
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="chargeId != null" >
+        charge_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="rechargeParentId != null" >
+        recharge_parent_id,
+      </if>
+      <if test="rechargePhoneNum != null" >
+        recharge_phone_num,
+      </if>
+      <if test="rechargeMoney != null" >
+        recharge_money,
+      </if>
+      <if test="rechageTime != null" >
+        rechage_time,
+      </if>
+      <if test="rechageNum != null" >
+        rechage_num,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="result != null" >
+        result,
+      </if>
+      <if test="returnTime != null" >
+        return_time,
+      </if>
+      <if test="chargeSysUsername != null" >
+        charge_sys_username,
+      </if>
+      <if test="chargeSysPwd != null" >
+        charge_sys_pwd,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="copyTime != null" >
+        copy_time,
+      </if>
+      <if test="copyRemark != null" >
+        copy_remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="chargeId != null" >
+        #{chargeId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="rechargeParentId != null" >
+        #{rechargeParentId,jdbcType=VARCHAR},
+      </if>
+      <if test="rechargePhoneNum != null" >
+        #{rechargePhoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rechargeMoney != null" >
+        #{rechargeMoney,jdbcType=INTEGER},
+      </if>
+      <if test="rechageTime != null" >
+        #{rechageTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rechageNum != null" >
+        #{rechageNum,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="result != null" >
+        #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="returnTime != null" >
+        #{returnTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chargeSysUsername != null" >
+        #{chargeSysUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeSysPwd != null" >
+        #{chargeSysPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="copyTime != null" >
+        #{copyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="copyRemark != null" >
+        #{copyRemark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>

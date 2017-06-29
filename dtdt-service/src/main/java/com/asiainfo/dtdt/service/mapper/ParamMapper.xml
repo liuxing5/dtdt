@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.dao.ParamMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.Param" >
+    <result column="param_code" property="paramCode" jdbcType="VARCHAR" />
+    <result column="param_value" property="paramValue" jdbcType="VARCHAR" />
+    <result column="parent_code" property="parentCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.Param" >
+    insert into t_s_param (param_code, param_value, parent_code, 
+      status, create_time, remark
+      )
+    values (#{paramCode,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR}, #{parentCode,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.Param" >
+    insert into t_s_param
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="paramCode != null" >
+        param_code,
+      </if>
+      <if test="paramValue != null" >
+        param_value,
+      </if>
+      <if test="parentCode != null" >
+        parent_code,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="paramCode != null" >
+        #{paramCode,jdbcType=VARCHAR},
+      </if>
+      <if test="paramValue != null" >
+        #{paramValue,jdbcType=VARCHAR},
+      </if>
+      <if test="parentCode != null" >
+        #{parentCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>
