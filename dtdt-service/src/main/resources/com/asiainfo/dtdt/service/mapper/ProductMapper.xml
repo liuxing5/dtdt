@@ -23,6 +23,12 @@
     from t_s_product
     where ID = #{id,jdbcType=BIGINT}
   </select>
+  <!-- 查询可订购产品列表服务 -->
+  <select id="getProductList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_product
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from t_s_product
     where ID = #{id,jdbcType=BIGINT}
