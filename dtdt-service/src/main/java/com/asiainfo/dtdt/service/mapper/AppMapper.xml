@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.dao.AppMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.App" >
+    <id column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="app_key" property="appKey" jdbcType="VARCHAR" />
+    <result column="secret" property="secret" jdbcType="VARCHAR" />
+    <result column="partner_id" property="partnerId" jdbcType="BIGINT" />
+    <result column="app_name" property="appName" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="TINYINT" />
+    <result column="is_need_charge" property="isNeedCharge" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="notice_url" property="noticeUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    app_id, app_key, secret, partner_id, app_name, state, is_need_charge, create_time, 
+    notice_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_app
+    where app_id = #{appId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_s_app
+    where app_id = #{appId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.App" >
+    insert into t_s_app (app_id, app_key, secret, 
+      partner_id, app_name, state, 
+      is_need_charge, create_time, notice_url
+      )
+    values (#{appId,jdbcType=BIGINT}, #{appKey,jdbcType=VARCHAR}, #{secret,jdbcType=VARCHAR}, 
+      #{partnerId,jdbcType=BIGINT}, #{appName,jdbcType=VARCHAR}, #{state,jdbcType=TINYINT}, 
+      #{isNeedCharge,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{noticeUrl,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.App" >
+    insert into t_s_app
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="appKey != null" >
+        app_key,
+      </if>
+      <if test="secret != null" >
+        secret,
+      </if>
+      <if test="partnerId != null" >
+        partner_id,
+      </if>
+      <if test="appName != null" >
+        app_name,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="isNeedCharge != null" >
+        is_need_charge,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="noticeUrl != null" >
+        notice_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="appId != null" >
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="appKey != null" >
+        #{appKey,jdbcType=VARCHAR},
+      </if>
+      <if test="secret != null" >
+        #{secret,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerId != null" >
+        #{partnerId,jdbcType=BIGINT},
+      </if>
+      <if test="appName != null" >
+        #{appName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT},
+      </if>
+      <if test="isNeedCharge != null" >
+        #{isNeedCharge,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="noticeUrl != null" >
+        #{noticeUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.App" >
+    update t_s_app
+    <set >
+      <if test="appKey != null" >
+        app_key = #{appKey,jdbcType=VARCHAR},
+      </if>
+      <if test="secret != null" >
+        secret = #{secret,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerId != null" >
+        partner_id = #{partnerId,jdbcType=BIGINT},
+      </if>
+      <if test="appName != null" >
+        app_name = #{appName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=TINYINT},
+      </if>
+      <if test="isNeedCharge != null" >
+        is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="noticeUrl != null" >
+        notice_url = #{noticeUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where app_id = #{appId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.App" >
+    update t_s_app
+    set app_key = #{appKey,jdbcType=VARCHAR},
+      secret = #{secret,jdbcType=VARCHAR},
+      partner_id = #{partnerId,jdbcType=BIGINT},
+      app_name = #{appName,jdbcType=VARCHAR},
+      state = #{state,jdbcType=TINYINT},
+      is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      notice_url = #{noticeUrl,jdbcType=VARCHAR}
+    where app_id = #{appId,jdbcType=BIGINT}
+  </update>
+</mapper>

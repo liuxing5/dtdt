@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.dao.VcodeMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.Vcode" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="vcode_send_time" property="vcodeSendTime" jdbcType="VARCHAR" />
+    <result column="lvcode" property="lvcode" jdbcType="VARCHAR" />
+    <result column="user_input_vcode" property="userInputVcode" jdbcType="VARCHAR" />
+    <result column="user_input_time" property="userInputTime" jdbcType="VARCHAR" />
+    <result column="vcode_valid_resut" property="vcodeValidResut" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, order_id, vcode_send_time, lvcode, user_input_vcode, user_input_time, vcode_valid_resut
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_vcode
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from t_s_vcode
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.Vcode" >
+    insert into t_s_vcode (ID, order_id, vcode_send_time, 
+      lvcode, user_input_vcode, user_input_time, 
+      vcode_valid_resut)
+    values (#{id,jdbcType=BIGINT}, #{orderId,jdbcType=VARCHAR}, #{vcodeSendTime,jdbcType=VARCHAR}, 
+      #{lvcode,jdbcType=VARCHAR}, #{userInputVcode,jdbcType=VARCHAR}, #{userInputTime,jdbcType=VARCHAR}, 
+      #{vcodeValidResut,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.Vcode" >
+    insert into t_s_vcode
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="vcodeSendTime != null" >
+        vcode_send_time,
+      </if>
+      <if test="lvcode != null" >
+        lvcode,
+      </if>
+      <if test="userInputVcode != null" >
+        user_input_vcode,
+      </if>
+      <if test="userInputTime != null" >
+        user_input_time,
+      </if>
+      <if test="vcodeValidResut != null" >
+        vcode_valid_resut,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="vcodeSendTime != null" >
+        #{vcodeSendTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lvcode != null" >
+        #{lvcode,jdbcType=VARCHAR},
+      </if>
+      <if test="userInputVcode != null" >
+        #{userInputVcode,jdbcType=VARCHAR},
+      </if>
+      <if test="userInputTime != null" >
+        #{userInputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="vcodeValidResut != null" >
+        #{vcodeValidResut,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.Vcode" >
+    update t_s_vcode
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="vcodeSendTime != null" >
+        vcode_send_time = #{vcodeSendTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lvcode != null" >
+        lvcode = #{lvcode,jdbcType=VARCHAR},
+      </if>
+      <if test="userInputVcode != null" >
+        user_input_vcode = #{userInputVcode,jdbcType=VARCHAR},
+      </if>
+      <if test="userInputTime != null" >
+        user_input_time = #{userInputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="vcodeValidResut != null" >
+        vcode_valid_resut = #{vcodeValidResut,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.Vcode" >
+    update t_s_vcode
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      vcode_send_time = #{vcodeSendTime,jdbcType=VARCHAR},
+      lvcode = #{lvcode,jdbcType=VARCHAR},
+      user_input_vcode = #{userInputVcode,jdbcType=VARCHAR},
+      user_input_time = #{userInputTime,jdbcType=VARCHAR},
+      vcode_valid_resut = #{vcodeValidResut,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
