@@ -13,16 +13,6 @@
     <start-class>com.asiainfo.dtdt.Application</start-class>
   </properties>
    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!--<dependency>-->
             <!--<groupId>com.github.tobato</groupId>-->
             <!--<artifactId>fastdfs-client</artifactId>-->
@@ -110,7 +100,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
-        <!-- 
         <dependency>
             <groupId>com.asiainfo.common</groupId>
             <artifactId>asiainfo-util</artifactId>
@@ -122,17 +111,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>com.asiainfo.aiwm</groupId>-->
-        <!--<artifactId>redis-cluster-configuration-starter</artifactId>-->
-        <!--<version>1.0-SNAPSHOT</version>-->
-        <!--</dependency>-->
-        <!--
+        <dependency>
+            <groupId>com.asiainfo.aiwm</groupId>
+            <artifactId>redis-cluster-configuration-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.asiainfo.aiwm</groupId>
             <artifactId>spring-cloud-zk-center</artifactId>
@@ -143,7 +130,6 @@
             <artifactId>dubbo-provider-configuration-starter</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-		-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -193,32 +179,18 @@
             <groupId>com.asiainfo.dtdt</groupId>
             <artifactId>dtdt-interface</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>system</scope>
-      		<systemPath>D:/workspace/DTDT/dtdt-interface/target/dtdt-interface-0.0.1-SNAPSHOT.jar</systemPath>
         </dependency>
-        
-		<dependency>
-		    <groupId>net.sf.json-lib</groupId>
-		    <artifactId>json-lib</artifactId>
-		    <version>2.4</version>
-		    <scope>system</scope>
-      		<systemPath>D:/gradle-3.0-rc-2-all/gradle-3.0-rc-2/caches/modules-2/files-2.1/net.sf.json-lib/json-lib/2.4/136743e0d12df4e785e62b48618cee169b2ae546/json-lib-2.4-jdk15.jar</systemPath>
-		</dependency>
         
         <dependency>
             <groupId>com.ai.bdx.itpl.uni.paasframe</groupId>
             <artifactId>bdx-itpl-unipaasframe</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>system</scope>
-      		<systemPath>D:/myJar/bdx-itpl-unipaasframe-1.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
         
         <dependency>
             <groupId>com.huawei</groupId>
             <artifactId>smproxy</artifactId>
             <version>1.4</version>
-            <scope>system</scope>
-      		<systemPath>D:/myJar/smproxy-1.4.jar</systemPath>
         </dependency>
         
     </dependencies>
