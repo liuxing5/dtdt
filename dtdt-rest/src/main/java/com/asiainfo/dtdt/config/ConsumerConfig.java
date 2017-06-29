@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.asiainfo.dtdt.api.IAuthoService;
+import com.asiainfo.dtdt.interfaces.IProductService;
 
 /**
  * 
@@ -32,6 +33,14 @@ public class ConsumerConfig {
     public ReferenceBean<IAuthoService> configClientSVReferenceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
         ReferenceBean<IAuthoService> referenceBean = new ReferenceBean<IAuthoService>();
         referenceBean.setInterface(IAuthoService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
+    public ReferenceBean<IProductService> configIProductServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IProductService> referenceBean = new ReferenceBean<IProductService>();
+        referenceBean.setInterface(IProductService.class);
         buildcommon(registryConfig, referenceBean);
         return referenceBean;
     }
