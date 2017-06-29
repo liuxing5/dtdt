@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.asiainfo.dtdt.dao.OrderMapper" >
+<mapper namespace="com.asiainfo.dtdt.service.mapper.OrderMapper" >
   <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.Order" >
     <id column="order_id" property="orderId" jdbcType="VARCHAR" />
     <result column="wo_order_id" property="woOrderId" jdbcType="VARCHAR" />

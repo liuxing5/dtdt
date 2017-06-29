@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.asiainfo.dtdt.dao.AppMapper" >
+<mapper namespace="com.asiainfo.dtdt.service.mapper.AppMapper" >
   <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.App" >
     <id column="app_id" property="appId" jdbcType="BIGINT" />
     <result column="app_key" property="appKey" jdbcType="VARCHAR" />
