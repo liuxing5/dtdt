@@ -3,6 +3,9 @@
 /* Created on:     2017/6/29 12:33:23                           */
 /*==============================================================*/
 
+CREATE DATABASE IF NOT EXISTS directionaldt DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+
+USE DATABASE directionaldt;
 
 drop table if exists t_s_app;
 
