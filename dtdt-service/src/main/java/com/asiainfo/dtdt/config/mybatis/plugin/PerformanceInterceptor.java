@@ -40,7 +40,6 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 public class PerformanceInterceptor implements Interceptor {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    @Override
     public Object intercept(Invocation invocation) throws Throwable {
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
         Object parameterObject = null;
@@ -59,7 +58,6 @@ public class PerformanceInterceptor implements Interceptor {
         return result;
     }
 
-    @Override
     public Object plugin(Object target) {
         if (target instanceof Executor) {
             return Plugin.wrap(target, this);
@@ -67,7 +65,6 @@ public class PerformanceInterceptor implements Interceptor {
         return target;
     }
 
-    @Override
     public void setProperties(Properties properties) {
     }
 

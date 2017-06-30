@@ -1,95 +1,31 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class App {
-    private Long appId;
+import lombok.Data;
 
-    private String appKey;
+@Data
+public class App implements Serializable {
 
-    private String secret;
+	private static final long serialVersionUID = 1L;
 
-    private Long partnerId;
+	private Long appId;
 
-    private String appName;
+	private String appKey;
 
-    private Byte state;
+	private String secret;
 
-    private Byte isNeedCharge;
+	private Long partnerId;
 
-    private Date createTime;
+	private String appName;
 
-    private String noticeUrl;
+	private Byte state;
 
-    public Long getAppId() {
-        return appId;
-    }
+	private Byte isNeedCharge;
 
-    public void setAppId(Long appId) {
-        this.appId = appId;
-    }
+	private Date createTime;
 
-    public String getAppKey() {
-        return appKey;
-    }
+	private String noticeUrl;
 
-    public void setAppKey(String appKey) {
-        this.appKey = appKey == null ? null : appKey.trim();
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret == null ? null : secret.trim();
-    }
-
-    public Long getPartnerId() {
-        return partnerId;
-    }
-
-    public void setPartnerId(Long partnerId) {
-        this.partnerId = partnerId;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName == null ? null : appName.trim();
-    }
-
-    public Byte getState() {
-        return state;
-    }
-
-    public void setState(Byte state) {
-        this.state = state;
-    }
-
-    public Byte getIsNeedCharge() {
-        return isNeedCharge;
-    }
-
-    public void setIsNeedCharge(Byte isNeedCharge) {
-        this.isNeedCharge = isNeedCharge;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getNoticeUrl() {
-        return noticeUrl;
-    }
-
-    public void setNoticeUrl(String noticeUrl) {
-        this.noticeUrl = noticeUrl == null ? null : noticeUrl.trim();
-    }
 }

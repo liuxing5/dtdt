@@ -1,73 +1,81 @@
 package com.asiainfo.dtdt.entity;
 
-public class Vcode {
-    private Long id;
+import java.io.Serializable;
 
-    private String orderId;
+import lombok.Data;
 
-    private String vcodeSendTime;
+@Data
+public class Vcode implements Serializable {
 
-    private String lvcode;
+	private static final long serialVersionUID = 1L;
 
-    private String userInputVcode;
+	private Long id;
 
-    private String userInputTime;
+	private String orderId;
 
-    private String vcodeValidResut;
+	private String vcodeSendTime;
 
-    public Long getId() {
-        return id;
-    }
+	private String lvcode;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	private String userInputVcode;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private String userInputTime;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	private String vcodeValidResut;
 
-    public String getVcodeSendTime() {
-        return vcodeSendTime;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setVcodeSendTime(String vcodeSendTime) {
-        this.vcodeSendTime = vcodeSendTime == null ? null : vcodeSendTime.trim();
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getLvcode() {
-        return lvcode;
-    }
+	public String getOrderId() {
+		return orderId;
+	}
 
-    public void setLvcode(String lvcode) {
-        this.lvcode = lvcode == null ? null : lvcode.trim();
-    }
+	public void setOrderId(String orderId) {
+		this.orderId = orderId == null ? null : orderId.trim();
+	}
 
-    public String getUserInputVcode() {
-        return userInputVcode;
-    }
+	public String getVcodeSendTime() {
+		return vcodeSendTime;
+	}
 
-    public void setUserInputVcode(String userInputVcode) {
-        this.userInputVcode = userInputVcode == null ? null : userInputVcode.trim();
-    }
+	public void setVcodeSendTime(String vcodeSendTime) {
+		this.vcodeSendTime = vcodeSendTime == null ? null : vcodeSendTime.trim();
+	}
 
-    public String getUserInputTime() {
-        return userInputTime;
-    }
+	public String getLvcode() {
+		return lvcode;
+	}
 
-    public void setUserInputTime(String userInputTime) {
-        this.userInputTime = userInputTime == null ? null : userInputTime.trim();
-    }
+	public void setLvcode(String lvcode) {
+		this.lvcode = lvcode == null ? null : lvcode.trim();
+	}
 
-    public String getVcodeValidResut() {
-        return vcodeValidResut;
-    }
+	public String getUserInputVcode() {
+		return userInputVcode;
+	}
 
-    public void setVcodeValidResut(String vcodeValidResut) {
-        this.vcodeValidResut = vcodeValidResut == null ? null : vcodeValidResut.trim();
-    }
+	public void setUserInputVcode(String userInputVcode) {
+		this.userInputVcode = userInputVcode == null ? null : userInputVcode.trim();
+	}
+
+	public String getUserInputTime() {
+		return userInputTime;
+	}
+
+	public void setUserInputTime(String userInputTime) {
+		this.userInputTime = userInputTime == null ? null : userInputTime.trim();
+	}
+
+	public String getVcodeValidResut() {
+		return vcodeValidResut;
+	}
+
+	public void setVcodeValidResut(String vcodeValidResut) {
+		this.vcodeValidResut = vcodeValidResut == null ? null : vcodeValidResut.trim();
+	}
 }

@@ -1,155 +1,162 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class HisCharge {
-    private String chargeId;
+import lombok.Data;
 
-    private String orderId;
+@Data
+public class HisCharge implements Serializable {
 
-    private String rechargeParentId;
+	private static final long serialVersionUID = 1L;
 
-    private String rechargePhoneNum;
+	private String chargeId;
 
-    private Integer rechargeMoney;
+	private String orderId;
 
-    private Date rechageTime;
+	private String rechargeParentId;
 
-    private Integer rechageNum;
+	private String rechargePhoneNum;
 
-    private String state;
+	private Integer rechargeMoney;
 
-    private String result;
+	private Date rechageTime;
 
-    private Date returnTime;
+	private Integer rechageNum;
 
-    private String chargeSysUsername;
+	private String state;
 
-    private String chargeSysPwd;
+	private String result;
 
-    private String remark;
+	private Date returnTime;
 
-    private Date copyTime;
+	private String chargeSysUsername;
 
-    private String copyRemark;
+	private String chargeSysPwd;
 
-    public String getChargeId() {
-        return chargeId;
-    }
+	private String remark;
 
-    public void setChargeId(String chargeId) {
-        this.chargeId = chargeId == null ? null : chargeId.trim();
-    }
+	private Date copyTime;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private String copyRemark;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	public String getChargeId() {
+		return chargeId;
+	}
 
-    public String getRechargeParentId() {
-        return rechargeParentId;
-    }
+	public void setChargeId(String chargeId) {
+		this.chargeId = chargeId == null ? null : chargeId.trim();
+	}
 
-    public void setRechargeParentId(String rechargeParentId) {
-        this.rechargeParentId = rechargeParentId == null ? null : rechargeParentId.trim();
-    }
+	public String getOrderId() {
+		return orderId;
+	}
 
-    public String getRechargePhoneNum() {
-        return rechargePhoneNum;
-    }
+	public void setOrderId(String orderId) {
+		this.orderId = orderId == null ? null : orderId.trim();
+	}
 
-    public void setRechargePhoneNum(String rechargePhoneNum) {
-        this.rechargePhoneNum = rechargePhoneNum == null ? null : rechargePhoneNum.trim();
-    }
+	public String getRechargeParentId() {
+		return rechargeParentId;
+	}
 
-    public Integer getRechargeMoney() {
-        return rechargeMoney;
-    }
+	public void setRechargeParentId(String rechargeParentId) {
+		this.rechargeParentId = rechargeParentId == null ? null : rechargeParentId.trim();
+	}
 
-    public void setRechargeMoney(Integer rechargeMoney) {
-        this.rechargeMoney = rechargeMoney;
-    }
+	public String getRechargePhoneNum() {
+		return rechargePhoneNum;
+	}
 
-    public Date getRechageTime() {
-        return rechageTime;
-    }
+	public void setRechargePhoneNum(String rechargePhoneNum) {
+		this.rechargePhoneNum = rechargePhoneNum == null ? null : rechargePhoneNum.trim();
+	}
 
-    public void setRechageTime(Date rechageTime) {
-        this.rechageTime = rechageTime;
-    }
+	public Integer getRechargeMoney() {
+		return rechargeMoney;
+	}
 
-    public Integer getRechageNum() {
-        return rechageNum;
-    }
+	public void setRechargeMoney(Integer rechargeMoney) {
+		this.rechargeMoney = rechargeMoney;
+	}
 
-    public void setRechageNum(Integer rechageNum) {
-        this.rechageNum = rechageNum;
-    }
+	public Date getRechageTime() {
+		return rechageTime;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public void setRechageTime(Date rechageTime) {
+		this.rechageTime = rechageTime;
+	}
 
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
+	public Integer getRechageNum() {
+		return rechageNum;
+	}
 
-    public String getResult() {
-        return result;
-    }
+	public void setRechageNum(Integer rechageNum) {
+		this.rechageNum = rechageNum;
+	}
 
-    public void setResult(String result) {
-        this.result = result == null ? null : result.trim();
-    }
+	public String getState() {
+		return state;
+	}
 
-    public Date getReturnTime() {
-        return returnTime;
-    }
+	public void setState(String state) {
+		this.state = state == null ? null : state.trim();
+	}
 
-    public void setReturnTime(Date returnTime) {
-        this.returnTime = returnTime;
-    }
+	public String getResult() {
+		return result;
+	}
 
-    public String getChargeSysUsername() {
-        return chargeSysUsername;
-    }
+	public void setResult(String result) {
+		this.result = result == null ? null : result.trim();
+	}
 
-    public void setChargeSysUsername(String chargeSysUsername) {
-        this.chargeSysUsername = chargeSysUsername == null ? null : chargeSysUsername.trim();
-    }
+	public Date getReturnTime() {
+		return returnTime;
+	}
 
-    public String getChargeSysPwd() {
-        return chargeSysPwd;
-    }
+	public void setReturnTime(Date returnTime) {
+		this.returnTime = returnTime;
+	}
 
-    public void setChargeSysPwd(String chargeSysPwd) {
-        this.chargeSysPwd = chargeSysPwd == null ? null : chargeSysPwd.trim();
-    }
+	public String getChargeSysUsername() {
+		return chargeSysUsername;
+	}
 
-    public String getRemark() {
-        return remark;
-    }
+	public void setChargeSysUsername(String chargeSysUsername) {
+		this.chargeSysUsername = chargeSysUsername == null ? null : chargeSysUsername.trim();
+	}
 
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
+	public String getChargeSysPwd() {
+		return chargeSysPwd;
+	}
 
-    public Date getCopyTime() {
-        return copyTime;
-    }
+	public void setChargeSysPwd(String chargeSysPwd) {
+		this.chargeSysPwd = chargeSysPwd == null ? null : chargeSysPwd.trim();
+	}
 
-    public void setCopyTime(Date copyTime) {
-        this.copyTime = copyTime;
-    }
+	public String getRemark() {
+		return remark;
+	}
 
-    public String getCopyRemark() {
-        return copyRemark;
-    }
+	public void setRemark(String remark) {
+		this.remark = remark == null ? null : remark.trim();
+	}
 
-    public void setCopyRemark(String copyRemark) {
-        this.copyRemark = copyRemark == null ? null : copyRemark.trim();
-    }
+	public Date getCopyTime() {
+		return copyTime;
+	}
+
+	public void setCopyTime(Date copyTime) {
+		this.copyTime = copyTime;
+	}
+
+	public String getCopyRemark() {
+		return copyRemark;
+	}
+
+	public void setCopyRemark(String copyRemark) {
+		this.copyRemark = copyRemark == null ? null : copyRemark.trim();
+	}
 }

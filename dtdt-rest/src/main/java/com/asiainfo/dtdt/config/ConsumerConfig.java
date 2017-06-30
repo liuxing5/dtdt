@@ -8,6 +8,8 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.asiainfo.dtdt.api.IAuthoService;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.interfaces.order.IOrderService;
+import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
 
 /**
  * 
@@ -44,6 +46,22 @@ public class ConsumerConfig {
         buildcommon(registryConfig, referenceBean);
         return referenceBean;
     }
+    
+    @Bean
+    public ReferenceBean<IOrderService> configIOrderServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IOrderService> referenceBean = new ReferenceBean<IOrderService>();
+        referenceBean.setInterface(IOrderService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
 
+    @Bean
+    public ReferenceBean<IQueryOrderService> configIQueryOrderServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IQueryOrderService> referenceBean = new ReferenceBean<IQueryOrderService>();
+        referenceBean.setInterface(IQueryOrderService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
 }
 

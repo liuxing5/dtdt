@@ -1,10 +1,15 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.asiainfo.dtdt.entity.OrderRecord;
 
 public interface OrderRecordMapper {
+	
+	OrderRecord selectByPrimaryKey(String orderId);
+	
 	/**
 	* @Title: OrderRecordMapper 
 	* @Description: (删除订购关系信息) 
@@ -41,4 +46,13 @@ public interface OrderRecordMapper {
     * @throws
      */
     int updateOrderRecord(OrderRecord record);
+    
+    /**
+     * @Title: queryOrderRecord 
+     * @Description: 查询订购信息服务
+     * @param phone
+     * @return List<OrderRecord>
+     * @throws
+      */
+ 	List<OrderRecord> queryOrderRecord(String phone);
 }

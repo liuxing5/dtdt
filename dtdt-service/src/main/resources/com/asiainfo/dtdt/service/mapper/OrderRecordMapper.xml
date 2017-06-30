@@ -34,6 +34,12 @@
     oper_source, allow_auto_pay, wo_order, remark, refund_valid_time, refund_time, valid_time, 
     invalid_time, update_time, create_time,redirect_url
   </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_order_record
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
   <select id="queryOrderRecordByParam" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     *
@@ -45,6 +51,15 @@
     <if test="mobilephone != null and mobilephone != ''">
     and mobilephone  = #{mobilephone}
     </if>
+  </select>
+  </select>
+  <!-- 查询订购信息服务 -->
+  <select id="queryOrderRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    	app_key,partner_order_id,cycle_type2,product_code,mobilephone,order_channel,
+    	price,count,money,valid_time,invalid_time
+    from t_s_order_record
+    where mobilephone = #{mobilephone,jdbcType=VARCHAR}
   </select>
   <delete id="deleteOrderRecord" parameterType="java.lang.String" >
     delete from t_s_order_record

@@ -1,255 +1,63 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class OrderRecord {
-    private String orderId;
+import lombok.Data;
 
-    private String parentOrderId;
+@Data
+public class OrderRecord implements Serializable {
 
-    private String partnerCode;
+	private static final long serialVersionUID = 1L;
 
-    private String appKey;
+	private String orderId;
 
-    private String partnerOrderId;
+	private String parentOrderId;
 
-    private Byte cycleType2;
+	private String partnerCode;
 
-    private String productCode;
+	private String appKey;
 
-    private String state;
+	private String partnerOrderId;
 
-    private String mobilephone;
+	private Byte cycleType2;
 
-    private String orderChannel;
+	private String productCode;
 
-    private Integer price;
+	private String state;
 
-    private Integer count;
+	private String mobilephone;
 
-    private Long money;
+	private String orderChannel;
 
-    private Byte isNeedCharge;
+	private Integer price;
 
-    private Byte operSource;
+	private Integer count;
 
-    private Byte allowAutoPay;
+	private Long money;
 
-    private Byte woOrder;
+	private Byte isNeedCharge;
 
-    private String remark;
+	private Byte operSource;
 
-    private Date refundValidTime;
+	private Byte allowAutoPay;
 
-    private Date refundTime;
+	private Byte woOrder;
 
-    private Date validTime;
+	private String remark;
 
-    private Date invalidTime;
+	private Date refundValidTime;
 
-    private Date updateTime;
+	private Date refundTime;
 
-    private Date createTime;
-    
-    private String redirectUrl;
+	private Date validTime;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private Date invalidTime;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	private Date updateTime;
 
-    public String getParentOrderId() {
-        return parentOrderId;
-    }
+	private Date createTime;
 
-    public void setParentOrderId(String parentOrderId) {
-        this.parentOrderId = parentOrderId == null ? null : parentOrderId.trim();
-    }
+	private String redirectUrl;
 
-    public String getPartnerCode() {
-        return partnerCode;
-    }
-
-    public void setPartnerCode(String partnerCode) {
-        this.partnerCode = partnerCode == null ? null : partnerCode.trim();
-    }
-
-    public String getAppKey() {
-        return appKey;
-    }
-
-    public void setAppKey(String appKey) {
-        this.appKey = appKey == null ? null : appKey.trim();
-    }
-
-    public String getPartnerOrderId() {
-        return partnerOrderId;
-    }
-
-    public void setPartnerOrderId(String partnerOrderId) {
-        this.partnerOrderId = partnerOrderId == null ? null : partnerOrderId.trim();
-    }
-
-    public Byte getCycleType2() {
-        return cycleType2;
-    }
-
-    public void setCycleType2(Byte cycleType2) {
-        this.cycleType2 = cycleType2;
-    }
-
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode == null ? null : productCode.trim();
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
-
-    public String getMobilephone() {
-        return mobilephone;
-    }
-
-    public void setMobilephone(String mobilephone) {
-        this.mobilephone = mobilephone == null ? null : mobilephone.trim();
-    }
-
-    public String getOrderChannel() {
-        return orderChannel;
-    }
-
-    public void setOrderChannel(String orderChannel) {
-        this.orderChannel = orderChannel == null ? null : orderChannel.trim();
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Long getMoney() {
-        return money;
-    }
-
-    public void setMoney(Long money) {
-        this.money = money;
-    }
-
-    public Byte getIsNeedCharge() {
-        return isNeedCharge;
-    }
-
-    public void setIsNeedCharge(Byte isNeedCharge) {
-        this.isNeedCharge = isNeedCharge;
-    }
-
-    public Byte getOperSource() {
-        return operSource;
-    }
-
-    public void setOperSource(Byte operSource) {
-        this.operSource = operSource;
-    }
-
-    public Byte getAllowAutoPay() {
-        return allowAutoPay;
-    }
-
-    public void setAllowAutoPay(Byte allowAutoPay) {
-        this.allowAutoPay = allowAutoPay;
-    }
-
-    public Byte getWoOrder() {
-        return woOrder;
-    }
-
-    public void setWoOrder(Byte woOrder) {
-        this.woOrder = woOrder;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getRefundValidTime() {
-        return refundValidTime;
-    }
-
-    public void setRefundValidTime(Date refundValidTime) {
-        this.refundValidTime = refundValidTime;
-    }
-
-    public Date getRefundTime() {
-        return refundTime;
-    }
-
-    public void setRefundTime(Date refundTime) {
-        this.refundTime = refundTime;
-    }
-
-    public Date getValidTime() {
-        return validTime;
-    }
-
-    public void setValidTime(Date validTime) {
-        this.validTime = validTime;
-    }
-
-    public Date getInvalidTime() {
-        return invalidTime;
-    }
-
-    public void setInvalidTime(Date invalidTime) {
-        this.invalidTime = invalidTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-	public String getRedirectUrl() {
-		return redirectUrl;
-	}
-
-	public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
-	}
 }

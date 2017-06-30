@@ -1,135 +1,40 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Charge {
-    private String chargeId;
+import lombok.Data;
 
-    private String orderId;
 
-    private String rechargeParentId;
+@Data
+public class Charge implements Serializable {
 
-    private String rechargePhoneNum;
+	private static final long serialVersionUID = 1L;
 
-    private Integer rechargeMoney;
+	private String chargeId;
 
-    private Date rechageTime;
+	private String orderId;
 
-    private Integer rechageNum;
+	private String rechargeParentId;
 
-    private String state;
+	private String rechargePhoneNum;
 
-    private String result;
+	private Integer rechargeMoney;
 
-    private Date returnTime;
+	private Date rechageTime;
 
-    private String chargeSysUsername;
+	private Integer rechageNum;
 
-    private String chargeSysPwd;
+	private String state;
 
-    private String remark;
+	private String result;
 
-    public String getChargeId() {
-        return chargeId;
-    }
+	private Date returnTime;
 
-    public void setChargeId(String chargeId) {
-        this.chargeId = chargeId == null ? null : chargeId.trim();
-    }
+	private String chargeSysUsername;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private String chargeSysPwd;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	private String remark;
 
-    public String getRechargeParentId() {
-        return rechargeParentId;
-    }
-
-    public void setRechargeParentId(String rechargeParentId) {
-        this.rechargeParentId = rechargeParentId == null ? null : rechargeParentId.trim();
-    }
-
-    public String getRechargePhoneNum() {
-        return rechargePhoneNum;
-    }
-
-    public void setRechargePhoneNum(String rechargePhoneNum) {
-        this.rechargePhoneNum = rechargePhoneNum == null ? null : rechargePhoneNum.trim();
-    }
-
-    public Integer getRechargeMoney() {
-        return rechargeMoney;
-    }
-
-    public void setRechargeMoney(Integer rechargeMoney) {
-        this.rechargeMoney = rechargeMoney;
-    }
-
-    public Date getRechageTime() {
-        return rechageTime;
-    }
-
-    public void setRechageTime(Date rechageTime) {
-        this.rechageTime = rechageTime;
-    }
-
-    public Integer getRechageNum() {
-        return rechageNum;
-    }
-
-    public void setRechageNum(Integer rechageNum) {
-        this.rechageNum = rechageNum;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result == null ? null : result.trim();
-    }
-
-    public Date getReturnTime() {
-        return returnTime;
-    }
-
-    public void setReturnTime(Date returnTime) {
-        this.returnTime = returnTime;
-    }
-
-    public String getChargeSysUsername() {
-        return chargeSysUsername;
-    }
-
-    public void setChargeSysUsername(String chargeSysUsername) {
-        this.chargeSysUsername = chargeSysUsername == null ? null : chargeSysUsername.trim();
-    }
-
-    public String getChargeSysPwd() {
-        return chargeSysPwd;
-    }
-
-    public void setChargeSysPwd(String chargeSysPwd) {
-        this.chargeSysPwd = chargeSysPwd == null ? null : chargeSysPwd.trim();
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
 }

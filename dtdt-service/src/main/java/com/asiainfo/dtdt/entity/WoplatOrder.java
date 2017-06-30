@@ -1,195 +1,202 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class WoplatOrder {
-    private String orderId;
+import lombok.Data;
 
-    private String woOrderId;
+@Data
+public class WoplatOrder implements Serializable {
 
-    private String partnerCode;
+	private static final long serialVersionUID = 1L;
 
-    private String appKey;
+	private String orderId;
 
-    private String partnerOrderId;
+	private String woOrderId;
 
-    private String productCode;
+	private String partnerCode;
 
-    private String state;
+	private String appKey;
 
-    private String mobilephone;
+	private String partnerOrderId;
 
-    private String orderChannel;
+	private String productCode;
 
-    private Date createTime;
+	private String state;
 
-    private Date updateTime;
+	private String mobilephone;
 
-    private Date validTime;
+	private String orderChannel;
 
-    private Date invalidTime;
+	private Date createTime;
 
-    private Integer price;
+	private Date updateTime;
 
-    private Integer count;
+	private Date validTime;
 
-    private Long money;
+	private Date invalidTime;
 
-    private Byte isNeedCharge;
+	private Integer price;
 
-    private Byte chargeType;
+	private Integer count;
 
-    private String remark;
+	private Long money;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private Byte isNeedCharge;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	private Byte chargeType;
 
-    public String getWoOrderId() {
-        return woOrderId;
-    }
+	private String remark;
 
-    public void setWoOrderId(String woOrderId) {
-        this.woOrderId = woOrderId == null ? null : woOrderId.trim();
-    }
+	public String getOrderId() {
+		return orderId;
+	}
 
-    public String getPartnerCode() {
-        return partnerCode;
-    }
+	public void setOrderId(String orderId) {
+		this.orderId = orderId == null ? null : orderId.trim();
+	}
 
-    public void setPartnerCode(String partnerCode) {
-        this.partnerCode = partnerCode == null ? null : partnerCode.trim();
-    }
+	public String getWoOrderId() {
+		return woOrderId;
+	}
 
-    public String getAppKey() {
-        return appKey;
-    }
+	public void setWoOrderId(String woOrderId) {
+		this.woOrderId = woOrderId == null ? null : woOrderId.trim();
+	}
 
-    public void setAppKey(String appKey) {
-        this.appKey = appKey == null ? null : appKey.trim();
-    }
+	public String getPartnerCode() {
+		return partnerCode;
+	}
 
-    public String getPartnerOrderId() {
-        return partnerOrderId;
-    }
+	public void setPartnerCode(String partnerCode) {
+		this.partnerCode = partnerCode == null ? null : partnerCode.trim();
+	}
 
-    public void setPartnerOrderId(String partnerOrderId) {
-        this.partnerOrderId = partnerOrderId == null ? null : partnerOrderId.trim();
-    }
+	public String getAppKey() {
+		return appKey;
+	}
 
-    public String getProductCode() {
-        return productCode;
-    }
+	public void setAppKey(String appKey) {
+		this.appKey = appKey == null ? null : appKey.trim();
+	}
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode == null ? null : productCode.trim();
-    }
+	public String getPartnerOrderId() {
+		return partnerOrderId;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public void setPartnerOrderId(String partnerOrderId) {
+		this.partnerOrderId = partnerOrderId == null ? null : partnerOrderId.trim();
+	}
 
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
+	public String getProductCode() {
+		return productCode;
+	}
 
-    public String getMobilephone() {
-        return mobilephone;
-    }
+	public void setProductCode(String productCode) {
+		this.productCode = productCode == null ? null : productCode.trim();
+	}
 
-    public void setMobilephone(String mobilephone) {
-        this.mobilephone = mobilephone == null ? null : mobilephone.trim();
-    }
+	public String getState() {
+		return state;
+	}
 
-    public String getOrderChannel() {
-        return orderChannel;
-    }
+	public void setState(String state) {
+		this.state = state == null ? null : state.trim();
+	}
 
-    public void setOrderChannel(String orderChannel) {
-        this.orderChannel = orderChannel == null ? null : orderChannel.trim();
-    }
+	public String getMobilephone() {
+		return mobilephone;
+	}
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+	public void setMobilephone(String mobilephone) {
+		this.mobilephone = mobilephone == null ? null : mobilephone.trim();
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public String getOrderChannel() {
+		return orderChannel;
+	}
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
+	public void setOrderChannel(String orderChannel) {
+		this.orderChannel = orderChannel == null ? null : orderChannel.trim();
+	}
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
+	public Date getCreateTime() {
+		return createTime;
+	}
 
-    public Date getValidTime() {
-        return validTime;
-    }
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 
-    public void setValidTime(Date validTime) {
-        this.validTime = validTime;
-    }
+	public Date getUpdateTime() {
+		return updateTime;
+	}
 
-    public Date getInvalidTime() {
-        return invalidTime;
-    }
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
 
-    public void setInvalidTime(Date invalidTime) {
-        this.invalidTime = invalidTime;
-    }
+	public Date getValidTime() {
+		return validTime;
+	}
 
-    public Integer getPrice() {
-        return price;
-    }
+	public void setValidTime(Date validTime) {
+		this.validTime = validTime;
+	}
 
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
+	public Date getInvalidTime() {
+		return invalidTime;
+	}
 
-    public Integer getCount() {
-        return count;
-    }
+	public void setInvalidTime(Date invalidTime) {
+		this.invalidTime = invalidTime;
+	}
 
-    public void setCount(Integer count) {
-        this.count = count;
-    }
+	public Integer getPrice() {
+		return price;
+	}
 
-    public Long getMoney() {
-        return money;
-    }
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
 
-    public void setMoney(Long money) {
-        this.money = money;
-    }
+	public Integer getCount() {
+		return count;
+	}
 
-    public Byte getIsNeedCharge() {
-        return isNeedCharge;
-    }
+	public void setCount(Integer count) {
+		this.count = count;
+	}
 
-    public void setIsNeedCharge(Byte isNeedCharge) {
-        this.isNeedCharge = isNeedCharge;
-    }
+	public Long getMoney() {
+		return money;
+	}
 
-    public Byte getChargeType() {
-        return chargeType;
-    }
+	public void setMoney(Long money) {
+		this.money = money;
+	}
 
-    public void setChargeType(Byte chargeType) {
-        this.chargeType = chargeType;
-    }
+	public Byte getIsNeedCharge() {
+		return isNeedCharge;
+	}
 
-    public String getRemark() {
-        return remark;
-    }
+	public void setIsNeedCharge(Byte isNeedCharge) {
+		this.isNeedCharge = isNeedCharge;
+	}
 
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
+	public Byte getChargeType() {
+		return chargeType;
+	}
+
+	public void setChargeType(Byte chargeType) {
+		this.chargeType = chargeType;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark == null ? null : remark.trim();
+	}
 }

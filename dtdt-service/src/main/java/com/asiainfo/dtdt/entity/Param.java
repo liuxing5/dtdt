@@ -1,65 +1,72 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Param {
-    private String paramCode;
+import lombok.Data;
 
-    private String paramValue;
+@Data
+public class Param implements Serializable {
 
-    private String parentCode;
+	private static final long serialVersionUID = 1L;
 
-    private Integer status;
+	private String paramCode;
 
-    private Date createTime;
+	private String paramValue;
 
-    private String remark;
+	private String parentCode;
 
-    public String getParamCode() {
-        return paramCode;
-    }
+	private Integer status;
 
-    public void setParamCode(String paramCode) {
-        this.paramCode = paramCode == null ? null : paramCode.trim();
-    }
+	private Date createTime;
 
-    public String getParamValue() {
-        return paramValue;
-    }
+	private String remark;
 
-    public void setParamValue(String paramValue) {
-        this.paramValue = paramValue == null ? null : paramValue.trim();
-    }
+	public String getParamCode() {
+		return paramCode;
+	}
 
-    public String getParentCode() {
-        return parentCode;
-    }
+	public void setParamCode(String paramCode) {
+		this.paramCode = paramCode == null ? null : paramCode.trim();
+	}
 
-    public void setParentCode(String parentCode) {
-        this.parentCode = parentCode == null ? null : parentCode.trim();
-    }
+	public String getParamValue() {
+		return paramValue;
+	}
 
-    public Integer getStatus() {
-        return status;
-    }
+	public void setParamValue(String paramValue) {
+		this.paramValue = paramValue == null ? null : paramValue.trim();
+	}
 
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
+	public String getParentCode() {
+		return parentCode;
+	}
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+	public void setParentCode(String parentCode) {
+		this.parentCode = parentCode == null ? null : parentCode.trim();
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public Integer getStatus() {
+		return status;
+	}
 
-    public String getRemark() {
-        return remark;
-    }
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark == null ? null : remark.trim();
+	}
 }

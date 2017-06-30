@@ -35,6 +35,12 @@
     update_time, valid_time, invalid_time, price, count, money, is_need_charge, charge_type, 
     remark, copy_time2, copy_type, copy_remark , allow_auto_pay,redirect_url
   </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_his_order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
   <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.HisOrder" >
     insert into t_s_his_order
     <trim prefix="(" suffix=")" suffixOverrides="," >

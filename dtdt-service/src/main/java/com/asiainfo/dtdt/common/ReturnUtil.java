@@ -1,9 +1,7 @@
 package com.asiainfo.dtdt.common;
 
-import java.util.Date;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -11,11 +9,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class ReturnUtil {
 	
-//	public static JsonConfig jsonConfig = new JsonConfig();
-//	
-//	static void initDate(){
-//		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd HH:mm:ss"));
-//	}
+	//JSON.toJSONStringWithDateFormat(new Date(), "yyyy-MM-dd HH:mm:ss")
 	
 	/**
 	* @Title: returnJsonError 
@@ -72,6 +66,29 @@ public class ReturnUtil {
 	}
 	
 	/**
+	* @Title: returnJson 
+	* @Description: returnJson 统一返回给APP端的数据：适用于返回错误提示，data为list
+	* @param code
+	* @param msg
+	* @return String
+	* @throws
+	 */
+	public static String returnJsonList(Object code, String msg, List<?> list)
+	{
+		JSONObject json = new JSONObject();
+		json.put("code", code);
+		json.put("msg", msg);
+		if (null == list)
+		{
+			json.put("data", "");
+		}else{
+			json.put("data", list);
+		}
+		
+		return json.toString();
+	}
+    
+	/**
 	* @Title: returnJsonObj 
 	* @Description: returnJsonObj 统一返回给APP端的数据：适用于返回错误提示，data为对象
 	* @param code
@@ -83,7 +100,6 @@ public class ReturnUtil {
 	@SuppressWarnings("static-access")
 	public static String returnJsonObj(Object code, String msg, Object obj)
 	{
-//		initDate();
 		JSONObject json = new JSONObject();
 		if(Constant.SUCCESS_CODE.equals(code)){
 			json.put("code", code);
@@ -96,36 +112,9 @@ public class ReturnUtil {
 		{
 			json.put("data", "");
 		}else{
-//			json.put("data", json.fromObject(obj, jsonConfig));
+			json.put("data", json.toJSON(obj));
 		}
 		return json.toString();
 	}
 	
-	
-	/**
-	* @Title: returnJson 
-	* @Description: returnJson 统一返回给APP端的数据：适用于返回错误提示，data为list
-	* @param code
-	* @param msg
-	* @return String
-	* @throws
-	 */
-	@SuppressWarnings("static-access")
-	public static String returnJsonList(Integer code, String msg, List<?> list)
-	{
-//		initDate();
-		JSONObject json = new JSONObject();
-		json.put("code", code);
-		json.put("msg", msg);
-		JSONArray jsonArray = new JSONArray();
-		if (null == list)
-		{
-			json.put("data", "");
-		}else{
-//			json.put("data", jsonArray.fromObject(list, jsonConfig));
-		}
-		
-		return json.toString();
-	}
-    
 }

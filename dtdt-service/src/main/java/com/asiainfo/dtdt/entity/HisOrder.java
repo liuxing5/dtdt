@@ -1,266 +1,65 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class HisOrder {
-    private String orderId;
+import lombok.Data;
 
-    private String woOrderId;
+@Data
+public class HisOrder implements Serializable {
 
-    private String partnerCode;
+	private static final long serialVersionUID = 1L;
 
-    private String appKey;
+	private String orderId;
 
-    private String partnerOrderId;
+	private String woOrderId;
 
-    private String productCode;
+	private String partnerCode;
 
-    private Byte operType;
+	private String appKey;
 
-    private String refundOrderId;
+	private String partnerOrderId;
 
-    private Byte isRealRequestWoplat;
+	private String productCode;
 
-    private String state;
+	private Byte operType;
 
-    private String mobilephone;
+	private String refundOrderId;
 
-    private String orderChannel;
+	private Byte isRealRequestWoplat;
 
-    private Date createTime;
+	private String state;
 
-    private Date updateTime;
+	private String mobilephone;
 
-    private Date validTime;
+	private String orderChannel;
 
-    private Date invalidTime;
+	private Date createTime;
 
-    private Integer price;
+	private Date updateTime;
 
-    private Integer count;
+	private Date validTime;
 
-    private Long money;
+	private Date invalidTime;
 
-    private Byte isNeedCharge;
+	private Integer price;
 
-    private Byte chargeType;
+	private Integer count;
 
-    private String remark;
+	private Long money;
 
-    private Date copyTime2;
+	private Byte isNeedCharge;
 
-    private Byte copyType;
+	private Byte chargeType;
 
-    private String copyRemark;
-    
-    private String redirectUrl;
+	private String remark;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private Date copyTime2;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	private Byte copyType;
 
-    public String getWoOrderId() {
-        return woOrderId;
-    }
+	private String copyRemark;
 
-    public void setWoOrderId(String woOrderId) {
-        this.woOrderId = woOrderId == null ? null : woOrderId.trim();
-    }
+	private String redirectUrl;
 
-    public String getPartnerCode() {
-        return partnerCode;
-    }
-
-    public void setPartnerCode(String partnerCode) {
-        this.partnerCode = partnerCode == null ? null : partnerCode.trim();
-    }
-
-    public String getAppKey() {
-        return appKey;
-    }
-
-    public void setAppKey(String appKey) {
-        this.appKey = appKey == null ? null : appKey.trim();
-    }
-
-    public String getPartnerOrderId() {
-        return partnerOrderId;
-    }
-
-    public void setPartnerOrderId(String partnerOrderId) {
-        this.partnerOrderId = partnerOrderId == null ? null : partnerOrderId.trim();
-    }
-
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode == null ? null : productCode.trim();
-    }
-
-    public Byte getOperType() {
-        return operType;
-    }
-
-    public void setOperType(Byte operType) {
-        this.operType = operType;
-    }
-
-    public String getRefundOrderId() {
-        return refundOrderId;
-    }
-
-    public void setRefundOrderId(String refundOrderId) {
-        this.refundOrderId = refundOrderId == null ? null : refundOrderId.trim();
-    }
-
-    public Byte getIsRealRequestWoplat() {
-        return isRealRequestWoplat;
-    }
-
-    public void setIsRealRequestWoplat(Byte isRealRequestWoplat) {
-        this.isRealRequestWoplat = isRealRequestWoplat;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
-
-    public String getMobilephone() {
-        return mobilephone;
-    }
-
-    public void setMobilephone(String mobilephone) {
-        this.mobilephone = mobilephone == null ? null : mobilephone.trim();
-    }
-
-    public String getOrderChannel() {
-        return orderChannel;
-    }
-
-    public void setOrderChannel(String orderChannel) {
-        this.orderChannel = orderChannel == null ? null : orderChannel.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Date getValidTime() {
-        return validTime;
-    }
-
-    public void setValidTime(Date validTime) {
-        this.validTime = validTime;
-    }
-
-    public Date getInvalidTime() {
-        return invalidTime;
-    }
-
-    public void setInvalidTime(Date invalidTime) {
-        this.invalidTime = invalidTime;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public Long getMoney() {
-        return money;
-    }
-
-    public void setMoney(Long money) {
-        this.money = money;
-    }
-
-    public Byte getIsNeedCharge() {
-        return isNeedCharge;
-    }
-
-    public void setIsNeedCharge(Byte isNeedCharge) {
-        this.isNeedCharge = isNeedCharge;
-    }
-
-    public Byte getChargeType() {
-        return chargeType;
-    }
-
-    public void setChargeType(Byte chargeType) {
-        this.chargeType = chargeType;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getCopyTime2() {
-        return copyTime2;
-    }
-
-    public void setCopyTime2(Date copyTime2) {
-        this.copyTime2 = copyTime2;
-    }
-
-    public Byte getCopyType() {
-        return copyType;
-    }
-
-    public void setCopyType(Byte copyType) {
-        this.copyType = copyType;
-    }
-
-    public String getCopyRemark() {
-        return copyRemark;
-    }
-
-    public void setCopyRemark(String copyRemark) {
-        this.copyRemark = copyRemark == null ? null : copyRemark.trim();
-    }
-
-	public String getRedirectUrl() {
-		return redirectUrl;
-	}
-
-	public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
-	}
-    
 }

@@ -1,105 +1,112 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Partner {
-    private Long partnerId;
+import lombok.Data;
 
-    private String partnerCode;
+@Data
+public class Partner implements Serializable {
 
-    private String partnerName;
+	private static final long serialVersionUID = 1L;
 
-    private Byte state;
+	private Long partnerId;
 
-    private String contacts;
+	private String partnerCode;
 
-    private String telephone;
+	private String partnerName;
 
-    private String mobilephone;
+	private Byte state;
 
-    private String address;
+	private String contacts;
 
-    private Date createTime;
+	private String telephone;
 
-    private Date updateTime;
+	private String mobilephone;
 
-    public Long getPartnerId() {
-        return partnerId;
-    }
+	private String address;
 
-    public void setPartnerId(Long partnerId) {
-        this.partnerId = partnerId;
-    }
+	private Date createTime;
 
-    public String getPartnerCode() {
-        return partnerCode;
-    }
+	private Date updateTime;
 
-    public void setPartnerCode(String partnerCode) {
-        this.partnerCode = partnerCode == null ? null : partnerCode.trim();
-    }
+	public Long getPartnerId() {
+		return partnerId;
+	}
 
-    public String getPartnerName() {
-        return partnerName;
-    }
+	public void setPartnerId(Long partnerId) {
+		this.partnerId = partnerId;
+	}
 
-    public void setPartnerName(String partnerName) {
-        this.partnerName = partnerName == null ? null : partnerName.trim();
-    }
+	public String getPartnerCode() {
+		return partnerCode;
+	}
 
-    public Byte getState() {
-        return state;
-    }
+	public void setPartnerCode(String partnerCode) {
+		this.partnerCode = partnerCode == null ? null : partnerCode.trim();
+	}
 
-    public void setState(Byte state) {
-        this.state = state;
-    }
+	public String getPartnerName() {
+		return partnerName;
+	}
 
-    public String getContacts() {
-        return contacts;
-    }
+	public void setPartnerName(String partnerName) {
+		this.partnerName = partnerName == null ? null : partnerName.trim();
+	}
 
-    public void setContacts(String contacts) {
-        this.contacts = contacts == null ? null : contacts.trim();
-    }
+	public Byte getState() {
+		return state;
+	}
 
-    public String getTelephone() {
-        return telephone;
-    }
+	public void setState(Byte state) {
+		this.state = state;
+	}
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone == null ? null : telephone.trim();
-    }
+	public String getContacts() {
+		return contacts;
+	}
 
-    public String getMobilephone() {
-        return mobilephone;
-    }
+	public void setContacts(String contacts) {
+		this.contacts = contacts == null ? null : contacts.trim();
+	}
 
-    public void setMobilephone(String mobilephone) {
-        this.mobilephone = mobilephone == null ? null : mobilephone.trim();
-    }
+	public String getTelephone() {
+		return telephone;
+	}
 
-    public String getAddress() {
-        return address;
-    }
+	public void setTelephone(String telephone) {
+		this.telephone = telephone == null ? null : telephone.trim();
+	}
 
-    public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
-    }
+	public String getMobilephone() {
+		return mobilephone;
+	}
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+	public void setMobilephone(String mobilephone) {
+		this.mobilephone = mobilephone == null ? null : mobilephone.trim();
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public String getAddress() {
+		return address;
+	}
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
+	public void setAddress(String address) {
+		this.address = address == null ? null : address.trim();
+	}
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
 }

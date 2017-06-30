@@ -1,7 +1,5 @@
 package com.asiainfo.dtdt.controller;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,7 @@ import com.asiainfo.dtdt.interfaces.IProductService;
  * @author liuixng5
  */
 @Controller
-@RequestMapping(value="/product", method=RequestMethod.POST)
+@RequestMapping(value="/product", method=RequestMethod.GET)
 public class ProductController {
 	
 	private static final Logger logger = Logger.getLogger(ProductController.class);
@@ -22,11 +20,16 @@ public class ProductController {
 	@Autowired
 	private IProductService productService;
 	
-	@SuppressWarnings("rawtypes")
+	/**
+	* @Title: getProductList 
+	* @Description: 查询可订购产品列表服务
+	* @return String
+	* @throws
+	 */
 	@RequestMapping(value="/getProductList", produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public List getProductList() {
-		logger.info("ProductController getProductList() partnerCode=");
+	public String getProductList() {
+		logger.info("ProductController getProductList()");
 		return productService.getProductList();
 	}
 }

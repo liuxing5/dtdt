@@ -1,165 +1,172 @@
 package com.asiainfo.dtdt.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Payorder {
-    private String payId;
+import lombok.Data;
 
-    private String orderId;
+@Data
+public class Payorder implements Serializable {
 
-    private String payAccount;
+	private static final long serialVersionUID = 1L;
 
-    private Long payMoney;
+	private String payId;
 
-    private String payType;
+	private String orderId;
 
-    private Byte operType;
+	private String payAccount;
 
-    private String state;
+	private Long payMoney;
 
-    private Long originRefoundMoney;
+	private String payType;
 
-    private Date originRefoundTime;
+	private Byte operType;
 
-    private Date manMadeRefoundTime;
+	private String state;
 
-    private String manMadeRefoundType;
+	private Long originRefoundMoney;
 
-    private Date accountDay;
+	private Date originRefoundTime;
 
-    private String prePayId;
+	private Date manMadeRefoundTime;
 
-    private String thirdPayId;
+	private String manMadeRefoundType;
 
-    private Date updateTime;
+	private Date accountDay;
 
-    private Date createTime;
+	private String prePayId;
 
-    public String getPayId() {
-        return payId;
-    }
+	private String thirdPayId;
 
-    public void setPayId(String payId) {
-        this.payId = payId == null ? null : payId.trim();
-    }
+	private Date updateTime;
 
-    public String getOrderId() {
-        return orderId;
-    }
+	private Date createTime;
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
+	public String getPayId() {
+		return payId;
+	}
 
-    public String getPayAccount() {
-        return payAccount;
-    }
+	public void setPayId(String payId) {
+		this.payId = payId == null ? null : payId.trim();
+	}
 
-    public void setPayAccount(String payAccount) {
-        this.payAccount = payAccount == null ? null : payAccount.trim();
-    }
+	public String getOrderId() {
+		return orderId;
+	}
 
-    public Long getPayMoney() {
-        return payMoney;
-    }
+	public void setOrderId(String orderId) {
+		this.orderId = orderId == null ? null : orderId.trim();
+	}
 
-    public void setPayMoney(Long payMoney) {
-        this.payMoney = payMoney;
-    }
+	public String getPayAccount() {
+		return payAccount;
+	}
 
-    public String getPayType() {
-        return payType;
-    }
+	public void setPayAccount(String payAccount) {
+		this.payAccount = payAccount == null ? null : payAccount.trim();
+	}
 
-    public void setPayType(String payType) {
-        this.payType = payType == null ? null : payType.trim();
-    }
+	public Long getPayMoney() {
+		return payMoney;
+	}
 
-    public Byte getOperType() {
-        return operType;
-    }
+	public void setPayMoney(Long payMoney) {
+		this.payMoney = payMoney;
+	}
 
-    public void setOperType(Byte operType) {
-        this.operType = operType;
-    }
+	public String getPayType() {
+		return payType;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public void setPayType(String payType) {
+		this.payType = payType == null ? null : payType.trim();
+	}
 
-    public void setState(String state) {
-        this.state = state == null ? null : state.trim();
-    }
+	public Byte getOperType() {
+		return operType;
+	}
 
-    public Long getOriginRefoundMoney() {
-        return originRefoundMoney;
-    }
+	public void setOperType(Byte operType) {
+		this.operType = operType;
+	}
 
-    public void setOriginRefoundMoney(Long originRefoundMoney) {
-        this.originRefoundMoney = originRefoundMoney;
-    }
+	public String getState() {
+		return state;
+	}
 
-    public Date getOriginRefoundTime() {
-        return originRefoundTime;
-    }
+	public void setState(String state) {
+		this.state = state == null ? null : state.trim();
+	}
 
-    public void setOriginRefoundTime(Date originRefoundTime) {
-        this.originRefoundTime = originRefoundTime;
-    }
+	public Long getOriginRefoundMoney() {
+		return originRefoundMoney;
+	}
 
-    public Date getManMadeRefoundTime() {
-        return manMadeRefoundTime;
-    }
+	public void setOriginRefoundMoney(Long originRefoundMoney) {
+		this.originRefoundMoney = originRefoundMoney;
+	}
 
-    public void setManMadeRefoundTime(Date manMadeRefoundTime) {
-        this.manMadeRefoundTime = manMadeRefoundTime;
-    }
+	public Date getOriginRefoundTime() {
+		return originRefoundTime;
+	}
 
-    public String getManMadeRefoundType() {
-        return manMadeRefoundType;
-    }
+	public void setOriginRefoundTime(Date originRefoundTime) {
+		this.originRefoundTime = originRefoundTime;
+	}
 
-    public void setManMadeRefoundType(String manMadeRefoundType) {
-        this.manMadeRefoundType = manMadeRefoundType == null ? null : manMadeRefoundType.trim();
-    }
+	public Date getManMadeRefoundTime() {
+		return manMadeRefoundTime;
+	}
 
-    public Date getAccountDay() {
-        return accountDay;
-    }
+	public void setManMadeRefoundTime(Date manMadeRefoundTime) {
+		this.manMadeRefoundTime = manMadeRefoundTime;
+	}
 
-    public void setAccountDay(Date accountDay) {
-        this.accountDay = accountDay;
-    }
+	public String getManMadeRefoundType() {
+		return manMadeRefoundType;
+	}
 
-    public String getPrePayId() {
-        return prePayId;
-    }
+	public void setManMadeRefoundType(String manMadeRefoundType) {
+		this.manMadeRefoundType = manMadeRefoundType == null ? null : manMadeRefoundType.trim();
+	}
 
-    public void setPrePayId(String prePayId) {
-        this.prePayId = prePayId == null ? null : prePayId.trim();
-    }
+	public Date getAccountDay() {
+		return accountDay;
+	}
 
-    public String getThirdPayId() {
-        return thirdPayId;
-    }
+	public void setAccountDay(Date accountDay) {
+		this.accountDay = accountDay;
+	}
 
-    public void setThirdPayId(String thirdPayId) {
-        this.thirdPayId = thirdPayId == null ? null : thirdPayId.trim();
-    }
+	public String getPrePayId() {
+		return prePayId;
+	}
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
+	public void setPrePayId(String prePayId) {
+		this.prePayId = prePayId == null ? null : prePayId.trim();
+	}
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
+	public String getThirdPayId() {
+		return thirdPayId;
+	}
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+	public void setThirdPayId(String thirdPayId) {
+		this.thirdPayId = thirdPayId == null ? null : thirdPayId.trim();
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 }

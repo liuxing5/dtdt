@@ -29,4 +29,11 @@
     from t_s_product
     where ID = #{id}
   </select>
+  <!-- 查询可订购产品列表服务 -->
+  <select id="getProductList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    product_code,product_name,cycle_type
+    from t_s_product
+    where state = 0
+  </select>
 </mapper>

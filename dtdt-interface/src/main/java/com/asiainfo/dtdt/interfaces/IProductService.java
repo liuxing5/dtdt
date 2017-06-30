@@ -1,12 +1,14 @@
 package com.asiainfo.dtdt.interfaces;
 
-import java.util.List;
-
-
 public interface IProductService {
 	
-	@SuppressWarnings("rawtypes")
-	List getProductList();
+	/**
+	* @Title: getProductList 
+	* @Description: 查询可订购产品列表服务
+	* @return String
+	* @throws
+	 */
+	String getProductList();
 	
 	String queryProduct(String productCode);
 }
