@@ -1,7 +1,8 @@
 package com.asiainfo.dtdt.service.impl.product;
-/*package com.asiainfo.dtdt.impl;
 
 import java.util.Date;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -14,7 +15,9 @@ import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.context.Config;
+import com.asiainfo.dtdt.entity.Vcode;
 import com.asiainfo.dtdt.interfaces.ICodeService;
+import com.asiainfo.dtdt.service.mapper.VcodeMapper;
 import com.huawei.insa2.util.SGIPSendMSGUtil;
 
 @Service("codeServiceImpl")
@@ -24,6 +27,9 @@ public class CodeServiceImpl implements ICodeService {
 	
 	@Autowired
 	private ICache cache;
+	
+	@Resource
+	private VcodeMapper vcodeMapper;
 	
 	public String getCode(String partnerCode, String appKey, String phone) {
 		logger.info("CodeServiceImpl getCode() partnerCode=" + partnerCode + " appKey=" + appKey + " phone=" + phone);
@@ -78,5 +84,32 @@ public class CodeServiceImpl implements ICodeService {
 		}
 	}
 
+	/**
+	* @Title: CodeServiceImpl 
+	* @Description: (这里用一句话描述这个方法的作用) 
+	* @param lvcode
+	* @param vcodeSendTime
+	* @param orderId
+	* @param userInputVcode
+	* @param userInputTime
+	* @param vcodeValidResut
+	* @return        
+	* @throws
+	 */
+	public int insertVcode(String lvcode,String vcodeSendTime,String orderId,String userInputVcode,String userInputTime,String vcodeValidResut) {
+		Vcode vcode = new Vcode();
+		vcode.setLvcode(lvcode);
+		vcode.setOrderId(orderId);
+		vcode.setVcodeSendTime(vcodeSendTime);
+		vcode.setUserInputVcode(userInputVcode);
+		vcode.setUserInputTime(userInputTime);
+		vcode.setVcodeValidResut(vcodeValidResut);
+		int n = vcodeMapper.insertVcode(vcode);
+		return n;
+	}
+
+	
+	
+	
+
 }
-*/

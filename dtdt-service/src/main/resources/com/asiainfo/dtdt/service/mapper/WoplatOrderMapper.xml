@@ -27,33 +27,22 @@
     mobilephone, order_channel, create_time, update_time, valid_time, invalid_time, price, 
     count, money, is_need_charge, charge_type, remark
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="queryWoplatOrderByParam" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
-    <include refid="Base_Column_List" />
+    *
     from t_s_woplat_order
-    where order_id = #{orderId,jdbcType=VARCHAR}
+    where 0 = 0
+    <if test="productCode != null and productCode !=''">
+    and product_code = #{productCode}
+    </if>
+    <if test="mobilephone != null and mobilephone != ''">
+    and mobilephone  = #{mobilephone}
+    </if>
+    <if test="state != null and state != ''">
+    and state = #{state}
+    </if>
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
-    delete from t_s_woplat_order
-    where order_id = #{orderId,jdbcType=VARCHAR}
-  </delete>
-  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
-    insert into t_s_woplat_order (order_id, wo_order_id, partner_code, 
-      app_key, partner_order_id, product_code, 
-      state, mobilephone, order_channel, 
-      create_time, update_time, valid_time, 
-      invalid_time, price, count, 
-      money, is_need_charge, charge_type, 
-      remark)
-    values (#{orderId,jdbcType=VARCHAR}, #{woOrderId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, 
-      #{appKey,jdbcType=VARCHAR}, #{partnerOrderId,jdbcType=VARCHAR}, #{productCode,jdbcType=VARCHAR}, 
-      #{state,jdbcType=VARCHAR}, #{mobilephone,jdbcType=VARCHAR}, #{orderChannel,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
-      #{invalidTime,jdbcType=TIMESTAMP}, #{price,jdbcType=INTEGER}, #{count,jdbcType=INTEGER}, 
-      #{money,jdbcType=BIGINT}, #{isNeedCharge,jdbcType=TINYINT}, #{chargeType,jdbcType=TINYINT}, 
-      #{remark,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
+  <insert id="insertWolatOrder" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
     insert into t_s_woplat_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="orderId != null" >
@@ -174,7 +163,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
+  <update id="updateWoplatOrder" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
     update t_s_woplat_order
     <set >
       <if test="woOrderId != null" >
@@ -232,28 +221,6 @@
         remark = #{remark,jdbcType=VARCHAR},
       </if>
     </set>
-    where order_id = #{orderId,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.WoplatOrder" >
-    update t_s_woplat_order
-    set wo_order_id = #{woOrderId,jdbcType=VARCHAR},
-      partner_code = #{partnerCode,jdbcType=VARCHAR},
-      app_key = #{appKey,jdbcType=VARCHAR},
-      partner_order_id = #{partnerOrderId,jdbcType=VARCHAR},
-      product_code = #{productCode,jdbcType=VARCHAR},
-      state = #{state,jdbcType=VARCHAR},
-      mobilephone = #{mobilephone,jdbcType=VARCHAR},
-      order_channel = #{orderChannel,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      valid_time = #{validTime,jdbcType=TIMESTAMP},
-      invalid_time = #{invalidTime,jdbcType=TIMESTAMP},
-      price = #{price,jdbcType=INTEGER},
-      count = #{count,jdbcType=INTEGER},
-      money = #{money,jdbcType=BIGINT},
-      is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
-      charge_type = #{chargeType,jdbcType=TINYINT},
-      remark = #{remark,jdbcType=VARCHAR}
     where order_id = #{orderId,jdbcType=VARCHAR}
   </update>
 </mapper>

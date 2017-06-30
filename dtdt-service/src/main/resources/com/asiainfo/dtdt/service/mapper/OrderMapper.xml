@@ -22,14 +22,15 @@
     <result column="count" property="count" jdbcType="INTEGER" />
     <result column="money" property="money" jdbcType="BIGINT" />
     <result column="is_need_charge" property="isNeedCharge" jdbcType="TINYINT" />
-    <result column="charge_type" property="chargeType" jdbcType="TINYINT" />
+    <result column="allow_auto_pay" property="allowAutoPay" jdbcType="TINYINT" />
+    <result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR"/>
     <result column="remark" property="remark" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
-    update_time, valid_time, invalid_time, price, count, money, is_need_charge, charge_type, 
-    remark
+    update_time, valid_time, invalid_time, price, count, money, is_need_charge, 
+    remark, allow_auto_pay,redirect_url
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -41,25 +42,7 @@
     delete from t_s_order
     where order_id = #{orderId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.Order" >
-    insert into t_s_order (order_id, wo_order_id, partner_code, 
-      app_key, partner_order_id, product_code, 
-      oper_type, refund_order_id, is_real_request_woplat, 
-      state, mobilephone, order_channel, 
-      create_time, update_time, valid_time, 
-      invalid_time, price, count, 
-      money, is_need_charge, charge_type, 
-      remark)
-    values (#{orderId,jdbcType=VARCHAR}, #{woOrderId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, 
-      #{appKey,jdbcType=VARCHAR}, #{partnerOrderId,jdbcType=VARCHAR}, #{productCode,jdbcType=VARCHAR}, 
-      #{operType,jdbcType=TINYINT}, #{refundOrderId,jdbcType=VARCHAR}, #{isRealRequestWoplat,jdbcType=TINYINT}, 
-      #{state,jdbcType=VARCHAR}, #{mobilephone,jdbcType=VARCHAR}, #{orderChannel,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
-      #{invalidTime,jdbcType=TIMESTAMP}, #{price,jdbcType=INTEGER}, #{count,jdbcType=INTEGER}, 
-      #{money,jdbcType=BIGINT}, #{isNeedCharge,jdbcType=TINYINT}, #{chargeType,jdbcType=TINYINT}, 
-      #{remark,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.Order" >
+  <insert id="insertOrder" parameterType="com.asiainfo.dtdt.entity.Order" >
     insert into t_s_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="orderId != null" >
@@ -122,11 +105,14 @@
       <if test="isNeedCharge != null" >
         is_need_charge,
       </if>
-      <if test="chargeType != null" >
-        charge_type,
-      </if>
       <if test="remark != null" >
         remark,
+      </if>
+      <if test="allowAutoPay != null">
+      	allow_auto_pay,
+      </if>
+      <if test="redirectUrl != null">
+      	redirect_url,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -190,11 +176,14 @@
       <if test="isNeedCharge != null" >
         #{isNeedCharge,jdbcType=TINYINT},
       </if>
-      <if test="chargeType != null" >
-        #{chargeType,jdbcType=TINYINT},
-      </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="allowAutoPay != null">
+      	#{allowAutoPay},
+      </if>
+      <if test="redirectUrl != null">
+      	#{redirectUrl},
       </if>
     </trim>
   </insert>
@@ -258,38 +247,16 @@
       <if test="isNeedCharge != null" >
         is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
       </if>
-      <if test="chargeType != null" >
-        charge_type = #{chargeType,jdbcType=TINYINT},
-      </if>
       <if test="remark != null" >
         remark = #{remark,jdbcType=VARCHAR},
       </if>
+      <if test="allowAutoPay != null">
+      	allow_auto_pay = #{allowAutoPay},
+      </if>
+      <if test="redirectUrl != null">
+      	redirect_url = #{redirectUrl},
+      </if>
     </set>
-    where order_id = #{orderId,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.Order" >
-    update t_s_order
-    set wo_order_id = #{woOrderId,jdbcType=VARCHAR},
-      partner_code = #{partnerCode,jdbcType=VARCHAR},
-      app_key = #{appKey,jdbcType=VARCHAR},
-      partner_order_id = #{partnerOrderId,jdbcType=VARCHAR},
-      product_code = #{productCode,jdbcType=VARCHAR},
-      oper_type = #{operType,jdbcType=TINYINT},
-      refund_order_id = #{refundOrderId,jdbcType=VARCHAR},
-      is_real_request_woplat = #{isRealRequestWoplat,jdbcType=TINYINT},
-      state = #{state,jdbcType=VARCHAR},
-      mobilephone = #{mobilephone,jdbcType=VARCHAR},
-      order_channel = #{orderChannel,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      valid_time = #{validTime,jdbcType=TIMESTAMP},
-      invalid_time = #{invalidTime,jdbcType=TIMESTAMP},
-      price = #{price,jdbcType=INTEGER},
-      count = #{count,jdbcType=INTEGER},
-      money = #{money,jdbcType=BIGINT},
-      is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
-      charge_type = #{chargeType,jdbcType=TINYINT},
-      remark = #{remark,jdbcType=VARCHAR}
     where order_id = #{orderId,jdbcType=VARCHAR}
   </update>
 </mapper>

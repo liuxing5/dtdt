@@ -3,15 +3,13 @@ package com.asiainfo.dtdt.service.mapper;
 import com.asiainfo.dtdt.entity.Vcode;
 
 public interface VcodeMapper {
-    int deleteByPrimaryKey(Long id);
 
-    int insert(Vcode record);
-
-    int insertSelective(Vcode record);
-
-    Vcode selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(Vcode record);
-
-    int updateByPrimaryKey(Vcode record);
+	/**
+	* @Title: VcodeMapper 
+	* @Description: (记录有效的验证码) 
+	* @param record
+	* @return        
+	* @throws
+	 */
+    int insertVcode(Vcode record);
 }

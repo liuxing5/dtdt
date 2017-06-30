@@ -17,143 +17,16 @@
     ID, product_code, product_name, price, state, cycle_type, type, can_unsubscribe, 
     create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from t_s_product
-    where ID = #{id,jdbcType=BIGINT}
+    where product_code = #{productCode}
   </select>
-  <!-- 查询可订购产品列表服务 -->
-  <select id="getProductList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from t_s_product
+    where ID = #{id}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
-    delete from t_s_product
-    where ID = #{id,jdbcType=BIGINT}
-  </delete>
-  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.Product" >
-    insert into t_s_product (ID, product_code, product_name, 
-      price, state, cycle_type, 
-      type, can_unsubscribe, create_time, 
-      update_time)
-    values (#{id,jdbcType=BIGINT}, #{productCode,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, 
-      #{price,jdbcType=INTEGER}, #{state,jdbcType=TINYINT}, #{cycleType,jdbcType=TINYINT}, 
-      #{type,jdbcType=TINYINT}, #{canUnsubscribe,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
-  </insert>
-  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.Product" >
-    insert into t_s_product
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        ID,
-      </if>
-      <if test="productCode != null" >
-        product_code,
-      </if>
-      <if test="productName != null" >
-        product_name,
-      </if>
-      <if test="price != null" >
-        price,
-      </if>
-      <if test="state != null" >
-        state,
-      </if>
-      <if test="cycleType != null" >
-        cycle_type,
-      </if>
-      <if test="type != null" >
-        type,
-      </if>
-      <if test="canUnsubscribe != null" >
-        can_unsubscribe,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="productCode != null" >
-        #{productCode,jdbcType=VARCHAR},
-      </if>
-      <if test="productName != null" >
-        #{productName,jdbcType=VARCHAR},
-      </if>
-      <if test="price != null" >
-        #{price,jdbcType=INTEGER},
-      </if>
-      <if test="state != null" >
-        #{state,jdbcType=TINYINT},
-      </if>
-      <if test="cycleType != null" >
-        #{cycleType,jdbcType=TINYINT},
-      </if>
-      <if test="type != null" >
-        #{type,jdbcType=TINYINT},
-      </if>
-      <if test="canUnsubscribe != null" >
-        #{canUnsubscribe,jdbcType=TINYINT},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.Product" >
-    update t_s_product
-    <set >
-      <if test="productCode != null" >
-        product_code = #{productCode,jdbcType=VARCHAR},
-      </if>
-      <if test="productName != null" >
-        product_name = #{productName,jdbcType=VARCHAR},
-      </if>
-      <if test="price != null" >
-        price = #{price,jdbcType=INTEGER},
-      </if>
-      <if test="state != null" >
-        state = #{state,jdbcType=TINYINT},
-      </if>
-      <if test="cycleType != null" >
-        cycle_type = #{cycleType,jdbcType=TINYINT},
-      </if>
-      <if test="type != null" >
-        type = #{type,jdbcType=TINYINT},
-      </if>
-      <if test="canUnsubscribe != null" >
-        can_unsubscribe = #{canUnsubscribe,jdbcType=TINYINT},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.Product" >
-    update t_s_product
-    set product_code = #{productCode,jdbcType=VARCHAR},
-      product_name = #{productName,jdbcType=VARCHAR},
-      price = #{price,jdbcType=INTEGER},
-      state = #{state,jdbcType=TINYINT},
-      cycle_type = #{cycleType,jdbcType=TINYINT},
-      type = #{type,jdbcType=TINYINT},
-      can_unsubscribe = #{canUnsubscribe,jdbcType=TINYINT},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where ID = #{id,jdbcType=BIGINT}
-  </update>
 </mapper>

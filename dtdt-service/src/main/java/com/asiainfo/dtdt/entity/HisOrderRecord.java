@@ -56,6 +56,8 @@ public class HisOrderRecord {
     private Byte copyType;
 
     private String copyRemark;
+    
+    private String redirectUrl;
 
     public String getOrderId() {
         return orderId;
@@ -272,4 +274,13 @@ public class HisOrderRecord {
     public void setCopyRemark(String copyRemark) {
         this.copyRemark = copyRemark == null ? null : copyRemark.trim();
     }
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+    
 }

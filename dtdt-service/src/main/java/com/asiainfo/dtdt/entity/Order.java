@@ -43,9 +43,11 @@ public class Order {
 
     private Byte isNeedCharge;
 
-    private Byte chargeType;
-
     private String remark;
+    
+    private Byte allowAutoPay;
+    
+    private String redirectUrl;
 
     public String getOrderId() {
         return orderId;
@@ -207,14 +209,6 @@ public class Order {
         this.isNeedCharge = isNeedCharge;
     }
 
-    public Byte getChargeType() {
-        return chargeType;
-    }
-
-    public void setChargeType(Byte chargeType) {
-        this.chargeType = chargeType;
-    }
-
     public String getRemark() {
         return remark;
     }
@@ -222,4 +216,21 @@ public class Order {
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
     }
+
+	public Byte getAllowAutoPay() {
+		return allowAutoPay;
+	}
+
+	public void setAllowAutoPay(Byte allowAutoPay) {
+		this.allowAutoPay = allowAutoPay;
+	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+    
 }

@@ -3,12 +3,14 @@ package com.asiainfo.dtdt.method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
+import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.UuidUtil;
 import com.asiainfo.dtdt.common.encode.MD5Util;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
+
 
 /** 
 * @author 作者 : xiangpeng
@@ -22,11 +24,6 @@ public class OrderMethod {
 	
 	private final static Log logger = LogFactory.getLog(OrderMethod.class);
 	
-	public static final String APPID = "9000012012";
-	public static final String  APPKEY = "213456gtr4";
-	public static final String ORDER_URL  = "http://<url>/<path>/order";
-	public static final String QUERYORDER_URL  = "http://<url>/<path>/queryorder";
-	public static final String NOTICEORDER_URL  = "http://<url>/<path>/order";
 	/**
 	 * @throws Exception 
 	* @Title: OrderMethod 
@@ -44,19 +41,19 @@ public class OrderMethod {
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
-			jsonObject.append("seq", UuidUtil.generateUUID());
-			jsonObject.append("appId", APPID);
-			jsonObject.append("operType", "1");
-			jsonObject.append("msisdn", msisdn);
-			jsonObject.append("productId", productId);
-			jsonObject.append("subscriptionTime", subscriptionTime);
-			jsonObject.append("orderMethod",orderMethod);
+			jsonObject.put("seq", UuidUtil.generateUUID());
+			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("operType", "1");
+			jsonObject.put("msisdn", msisdn);
+			jsonObject.put("productId", productId);
+			jsonObject.put("subscriptionTime", subscriptionTime);
+			jsonObject.put("orderMethod",orderMethod);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
-			jsonObject.append("timeStamp", timeStamp);
-			String signStr = APPID+msisdn+timeStamp+APPKEY;
-			jsonObject.append("appSignature", MD5Util.MD5Encode(signStr));
+			jsonObject.put("timeStamp", timeStamp);
+			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			logger.info("post wojia order param:"+jsonObject.toString());
-			result = HttpClientUtil.doHttpPost(ORDER_URL, jsonObject.toString());
+			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
 			logger.info("wojia order return result:"+result);
 		} catch (Exception e) {
 			logger.error("post wojia order error:"+e.getMessage(), e);
@@ -84,20 +81,20 @@ public class OrderMethod {
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
-			jsonObject.append("seq", UuidUtil.generateUUID());
-			jsonObject.append("appId", APPID);
-			jsonObject.append("operType", "1");
-			jsonObject.append("msisdn", msisdn);
-			jsonObject.append("productId", productId);
-			jsonObject.append("orderId", orderId);
-			jsonObject.append("subscriptionTime", subscriptionTime);
-			jsonObject.append("orderMethod",orderMethod);
+			jsonObject.put("seq", UuidUtil.generateUUID());
+			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("operType", "2");
+			jsonObject.put("msisdn", msisdn);
+			jsonObject.put("productId", productId);
+			jsonObject.put("orderId", orderId);
+			jsonObject.put("subscriptionTime", subscriptionTime);
+			jsonObject.put("orderMethod",orderMethod);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
-			jsonObject.append("timeStamp", timeStamp);
-			String signStr = APPID+msisdn+timeStamp+APPKEY;
-			jsonObject.append("appSignature", MD5Util.MD5Encode(signStr));
+			jsonObject.put("timeStamp", timeStamp);
+			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			logger.info("post wojia closeOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.doHttpPost(ORDER_URL, jsonObject.toString());
+			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
 			logger.info("wojia closeOrder return result:"+result);
 		} catch (Exception e) {
 			logger.error("post wojia closeOrder error:"+e.getMessage(), e);
@@ -126,16 +123,16 @@ public class OrderMethod {
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
-			jsonObject.append("seq", UuidUtil.generateUUID());
-			jsonObject.append("appId", APPID);
-			jsonObject.append("msisdn", msisdn);
-			jsonObject.append("orderId", orderId);
+			jsonObject.put("seq", UuidUtil.generateUUID());
+			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("msisdn", msisdn);
+			jsonObject.put("orderId", orderId);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
-			jsonObject.append("timeStamp", timeStamp);
-			String signStr = APPID+msisdn+timeStamp+APPKEY;
-			jsonObject.append("appSignature", MD5Util.MD5Encode(signStr));
+			jsonObject.put("timeStamp", timeStamp);
+			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			logger.info("wojia post queryOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.doHttpPost(ORDER_URL, jsonObject.toString());
+			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
 			logger.info("wojia queryOrder return result:"+result);
 		} catch (Exception e) {
 			logger.error("post wojia queryOrder error:"+e.getMessage(), e);
