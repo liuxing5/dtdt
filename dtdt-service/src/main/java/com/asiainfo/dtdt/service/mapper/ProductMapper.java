@@ -1,17 +1,13 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.asiainfo.dtdt.entity.Product;
 
 public interface ProductMapper {
-    int deleteByPrimaryKey(Long id);
-
-    int insert(Product record);
-
-    int insertSelective(Product record);
-
-    Product selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(Product record);
-
-    int updateByPrimaryKey(Product record);
+	
+	Product queryProduct(@Param("productCode")String productCode);
+	
+	Product selectByPrimaryKey(Long id);
+	
 }

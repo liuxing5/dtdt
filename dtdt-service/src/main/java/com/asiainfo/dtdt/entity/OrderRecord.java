@@ -50,6 +50,8 @@ public class OrderRecord {
     private Date updateTime;
 
     private Date createTime;
+    
+    private String redirectUrl;
 
     public String getOrderId() {
         return orderId;
@@ -242,4 +244,12 @@ public class OrderRecord {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
 }

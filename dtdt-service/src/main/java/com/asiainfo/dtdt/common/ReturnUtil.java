@@ -3,20 +3,19 @@ package com.asiainfo.dtdt.common;
 import java.util.Date;
 import java.util.List;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
 * @ClassName: ReturnUtil 
  */
 public class ReturnUtil {
 	
-	public static JsonConfig jsonConfig = new JsonConfig();
-	
-	static void initDate(){
-		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd HH:mm:ss"));
-	}
+//	public static JsonConfig jsonConfig = new JsonConfig();
+//	
+//	static void initDate(){
+//		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor("yyyy-MM-dd HH:mm:ss"));
+//	}
 	
 	/**
 	* @Title: returnJsonError 
@@ -84,7 +83,7 @@ public class ReturnUtil {
 	@SuppressWarnings("static-access")
 	public static String returnJsonObj(Object code, String msg, Object obj)
 	{
-		initDate();
+//		initDate();
 		JSONObject json = new JSONObject();
 		if(Constant.SUCCESS_CODE.equals(code)){
 			json.put("code", code);
@@ -97,7 +96,7 @@ public class ReturnUtil {
 		{
 			json.put("data", "");
 		}else{
-			json.put("data", json.fromObject(obj, jsonConfig));
+//			json.put("data", json.fromObject(obj, jsonConfig));
 		}
 		return json.toString();
 	}
@@ -114,7 +113,7 @@ public class ReturnUtil {
 	@SuppressWarnings("static-access")
 	public static String returnJsonList(Integer code, String msg, List<?> list)
 	{
-		initDate();
+//		initDate();
 		JSONObject json = new JSONObject();
 		json.put("code", code);
 		json.put("msg", msg);
@@ -123,7 +122,7 @@ public class ReturnUtil {
 		{
 			json.put("data", "");
 		}else{
-			json.put("data", jsonArray.fromObject(list, jsonConfig));
+//			json.put("data", jsonArray.fromObject(list, jsonConfig));
 		}
 		
 		return json.toString();

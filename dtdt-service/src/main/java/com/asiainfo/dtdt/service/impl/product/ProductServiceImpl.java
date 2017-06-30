@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
@@ -32,4 +33,11 @@ public class ProductServiceImpl implements IProductService {
 		
 	}
 
+	public String queryProduct(String productCode) {
+		Product product = productMapper.queryProduct(productCode);
+		if(product == null){
+			return null;
+		}
+		return JSONObject.toJSONString(product);
+	}
 }

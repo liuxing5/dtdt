@@ -1,9 +1,13 @@
 package com.asiainfo.dtdt.common;
 
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+
+import org.apache.ibatis.javassist.expr.NewArray;
 
 /**
  * 
@@ -266,4 +270,67 @@ public class DateUtil {
 		return (int) sec / 1000;
 	}
 
+	/**
+     * 当月最后一天
+     * @return
+     */
+    public static String getLastDay(Date dateTime) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateTime);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH)); 
+        Date theDate = calendar.getTime();
+        String s = df.format(theDate);
+        StringBuffer str = new StringBuffer().append(s).append(" 23:59:59");
+        return str.toString();
+
+    }
+    
+    public static   Date getCurrentMonthEndTime(Date dateTime) {
+        Calendar c = Calendar.getInstance();
+        Date now = null;
+        try {
+        	c.setTime(d.parse(d.format(dateTime)));
+            c.set(Calendar.DATE, 1);
+            c.add(Calendar.MONTH, 1);
+            c.add(Calendar.DATE, -1);
+            StringBuffer str = new StringBuffer().append(d.format(c.getTime())).append(" 23:59:59");
+            now = df.parse(str.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return now;
+    }
+    
+    public static   Date getCurrentNextYear(Date dateTime,int n) {
+        Calendar c = Calendar.getInstance();
+        Date now = null;
+        try {
+        	c.setTime(d.parse(d.format(dateTime)));
+        	c.add(Calendar.MONTH, n-1);
+            StringBuffer str = new StringBuffer().append(d.format(c.getTime())).append(" 23:59:59");
+            now = df.parse(str.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return now;
+    }
+    
+    public static   Date getHalfYearStartTime(){
+        Calendar c = Calendar.getInstance();
+        System.out.println(getDateTime(c.getTime()));
+        c.set(Calendar.YEAR, c.getTime().getYear());
+        c.set(Calendar.MONTH, c.getTime().getMonth());
+        c.set(Calendar.DAY_OF_MONTH, c.getTime().getDay());
+        System.out.println(c.getTime().getDay());
+        c.add(Calendar.MONTH, 6);
+        return c.getTime();
+        
+    }
+	public static void main(String[] args) {
+		System.out.println(getDateTime(getCurrentMonthEndTime(new Date())));
+		System.out.println(getDateTime(getCurrentMonthEndTime(getCurrentNextYear(new Date(),6))));
+		System.out.println(getDateTime(getCurrentMonthEndTime(getCurrentNextYear(new Date(),12))));
+
+	}
 }
