@@ -74,6 +74,11 @@ public class Constant {
 	/**订购免流产品不存在编码描述**/
 	public static final String PRODUCT_EXISTENCE_MSG	=	"订购产品不存在";
 	
+	/**订单不存在编码**/
+	public static final String NO_ORDER_CODE	=	"40010";
+	/**订单不存在编码描述**/
+	public static final String NO_ORDER_MSG	=	"订单不存在";
+	
 	/**定向流量产品第二三位表示产品周期*/
 	/**包月**/
 	public static final String CYCLE_TYPE_01	=	"01";

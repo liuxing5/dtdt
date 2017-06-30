@@ -43,14 +43,14 @@ public class OrderServiceImpl implements IOrderService{
 
 	private static final Logger logger = Logger.getLogger(OrderServiceImpl.class);
 	
-	@Autowired
-	private ICache cache;
+//	@Autowired
+//	private ICache cache;
 	
 	@Autowired
 	private OrderMapper orderMapper;
 	
-	@Resource
-	private ICodeService codeService;
+//	@Autowired
+//	private ICodeService codeService;
 	
 	@Autowired
 	private IOrderRecordService orderRecordService;
@@ -115,13 +115,13 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
 		}
 		/**校验验证码是否正确 start*/
-		if(cache.exists("Y_" + partnerCode + appKey + phone)){//判断验证码是否存在
-			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
-		}
-		String vaildateCode = (String) cache.getItem("Y_" + partnerCode + appKey + phone);//获取有效的验证码
-		if(!StringUtils.equals(vcode, vaildateCode)){
-			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
-		}
+//		if(cache.exists("Y_" + partnerCode + appKey + phone)){//判断验证码是否存在
+//			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
+//		}
+//		String vaildateCode = (String) cache.getItem("Y_" + partnerCode + appKey + phone);//获取有效的验证码
+//		if(!StringUtils.equals(vcode, vaildateCode)){
+//			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
+//		}
 		/**校验验证码是否正确 end*/
 		/**校验接口中传递的参数是否合法  end*/
 		
@@ -149,7 +149,7 @@ public class OrderServiceImpl implements IOrderService{
 			order = order(appKey, partnerCode, seq, phone, product, orderMethod, allowAutoPay,redirectUrl);
 		}
 		//记录验证码信息
-		codeService.insertVcode(cache.getItem("Y_" + partnerCode + appKey + phone).toString(),DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");
+//		codeService.insertVcode(cache.getItem("Y_" + partnerCode + appKey + phone).toString(),DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");
 		/**组装支付订单信息返回给接入商 start**/
 		JSONObject json = new JSONObject();
 		json.put("orderId", order.getOrderId());

@@ -2,12 +2,14 @@ package com.asiainfo.dtdt.service.impl.order;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
+import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
@@ -22,7 +24,7 @@ import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 @Service
 public class QueryOrderServiceImpl implements IQueryOrderService {
 	
-	private static final Logger logger = Logger.getLogger(OrderServiceImpl.class);
+	private static final Logger logger = Logger.getLogger(QueryOrderServiceImpl.class);
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -48,6 +50,14 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		
 		logger.info("OrderServiceImpl queryOrderRecord() phone=" + phone);
 		
+		if (StringUtils.isEmpty(phone)) {
+			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
+		}
+		
+		if (!IsMobileNo.isMobile(phone)) {
+			return ReturnUtil.returnJsonList(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+		}
+		
 		try {
 			List<OrderRecord> list = orderRecordMapper.queryOrderRecord(phone);
 			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, list);
@@ -66,6 +76,10 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	public String queryOrderState(String orderId) {
 		logger.info("OrderServiceImpl queryOrderState() orderId=" + orderId);
 		
+		if (StringUtils.isEmpty(orderId)) {
+			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
+		}
+		
 		try {
 			//先后：order表，order_record表，his_order_record表，his_order表
 			
@@ -78,7 +92,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 					if (null == hisOrderRecord) {
 						HisOrder hisOrder = hisOrderMapper.selectByPrimaryKey(orderId);
 						if (null == hisOrder) {
-							return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, "no order data", null);
+							return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
 						}
 						state = hisOrder.getState();
 					}
@@ -88,7 +102,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			}
 			state = order.getState();
 			
-			logger.info("OrderServiceImpl queryOrder() state=" + state);
+			logger.info("OrderServiceImpl queryOrderState() state=" + state);
 			
 			JSONObject json = new JSONObject();
 			json.put("state", state);
