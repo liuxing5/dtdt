@@ -52,7 +52,6 @@
     and mobilephone  = #{mobilephone}
     </if>
   </select>
-  </select>
   <!-- 查询订购信息服务 -->
   <select id="queryOrderRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
