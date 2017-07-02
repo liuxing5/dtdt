@@ -40,6 +40,7 @@ public class ProductServiceImpl implements IProductService {
 	}
 
 	public String queryProduct(String productCode) {
+		logger.info("ProductServiceImpl queryProduct param:productCode="+productCode);
 		Product product = productMapper.queryProduct(productCode);
 		if(product == null){
 			return null;

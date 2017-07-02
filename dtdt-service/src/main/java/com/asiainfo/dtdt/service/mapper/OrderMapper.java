@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.asiainfo.dtdt.entity.Order;
 
 public interface OrderMapper {
@@ -18,4 +20,34 @@ public interface OrderMapper {
 
     int updateByPrimaryKeySelective(Order record);
     
+	/**
+	* @Title: queryOrder 
+	* @Description: 查询订单状态服务
+	* @param orderId
+	* @return String
+	* @throws
+	 */
+    String queryOrder(String orderId);
+    
+    /**
+     * @Title: OrderMapper 
+     * @Description: (将在途订购信息存放到备份表中) 
+     * @param orderId
+     * @param copyType
+     * @param copyRemark
+     * @return        
+     * @throws
+      */
+     int insertFromHisOrderById(@Param("orderId")String orderId,@Param("copyType")String copyType,@Param("copyRemark")String copyRemark);
+     
+     /**
+     * @Title: OrderMapper 
+     * @Description: (将在途订购信息沉淀到订购关系表) 
+     * @param orderId 订单ID
+     * @param cycleType 产品周期
+     * @param woOrder  沃家总管方订购记录 0：我方初始化订购 1：其他代理商订购 2：其他代理商订购失效、到期或退订由我方续订
+     * @return        
+     * @throws
+      */
+     int insertFromOrderRecordById(@Param("orderId")String orderId,@Param("cycleType")byte cycleType,@Param("woOrder")String woOrder);
 }

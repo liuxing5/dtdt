@@ -36,7 +36,7 @@ public interface OrderRecordMapper {
     * @return        
     * @throws
      */
-    OrderRecord queryOrderRecordByParam(@Param("productCode")String productCode,@Param("mobilephone")String mobilephone);
+    List<OrderRecord> queryOrderRecordByParam(@Param("appKey")String appKey,@Param("productCode")String productCode,@Param("mobilephone")String mobilephone);
 
     /**
     * @Title: OrderRecordMapper 

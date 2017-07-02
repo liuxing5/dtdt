@@ -7,9 +7,14 @@ import org.springframework.context.annotation.Configuration;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.asiainfo.dtdt.api.IAuthoService;
+import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
+import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
+import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
+import com.asiainfo.dtdt.interfaces.pay.IPayService;
 
 /**
  * 
@@ -48,6 +53,14 @@ public class ConsumerConfig {
     }
     
     @Bean
+    public ReferenceBean<IAppService> configIAppServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IAppService> referenceBean = new ReferenceBean<IAppService>();
+        referenceBean.setInterface(IAppService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
     public ReferenceBean<IOrderService> configIOrderServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
         ReferenceBean<IOrderService> referenceBean = new ReferenceBean<IOrderService>();
         referenceBean.setInterface(IOrderService.class);
@@ -63,5 +76,36 @@ public class ConsumerConfig {
         return referenceBean;
     }
     
+    @Bean
+    public ReferenceBean<IOrderRecordService> configIOrderRecordServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IOrderRecordService> referenceBean = new ReferenceBean<IOrderRecordService>();
+        referenceBean.setInterface(IOrderRecordService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
+    public ReferenceBean<IWoplatOrderService> configIWoplatOrderServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IWoplatOrderService> referenceBean = new ReferenceBean<IWoplatOrderService>();
+        referenceBean.setInterface(IWoplatOrderService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
+    public ReferenceBean<IPayOrderService> configIPayOrderServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IPayOrderService> referenceBean = new ReferenceBean<IPayOrderService>();
+        referenceBean.setInterface(IPayOrderService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
+    public ReferenceBean<IPayService> configIPayServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<IPayService> referenceBean = new ReferenceBean<IPayService>();
+        referenceBean.setInterface(IPayService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.asiainfo.dtdt.interfaces.order;
 
+import java.util.List;
 
 /** 
 * @author 作者 : xiangpeng
@@ -19,5 +20,6 @@ public interface IOrderRecordService {
 	* @return        
 	* @throws
 	 */
-	String queryOrderRecordByParam(String productCode,String mobilephone);
+	List queryOrderRecordByParam(String appKey,String productCode,String mobilephone);
+	
 }

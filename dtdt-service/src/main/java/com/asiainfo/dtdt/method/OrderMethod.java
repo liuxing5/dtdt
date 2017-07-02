@@ -32,11 +32,11 @@ public class OrderMethod {
 	* @param msisdn 订购号码（联通手机号码）
 	* @param productId	订购产品ID
 	* @param subscriptionTime 订购时间
-	* @param orderMethod 订购渠道1：APP 2：WEB 3：文件接口 4：其他
+	* @param orderChannel 订购渠道1：APP 2：WEB 3：文件接口 4：其他
 	* @return    订购ID    
 	* @throws
 	 */
-	public static String order(String msisdn,String productId,String subscriptionTime,String orderMethod){
+	public static String order(String msisdn,String productCode,String subscriptionTime,String orderChannel){
 		logger.info("**********请求沃家总管进行定向流量订购开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
@@ -45,9 +45,9 @@ public class OrderMethod {
 			jsonObject.put("appId", Constant.APPID);
 			jsonObject.put("operType", "1");
 			jsonObject.put("msisdn", msisdn);
-			jsonObject.put("productId", productId);
+			jsonObject.put("productId", productCode);
 			jsonObject.put("subscriptionTime", subscriptionTime);
-			jsonObject.put("orderMethod",orderMethod);
+			jsonObject.put("orderMethod",orderChannel);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
 			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;

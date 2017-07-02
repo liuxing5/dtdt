@@ -44,7 +44,7 @@ public class OrderController {
 	* @throws IOException        
 	* @throws
 	 */
-	@RequestMapping("/pre-order")
+	@RequestMapping(value="/pre-order",produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String order(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();

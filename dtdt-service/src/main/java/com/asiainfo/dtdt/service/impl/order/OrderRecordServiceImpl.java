@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.impl.order;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,11 +36,11 @@ public class OrderRecordServiceImpl implements IOrderRecordService {
 	* @return 
 	* @see com.asiainfo.dtdt.interfaces.order.IOrderRecordService#queryOrderRecordByParam(java.lang.String, java.lang.String)
 	 */
-	public String queryOrderRecordByParam(String productCode, String mobilephone) {
+	public List<OrderRecord> queryOrderRecordByParam(String appKey,String productCode, String mobilephone) {
 		logger.info("orderRecordServiceImpl queryOrderRecordByParam interface param:{productCode:"+productCode+",mobilephone:"+mobilephone+"}");
-		OrderRecord orderRecord = orderRecordMapper.queryOrderRecordByParam(productCode, mobilephone);
-		logger.info("orderRecordServiceImpl queryOrderRecordByParam interface return data:"+JSONObject.toJSONString(orderRecord));
-		return JSONObject.toJSONString(orderRecord);
+		List<OrderRecord> orderRecordList = orderRecordMapper.queryOrderRecordByParam(appKey,productCode, mobilephone);
+		logger.info("orderRecordServiceImpl queryOrderRecordByParam interface return data:"+JSONObject.toJSONString(orderRecordList));
+		return orderRecordList;
 	}
 
 }

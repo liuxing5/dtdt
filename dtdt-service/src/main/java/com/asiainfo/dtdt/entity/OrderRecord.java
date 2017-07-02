@@ -43,7 +43,7 @@ public class OrderRecord implements Serializable {
 	private Byte allowAutoPay;
 
 	private Byte woOrder;
-
+	
 	private String remark;
 
 	private Date refundValidTime;
@@ -59,5 +59,7 @@ public class OrderRecord implements Serializable {
 	private Date createTime;
 
 	private String redirectUrl;
+	
+	private String woOrderId;
 
 }

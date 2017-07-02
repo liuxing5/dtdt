@@ -82,24 +82,24 @@ public class HttpClientUtil {
 			logger.error("post 请求超时："+e);
 			e.printStackTrace();
 			JSONObject json = new JSONObject();
-			json.put("code", Constant.ERROR_CODE);
-			json.put("msg", "请求超时"+Constant.ERROR_MSG);
+			json.put("ecode", Constant.ERROR_CODE);
+			json.put("emsg", "请求超时"+Constant.ERROR_MSG);
 			return json.toString();
 		}catch (IllegalArgumentException e) {
 			logger.error("post 请求参数异常："+urlPath+e.getMessage());
 			logger.error("post 请求参数异常："+e);
 			e.printStackTrace();
 			JSONObject json = new JSONObject();
-			json.put("code", Constant.ERROR_CODE);
-			json.put("msg", "请求参数"+Constant.ERROR_MSG);
+			json.put("ecode", Constant.ERROR_CODE);
+			json.put("emsg", "请求参数"+Constant.ERROR_MSG);
 			return json.toString();
 		} catch (Exception e) {
 			logger.error("post 请求接口异常："+urlPath+e.getMessage());
 			logger.error("post 请求接口异常："+e);
 			e.printStackTrace();
 			JSONObject json = new JSONObject();
-			json.put("code", Constant.ERROR_CODE);
-			json.put("msg", "接口通讯"+Constant.ERROR_MSG);
+			json.put("ecode", Constant.ERROR_CODE);
+			json.put("emsg", "接口通讯"+Constant.ERROR_MSG);
 			return json.toString();
 		}
     	

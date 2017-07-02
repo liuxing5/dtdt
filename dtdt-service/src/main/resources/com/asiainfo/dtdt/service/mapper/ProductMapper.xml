@@ -4,8 +4,10 @@
   <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.Product" >
     <id column="ID" property="id" jdbcType="BIGINT" />
     <result column="product_code" property="productCode" jdbcType="VARCHAR" />
+    <result column="wo_product_code" property="woProductCode" jdbcType="VARCHAR"/>
     <result column="product_name" property="productName" jdbcType="VARCHAR" />
     <result column="price" property="price" jdbcType="INTEGER" />
+    <result column="wo_product_price" property="woProductPrice" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="TINYINT" />
     <result column="cycle_type" property="cycleType" jdbcType="TINYINT" />
     <result column="type" property="type" jdbcType="TINYINT" />
@@ -14,7 +16,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, product_code, product_name, price, state, cycle_type, type, can_unsubscribe, 
+    ID, product_code,wo_product_code, product_name, price,wo_product_price, state, cycle_type, type, can_unsubscribe, 
     create_time, update_time
   </sql>
   <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >

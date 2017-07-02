@@ -118,4 +118,26 @@ public class Constant {
 	/**充值类型 1-一次性**/
 	public static final byte CHARGE_TYPE_1			=	1;
 	
+	/**第三方支付状态**/
+	/**0-初始化状态*/
+	public static final String PAY_STATUS_INIT		= "0";
+	/**1-支付失败*/
+	public static final String PAY_STATUS_FAIL		= "1";
+	/**2-支付成功*/
+	public static final String PAY_STATUS_SUCCESS		= "2";
+	/**3-退款中*/
+	public static final String PAY_STATUS_REFUNDINIT		= "3";
+	/**4-退款失败*/
+	public static final String PAY_STATUS_REUNFFAIL		= "4";
+	/**5-退款成功*/
+	public static final String PAY_STATUS_REFUNDSUCCESS		= "5";
+	
+	/**0：我方初始化订购 1：其他代理商订购 2：其他代理商订购失效、到期或退订由我方续订 3：由我方订购互斥产品**/
+	public static final String WOORDER_TYPE_0	= "0";
+	/**1：其他代理商订购 **/
+	public static final String WOORDER_TYPE_1	= "1";
+	/**2：其他代理商订购失效、到期或退订由我方续订**/
+	public static final String WOORDER_TYPE_2	= "2";
+	/**3：由我方订购互斥产品**/
+	public static final String WOORDER_TYPE_3	= "3";
 }

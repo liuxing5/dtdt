@@ -13,10 +13,14 @@ public class Product implements Serializable{
 	private Long id;
 
     private String productCode;
+    
+    private String woProductCode;
 
     private String productName;
 
     private Integer price;
+    
+    private Integer woProductPrice;
 
     private Byte state;
 

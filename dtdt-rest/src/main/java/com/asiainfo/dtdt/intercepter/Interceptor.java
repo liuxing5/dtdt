@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ai.paas.cache.ICache;
+//import com.ai.paas.cache.ICache;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -27,7 +27,7 @@ public class Interceptor implements HandlerInterceptor {
 	private static final String[] IGNORE_URI = {"/token/getToken"};//过滤第一次获取token
 
 	@Autowired
-	private ICache cache;
+//	private ICache cache;
 
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 		logger.info("Interceptor preHandle()");
@@ -49,7 +49,7 @@ public class Interceptor implements HandlerInterceptor {
 				String tokenCache = null;
 				JSONObject result = new JSONObject();
 				if (StringUtils.isNotEmpty(tokenGet)) {
-					tokenCache = (String) cache.getItem("T_" + partnerCode + appKey);
+//					tokenCache = (String) cache.getItem("T_" + partnerCode + appKey);
 					if (tokenGet.equals(tokenCache))
 					{
 						result.put("code", "10011");
@@ -60,7 +60,7 @@ public class Interceptor implements HandlerInterceptor {
 					}
 					if (null != tokenCache) {
 						// 刷新token存活时间
-						cache.addItem("T_" + partnerCode + appKey, tokenCache, 24*60*60);
+//						cache.addItem("T_" + partnerCode + appKey, tokenCache, 24*60*60);
 					}
 				} else {
 					result.put("code", "10012");

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.asiainfo.dtdt.common.encode.MD5Util;
+
 /**
 * @ClassName: SignUtil
 * @Description: 签名生成工具类

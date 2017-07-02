@@ -10,7 +10,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ai.paas.cache.ICache;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.BaseSeq;
@@ -20,15 +19,17 @@ import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Order;
+import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Product;
+import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.ICodeService;
 import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
+import com.asiainfo.dtdt.method.OrderMethod;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
-import com.asiainfo.dtdt.service.mapper.VcodeMapper;
 
 /** 
 * @author 作者 : xiangpeng
@@ -49,7 +50,7 @@ public class OrderServiceImpl implements IOrderService{
 	@Autowired
 	private OrderMapper orderMapper;
 	
-//	@Autowired
+//	@Resource
 //	private ICodeService codeService;
 	
 	@Autowired
@@ -137,8 +138,9 @@ public class OrderServiceImpl implements IOrderService{
 		
 		/**检查是否存在互斥产品并存储在途数据**/
 		Order order = null;
-		if(checkWoplatOrderRecord(phone, productCode)){//检查沃家总管同步是否存在已订购的产品 不存在true 存在false
-			if(checkOrderRecord(phone, productCode)){//检查我方是否存在已订购的产品 不存在true 存在false
+		String woplatOrder = checkWoplatOrderRecord(phone, null,"2");//订购成功
+		if(StringUtils.isBlank(woplatOrder)){//检查沃家总管同步是否存在已订购的产品 不存在true 存在false
+			if(checkOrderRecord(appKey,phone, productCode).size() <= 0){//检查我方是否存在已订购的产品 不存在true 存在false
 				//检查沃家总管和我方都不存在需要记录预订购信息
 				order = order(appKey, partnerCode, seq, phone, product, orderMethod, allowAutoPay,redirectUrl);
 			}else {
@@ -225,15 +227,15 @@ public class OrderServiceImpl implements IOrderService{
 	* @return        
 	* @throws
 	 */
-	public boolean checkOrderRecord(String phone,String productCode){
+	public List<OrderRecord> checkOrderRecord(String appKey,String phone,String productCode){
 		logger.info("orderServiceImpl preOrder checkOrderRecord is param:{productCode:"+productCode+",phone:"+phone+"}");
-		String orderRecord = orderRecordService.queryOrderRecordByParam(productCode, phone);
-		if(StringUtils.isBlank(orderRecord)){
+		List<OrderRecord> orderRecordList = orderRecordService.queryOrderRecordByParam(appKey,productCode, phone);
+		if(orderRecordList.size() == 0){
 			logger.info("orderServiceImpl preOrder checkOrderRecord not Existence order message;");
-			return true;
+			return null;
 		}
 		logger.info("orderServiceImpl preOrder checkOrderRecord Existence order message;");
-		return false;
+		return orderRecordList;
 	}
 
 	/**
@@ -241,18 +243,19 @@ public class OrderServiceImpl implements IOrderService{
 	* @Description: (检查沃家总管同步是否存在已订购的产品) 
 	* @param phone 订购手机号码
 	* @param productCode 订购产品编码
+	* @param state 状态
 	* @return        
 	* @throws
 	 */
-	public boolean checkWoplatOrderRecord(String phone,String productCode){
-		logger.info("orderServiceImpl preOrder checkWoplatOrderRecord is param:{productCode:"+productCode+",phone:"+phone+"}");
-		String woplatOrder = woplatOrderService.queryWoplatOrderByParam(productCode, phone, "2");//查询是否有同步的订购信息
+	public String checkWoplatOrderRecord(String phone,String productCode,String state){
+		logger.info("orderServiceImpl preOrder checkWoplatOrderRecord is param:{productCode:"+productCode+",phone:"+phone+",state:"+state+"}");
+		String woplatOrder = woplatOrderService.queryWoplatOrderByParam(productCode, phone, state);//查询是否有同步的订购信息
 		if(StringUtils.isBlank(woplatOrder)){
 			logger.info("orderServiceImpl preOrder checkWoplatOrderRecord not Existence order message;");
-			return true;
+			return null;
 		}
 		logger.info("orderServiceImpl preOrder checkWoplatOrderRecord Existence order message");
-		return false;
+		return woplatOrder;
 	}
 	
 	/**
@@ -267,5 +270,211 @@ public class OrderServiceImpl implements IOrderService{
 		Order order = JSONObject.parseObject(orderStr, Order.class);
 		return orderMapper.insertOrder(order);
 	}
+
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: paySuccessOrderDeposition</p> 
+	* <p>Description: 支付成功处理订购信息</p> 
+	* @param arg0
+	* @param arg1
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.order.IOrderService#paySuccessOrderDeposition(java.lang.String, java.lang.String)
+	 */
+	public boolean paySuccessOrderDeposition(String resultCode,String orderId) {
+		logger.info("begin orderService paySuccessOrderDeposition param: resultCode="+resultCode+",orderId="+orderId);
+		try {
+			if("SUCCESS".equals(resultCode)){//支付返回成功
+				/**检查是否存在互斥产品并存储在途数据**/
+				Order order = orderMapper.selectByPrimaryKey(orderId);
+				String woplatOrder = checkWoplatOrderRecord(order.getMobilephone(), null,"2");//订购成功
+				if(StringUtils.isBlank(woplatOrder)){//检查沃家总管同步是否存在已订购的产品 不存在true 存在false
+					logger.info("begin orderService paySuccessOrderDeposition checkWoplatOrderRecord not Existence woplatOrder");
+					if(checkOrderRecord(order.getAppKey(),order.getMobilephone(), order.getProductCode()).size() <= 0){//检查我方是否存在已订购的产品 不存在true 存在false
+						logger.info("begin orderService paySuccessOrderDeposition checkOrderRecord not Existence order");
+						String proStr  = productService.queryProduct(order.getProductCode());
+						Product product = JSONObject.parseObject(proStr, Product.class);
+						//不存在订购信息，调用沃家总管订购接口
+						String wjzgResult = OrderMethod.order(order.getMobilephone(), product.getWoProductCode(), DateUtil.getDateTime(order.getCreateTime()),order.getOrderChannel() );
+						if(StringUtils.isBlank(wjzgResult)){
+							//订购接口处理异常
+							logger.error("orderService order product post wojia return fail param:orderId="+orderId);
+							return false;
+						}
+						JSONObject wjzgJson = JSONObject.parseObject(wjzgResult);
+						String ecode = wjzgJson.getString("ecode");
+						String woOrderId = wjzgJson.getString("orderId");
+						if("0".equals(ecode)){
+							logger.error("orderService order product post wojia return success param:orderId="+orderId);
+							//订购成功，处理数据
+							//woOrder 0-我方初始化订购
+							//沉淀订购关系数据成功
+							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_0, "10", order.getPartnerCode(),Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+						}else if("4001".equals(ecode)){
+							//存在重复订购，处理业务
+							logger.error("orderService order product post wojia return repeat order param:orderId="+orderId);
+							//沃家返回重复订购，邮箱侧创建订购关系，返回订购成功，当前月不用反冲话费
+							//*状态13：邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功
+							//疑问？：重复订购
+							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+						}else if("4005".equals(ecode)){
+							//订购互斥产品
+							//存在重复订购，处理业务
+							logger.error("orderService order product post wojia return mutex order param:orderId="+orderId);
+							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+						}
+					}else {//存在介入方产品使用此免流产品
+						return optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+					}
+				}else {//沃家总管存在已订购产品
+					WoplatOrder woOrder  = JSONObject.parseObject(woplatOrder, WoplatOrder.class);
+					String woCycleType = woOrder.getProductCode().substring(2, 3);//沃家总管订购流量包
+					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
+					if(Constant.CYCLE_TYPE_01.equals(woCycleType) && woCycleType.equals(cycleType)){//包月
+						//判断wojia总管订购流量包为包月并且当前也为包月流量包
+						
+					}else if(Constant.CYCLE_TYPE_02.equals(woCycleType) && woCycleType.equals(cycleType)){//包半年
+						//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
+						
+					}else if(Constant.CYCLE_TYPE_03.equals(woCycleType) && woCycleType.equals(cycleType)){//包年
+						//判断wojia总管订购流量包为包年并且当前也为包年流量包
+						
+					}
+					return optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+				}
+			}else {//支付失败
+				//更新在途订购订单状态4-付款失败
+				updateOrder(orderId,null, "4",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+				//将在途表信息存放在备份表中
+				orderPayFailBak(orderId, "2", "第三方支付失败");
+			}
+		} catch (Exception e) {
+			logger.error("orderService paySuccessOrderDeposition fail:"+e.getMessage(),e);
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	* @Title: OrderServiceImpl 
+	* @Description: (处理成功沉淀订购关系) 
+	* @param orderId 订单ID
+	* @param woOrderId 沃家总管订购ID
+	* @param woOrder 沃家总管方订购记录 0：我方初始化订购 1：其他代理商订购 2：其他代理商订购失效、到期或退订由我方续订
+	* @param state
+	* @param productCode 产品编码
+	* @return        
+	* @throws
+	 */
+	public boolean optOrderRecord(String orderId,String woOrderId,String woOrder,String state,String productCode,byte isNeedCharge,byte isRealRequestWoplat){
+		int num = updateOrder(orderId, woOrderId, state,isNeedCharge,isRealRequestWoplat);
+		if(num > 0){
+			String cycleType = productCode.substring(2, 3);//当前订购流量包
+			byte cycleType2 = 0;
+			if(Constant.CYCLE_TYPE_01.equals(cycleType)){//包月
+				//判断wojia总管订购流量包为包月并且当前也为包月流量包
+				cycleType2 = 0;
+			}else if(Constant.CYCLE_TYPE_02.equals(cycleType)){//包半年
+				//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
+				cycleType2 = 1;
+			}else if(Constant.CYCLE_TYPE_03.equals(cycleType)){//包年
+				//判断wojia总管订购流量包为包年并且当前也为包年流量包
+				cycleType2 = 2;
+			}
+			//沉淀订购关系
+			int count = insertFromOrderRecordById(orderId, cycleType2, woOrder);//0-我方初始化订购
+			if(count > 0){
+				logger.error("orderService order product deposit orderRecord data success:orderId="+orderId);
+				return true;
+			}
+		}
+		logger.error("orderService order product deposit orderRecord data fail:orderId="+orderId);
+		return false;
+	}
+	
+	/**
+    * @Title: OrderMapper 
+    * @Description: (将在途订购信息存放到备份表中) 
+    * @param orderId
+    * @param copyType
+    * @param copyRemark
+    * @return        
+    * @throws
+     */
+	public int insertFromHisOrderById(String orderId,String copyType,String copyRemark) {
+		
+		return orderMapper.insertFromHisOrderById(orderId, copyType, copyRemark);
+	}
+
+	/**
+    * @Title: OrderMapper 
+    * @Description: (将在途订购信息沉淀到订购关系表) 
+    * @param orderId 订单ID
+    * @param cycleType 产品周期 包月：0，包半年：1，包年：2
+    * @param woOrder  沃家总管方订购记录 0：我方初始化订购 1：其他代理商订购 2：其他代理商订购失效、到期或退订由我方续订
+    * @return        
+    * @throws
+     */
+	public int insertFromOrderRecordById(String orderId,byte cycleType2,String woOrder) {
+		
+		return orderMapper.insertFromOrderRecordById(orderId, cycleType2, woOrder);
+	}
+
+	/**
+	* @Title: OrderServiceImpl 
+	* @Description: (更新在途订购订单状态) 
+	* @param orderId
+	* @param state
+	* 	状态1：未付款，此时邮箱侧合作方查询该笔订购状态为：未付款；
+	*	状态2：付款中，此时邮箱侧合作方查询该笔订购状态为：付款中；
+	*	状态3：付款失败，此时邮箱侧合作方查询该笔订购状态为：付款失败；
+	*	状态4：付款成功&邮箱侧发起订购中，此时邮箱侧合作方查询该笔订购状态为：付款成功，待订购；
+	*	状态5：邮箱侧订购失败&未原路原付款金额退款，此时邮箱侧合作方查询该笔订购状态为：订购失败，待原路退款；
+	*	状态6：邮箱侧订购失败&原路原付款金额退款中，此时邮箱侧合作方查询该笔订购状态为：订购失败，原路退款中；
+	*	状态7：邮箱侧订购失败&原路原付款金额退款成功，此时邮箱侧合作方查询该笔订购状态为：订购失败，原路退款成功；
+	*	状态8：邮箱侧订购失败&原路原付款金额退款失败，此时邮箱侧合作方查询该笔订购状态为：订购失败，原路退款失败，人工处理中；
+	*	状态9：邮箱侧订购中，此时邮箱侧合作方查询该笔订购状态为：订购受理中；
+	*	状态10：邮箱侧订购成功&沃家总管侧存在有效订购关系&待返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+	*	状态11：邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费成功，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+	*	状态12：邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费失败，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+	*	状态13：邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+	*	状态14：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
+	*	状态15：邮箱侧订购失败&沃家总管侧不存在有效订购关系&未原路非付款金额退款，此时邮箱侧合作方查询该笔订购状态为：订购成功，定向流量服务中断，待原路部分退款；
+	*	状态16：邮箱侧订购失败&沃家总管侧不存在有效订购关系&原路非付款金额退款中，此时邮箱侧合作方查询该笔订购状态为：订购成功，定向流量服务中断，原路部分退款中；
+	*	状态17：邮箱侧订购失败&沃家总管侧不存在有效订购关系&原路非付款金额退款失败，此时邮箱侧合作方查询该笔订购状态为：订购成功，定向流量服务中断，原路部分退款失败，人工处理中；
+	*	状态18：邮箱侧订购失败&沃家总管侧不存在有效订购关系&原路非付款金额退款成功，此时邮箱侧合作方查询该笔订购状态为：订购成功，定向流量服务中断，原路部分退款成功；
+	*	状态19：邮箱侧退订成功，此时邮箱侧合作方查询该笔订购状态为：退订成功；
+	*	状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
+	*	状态21：邮箱侧已作废（订购状态在X小时内一直为“未支付”，X小时后将该订单状态设置为“已作废”），此时邮箱侧合作方查询该笔订购状态为：订购作废；
+	*	状态22：服务到期（半年包、年包产品自然达到有效期截止日），此时邮箱侧合作方查询该笔订购状态为：服务到期；
+	* @return        
+	* @throws
+	 */
+	public int updateOrder(String orderId,String woOrderId,String state,byte isNeedCharge,byte isRealRequestWoplat){
+		Order order = new Order();
+		order.setOrderId(orderId);
+		order.setWoOrderId(woOrderId);
+		order.setState(state);
+		order.setIsRealRequestWoplat(isRealRequestWoplat);
+		order.setIsNeedCharge(isNeedCharge);
+		int num = orderMapper.updateByPrimaryKeySelective(order);
+		return num;
+	}
+	
+	/**
+	* @Title: OrderServiceImpl 
+	* @Description: (将在途订单订购信息存放在备份表中并删除在途表信息) 
+	* @param orderId 订单ID
+	* @param copyType	入表方式（0：订单完工 1：未支付失效 2：支付失败 3：人工操作）
+	* @param copyRemark  入表备注      
+	* @throws
+	 */
+	public void orderPayFailBak(String orderId,String copyType,String copyRemark){
+		int num = orderMapper.insertFromHisOrderById(orderId, copyType, copyRemark);
+		if(num > 0){
+			orderMapper.deleteByPrimaryKey(orderId);//清除在途表信息
+		}
+	}
+	
 	
 }

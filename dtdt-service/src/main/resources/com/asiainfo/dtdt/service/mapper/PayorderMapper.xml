@@ -24,7 +24,7 @@
     origin_refound_time, man_made_refound_time, man_made_refound_type, account_day, pre_pay_id, 
     third_pay_id, update_time, create_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="queryPayOrderByPayId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from t_s_payorder
@@ -34,20 +34,6 @@
     delete from t_s_payorder
     where pay_id = #{payId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.Payorder" >
-    insert into t_s_payorder (pay_id, order_id, pay_account, 
-      pay_money, pay_type, oper_type, 
-      state, origin_refound_money, origin_refound_time, 
-      man_made_refound_time, man_made_refound_type, 
-      account_day, pre_pay_id, third_pay_id, 
-      update_time, create_time)
-    values (#{payId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{payAccount,jdbcType=VARCHAR}, 
-      #{payMoney,jdbcType=BIGINT}, #{payType,jdbcType=VARCHAR}, #{operType,jdbcType=TINYINT}, 
-      #{state,jdbcType=VARCHAR}, #{originRefoundMoney,jdbcType=BIGINT}, #{originRefoundTime,jdbcType=TIMESTAMP}, 
-      #{manMadeRefoundTime,jdbcType=TIMESTAMP}, #{manMadeRefoundType,jdbcType=VARCHAR}, 
-      #{accountDay,jdbcType=TIMESTAMP}, #{prePayId,jdbcType=VARCHAR}, #{thirdPayId,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
-  </insert>
   <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.Payorder" >
     insert into t_s_payorder
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -151,7 +137,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.Payorder" >
+  <update id="updatePayOrder" parameterType="com.asiainfo.dtdt.entity.Payorder" >
     update t_s_payorder
     <set >
       <if test="orderId != null" >
@@ -200,25 +186,6 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where pay_id = #{payId,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.asiainfo.dtdt.entity.Payorder" >
-    update t_s_payorder
-    set order_id = #{orderId,jdbcType=VARCHAR},
-      pay_account = #{payAccount,jdbcType=VARCHAR},
-      pay_money = #{payMoney,jdbcType=BIGINT},
-      pay_type = #{payType,jdbcType=VARCHAR},
-      oper_type = #{operType,jdbcType=TINYINT},
-      state = #{state,jdbcType=VARCHAR},
-      origin_refound_money = #{originRefoundMoney,jdbcType=BIGINT},
-      origin_refound_time = #{originRefoundTime,jdbcType=TIMESTAMP},
-      man_made_refound_time = #{manMadeRefoundTime,jdbcType=TIMESTAMP},
-      man_made_refound_type = #{manMadeRefoundType,jdbcType=VARCHAR},
-      account_day = #{accountDay,jdbcType=TIMESTAMP},
-      pre_pay_id = #{prePayId,jdbcType=VARCHAR},
-      third_pay_id = #{thirdPayId,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
-    where pay_id = #{payId,jdbcType=VARCHAR}
+    where pay_id = #{payId,jdbcType=VARCHAR}  and  third_pay_id = #{thirdPayId,jdbcType=VARCHAR}
   </update>
 </mapper>
