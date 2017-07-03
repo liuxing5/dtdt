@@ -12,6 +12,16 @@ public class Constant {
 	public static final String APPID = "209b6980-d0d5-4b64-a8e0-1eb384ad9de7";
 	public static final String  APPKEY = "38d3e80a-e1e7-4b50-b50d-158c51b5bb0f";
 	
+	public static final String CHARGESYSUSERNAME = "wojia";
+	
+	public static final String CHARGESYSPASSWORD = "123qwe";
+	
+	public static final String CHARGEENCRYFACTOR = "mobile%userN%pwd";
+	
+	public static final String GETDMTFROMCHARGESYSTM = "http://120.197.60.118:21180/aiwmRecharge/query/denominationQuery.do";
+	
+	public static final String RECHARGE_URL	= "http://120.52.21.138:11186/RechargeApi/rest/activity/recharge.n";
+	
 	public static final String WJZG_RETURN_SUCCESS_CODE	= "0";
 	
 	/**处理成功码**/
@@ -42,7 +52,7 @@ public class Constant {
 	/**沃家总管订购退订接口**/
 	public static final String ORDER_URL  			= "http://120.52.120.106:9008/order";
 	/**沃家总管查询订购信息接口**/
-	public static final String QUERYORDER_URL  		= "http://<url>/<path>/queryorder";
+	public static final String QUERYORDER_URL  		= "http://120.52.120.106:9008/queryorder";
 	
 	/**非联通号码**/
 	public static final String NOT_UNICOM_CODE 		= "20001";
@@ -140,4 +150,28 @@ public class Constant {
 	public static final String WOORDER_TYPE_2	= "2";
 	/**3：由我方订购互斥产品**/
 	public static final String WOORDER_TYPE_3	= "3";
+	
+	/**入表方式（0：订单完工 1：未支付失效 2：人工操作）**/
+	public static final String HISORDER_TYPE_0	= "0";
+	/**1：未支付失效 **/
+	public static final String HISORDER_TYPE_1	= "1";
+	/**2：人工操作**/
+	public static final String HISORDER_TYPE_2	= "2";
+	
+	/**
+     * 充值失败
+     */
+    public static final Integer RECHARGE_FAIL_CODE		   		= 916;
+    public static final String RECHARGE_FAIL_MSG		   		= "充值失败";
+    /**
+     * 充值异常
+     */
+    public static final Integer RECHARGE_ERROR_CODE		   		= 917;
+    public static final String RECHARGE_ERROR_MSG		   		= "充值异常";
+    /**
+     * 充值异常
+     */
+    public static final Integer RECHARGE_TIMEOUT_CODE		   		= 918;
+    public static final String RECHARGE_TIMEOUT_MSG		   		= "充值超时";
+
 }

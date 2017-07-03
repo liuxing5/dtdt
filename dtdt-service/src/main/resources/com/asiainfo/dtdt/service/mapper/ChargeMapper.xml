@@ -26,6 +26,12 @@
     from t_s_charge
     where charge_id = #{chargeId,jdbcType=VARCHAR}
   </select>
+  <select id="getChargeByParentId" resultMap="BaseResultMap"  parameterType="java.lang.String" >
+  select 
+    <include refid="Base_Column_List" />
+    from t_s_charge
+    where recharge_parent_id = #{rechargeParentId,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from t_s_charge
     where charge_id = #{chargeId,jdbcType=VARCHAR}

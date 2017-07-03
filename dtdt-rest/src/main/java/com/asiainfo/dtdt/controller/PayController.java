@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.util.AliPayCommonUtil;
 import com.asiainfo.dtdt.common.util.WcPayCommonUtil;
 import com.asiainfo.dtdt.common.util.XmlUtils;
+import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayService;
 
@@ -54,13 +55,16 @@ public class PayController {
 	@Resource
 	private IPayOrderService payOrderService;
 	
+	@Resource
+	private IOrderService orderService;
+	
 	/**
-	 * Description:微信支付回调
-	 * @param:
-	 * @return:String
-	 * @author:Iffie
-	 * Date:2016年11月1日
-	 * @throws IOException 
+	* @Title: PayController 
+	* @Description: (微信支付回调) 
+	* @param request
+	* @param response
+	* @throws Exception        
+	* @throws
 	 */
 	@RequestMapping(value="/wcPayNotify")
 	public void wcPayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -111,11 +115,9 @@ public class PayController {
 				return;
 			}
 			if("SUCCESS".equals(resultCode)){
-				/**检验是否存在订购关系 start**/
-				
-				/**检验是否存在订购关系 end**/
 				/**支付成功沉淀订购关系数据 start**/
-				
+				String orderId = (String) map.get("out_trade_no");
+				orderService.paySuccessOrderDeposition(resultCode, orderId);
 				/**支付成功沉淀订购关系数据 end**/
 			}
 			
@@ -123,26 +125,12 @@ public class PayController {
 	}
 	
 	/**
-	 * Description:支付宝支付同步回调
-	 * @param:
-	 * @return:String
-	 * @author:Iffie
-	 * Date:2016年11月4日
-	 * @throws Exception 
-	 */
-	@RequestMapping(value="/aliPayAppNotify",produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public String aliPayAppNotify(@RequestBody JSONObject jsonObject) throws Exception{
-		logger.info("调用支付宝支付同步回调接口：aliPayAppNotify-------------------------");
-		return "";//payService.aliPayAppNotify(jsonObject);
-	}
-	/**
-	 * Description:支付宝支付异步回调
-	 * @param:
-	 * @return:String
-	 * @author:Iffie
-	 * Date:2016年11月4日
-	 * @throws Exception 
+	* @Title: PayController 
+	* @Description: (支付宝支付异步回调) 
+	* @param request
+	* @param response
+	* @throws Exception        
+	* @throws
 	 */
 	@RequestMapping(value="/aliPayNotify")
 	public void aliPayNotify(HttpServletRequest request,HttpServletResponse response) throws Exception{
@@ -168,8 +156,7 @@ public class PayController {
 			return;
 		}
 		//验签不通过
-//		if(!payService.aliPayCheckSign(params)){
-		if(1==1){
+		if(!payService.aliPayCheckSign(params)){
 			logger.error("==aliPayNotify==aliPayCheckSign fail=="+" params:"+params);
 			AliPayCommonUtil.aliPayResponse("wrong sign", response);
 			return;
@@ -177,8 +164,7 @@ public class PayController {
 		//商户订单号
 		String out_trade_no = params.get("out_trade_no");
 		//判断业务是否已经处理过
-//		if(payService.isProcessed(out_trade_no)){
-		if(1==1){
+		if(payService.isProcessed(out_trade_no)){
 			logger.info("==aliPayNotify==isProcessed==支付宝回调,业务已经处理过");
 			AliPayCommonUtil.aliPayResponse("success", response);
 			return;
@@ -188,55 +174,25 @@ public class PayController {
 		String trade_no = params.get("trade_no");
 		//交易状态
 		String trade_status = params.get("trade_status");
-		//红包
-		if(out_trade_no.endsWith("_REDP")){
-			try {
-				logger.info("==aliPayNotify==updateRedpacketPayStatus==begin,trade_status:"+trade_status);
-				//数据沉淀
-				if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-//					payService.updateRedpacketPayStatusAfterPayNotify("SUCCESS",out_trade_no,trade_no);
-				}else{
-//					payService.updateRedpacketPayStatusAfterPayNotify("FAIL",out_trade_no,trade_no);
-				}
-				logger.info("==aliPayNotify==updateRedpacketPayStatus==success");
-				//响应支付宝
-				AliPayCommonUtil.aliPayResponse("success", response);
-			} catch (Exception e) {
-				logger.error("==aliPayNotify==updateRedpacketPayStatus==exception",e);
-				//响应支付宝
-				AliPayCommonUtil.aliPayResponse("fail", response);
-				return;
-			}
+		try {
+			logger.info("==aliPayNotify==updateRedpacketPayStatus==begin,trade_status:"+trade_status);
+			//数据沉淀
 			if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-				//红包业务
-//				payService.doRedPacket(out_trade_no);
+				orderService.paySuccessOrderDeposition("SUCCESS", out_trade_no);
+			}else{
+				orderService.paySuccessOrderDeposition("FAIL", out_trade_no);
 			}
-		//充值
-		}else if(out_trade_no.endsWith("_RECH")){
-			try {
-				logger.info("==aliPayNotify==updateRechargePayStatus==begin,trade_status:"+trade_status);
-				//数据沉淀
-				if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-//					payService.updateRechargePayStatusAfterPayNotify("SUCCESS", out_trade_no,trade_no);
-				}else{
-//					payService.updateRechargePayStatusAfterPayNotify("FAIL", out_trade_no,trade_no);
-				}
-				logger.info("==aliPayNotify==updateRechargePayStatus==success");
-				//响应支付宝
-				AliPayCommonUtil.aliPayResponse("success", response);
-			} catch (Exception e) {
-				logger.error("==aliPayNotify==updateRechargePayStatus==exception",e);
-				//响应支付宝
-				AliPayCommonUtil.aliPayResponse("fail", response);
-				return;
-			}
-			if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-				//充值业务
-//				payService.doRecharge(out_trade_no);
-			}
+			logger.info("==aliPayNotify==updateRedpacketPayStatus==success");
+			//响应支付宝
+			AliPayCommonUtil.aliPayResponse("success", response);
+		} catch (Exception e) {
+			logger.error("==aliPayNotify==updateRedpacketPayStatus==exception",e);
+			//响应支付宝
+			AliPayCommonUtil.aliPayResponse("fail", response);
+			return;
 		}
+		
 	}
-	
 	
 }
 

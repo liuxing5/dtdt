@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.Vcode;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
+import com.asiainfo.dtdt.interfaces.ICodeService;
 import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
@@ -56,6 +59,18 @@ public class OrderServiceImpl implements IOrderService{
 	@Autowired
 	private OrderMapper orderMapper;
 	
+	@Autowired
+	private OrderRecordMapper orderRecordMapper;
+	
+	@Autowired
+	private ProductMapper productMapper;
+	
+	@Autowired
+	private VcodeMapper vcodeMapper;
+	
+	@Autowired
+	private HisOrderRecordMapper hisOrderRecordMapper;
+	
 //	@Resource
 //	private ICodeService codeService;
 	
@@ -70,18 +85,6 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private IAppService appService;
-	
-	@Autowired
-	private OrderRecordMapper orderRecordMapper;
-	
-	@Autowired
-	private HisOrderRecordMapper hisOrderRecordMapper;
-	
-	@Autowired
-	private VcodeMapper vcodeMapper;
-	
-	@Autowired
-	private ProductMapper productMapper;
 	
 	/**
 	 * (非 Javadoc) 
@@ -298,7 +301,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @return 
 	* @see com.asiainfo.dtdt.interfaces.order.IOrderService#paySuccessOrderDeposition(java.lang.String, java.lang.String)
 	 */
-	public boolean paySuccessOrderDeposition(String resultCode,String orderId) {
+	public void paySuccessOrderDeposition(String resultCode,String orderId) {
 		logger.info("begin orderService paySuccessOrderDeposition param: resultCode="+resultCode+",orderId="+orderId);
 		try {
 			if("SUCCESS".equals(resultCode)){//支付返回成功
@@ -315,62 +318,62 @@ public class OrderServiceImpl implements IOrderService{
 						String wjzgResult = OrderMethod.order(order.getMobilephone(), product.getWoProductCode(), DateUtil.getDateTime(order.getCreateTime()),order.getOrderChannel() );
 						if(StringUtils.isBlank(wjzgResult)){
 							//订购接口处理异常
-							logger.error("orderService order product post wojia return fail param:orderId="+orderId);
-							return false;
+							logger.info("orderService order product post wojia return fail param:orderId="+orderId);
+							return;
 						}
 						JSONObject wjzgJson = JSONObject.parseObject(wjzgResult);
 						String ecode = wjzgJson.getString("ecode");
 						String woOrderId = wjzgJson.getString("orderId");
 						if("0".equals(ecode)){
-							logger.error("orderService order product post wojia return success param:orderId="+orderId);
+							logger.info("orderService order product post wojia return success param:orderId="+orderId);
 							//订购成功，处理数据
 							//woOrder 0-我方初始化订购
 							//沉淀订购关系数据成功
-							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_0, "10", order.getPartnerCode(),Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+							updateOrder(orderId, woOrderId, "10", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+//							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_0, "10", order.getPartnerCode(),Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+							return;
 						}else if("4001".equals(ecode)){
 							//存在重复订购，处理业务
-							logger.error("orderService order product post wojia return repeat order param:orderId="+orderId);
+							logger.info("orderService order product post wojia return repeat order param:orderId="+orderId);
 							//沃家返回重复订购，邮箱侧创建订购关系，返回订购成功，当前月不用反冲话费
 							//*状态13：邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功
 							//疑问？：重复订购
-							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费");
+							return;
 						}else if("4005".equals(ecode)){
 							//订购互斥产品
 							//存在重复订购，处理业务
-							logger.error("orderService order product post wojia return mutex order param:orderId="+orderId);
+							logger.info("orderService order product post wojia return mutex order param:orderId="+orderId);
 							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
-							return optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+							return ;
 						}
-					}else {//存在介入方产品使用此免流产品
-						return optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+					}else {//存在介入方产品使用此免流产品,重复订购
+						//optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+						logger.info("orderService order product repeat order param:appkey="+order.getAppKey()+",orderId="+orderId);
+						return ;
 					}
 				}else {//沃家总管存在已订购产品
 					WoplatOrder woOrder  = JSONObject.parseObject(woplatOrder, WoplatOrder.class);
-					String woCycleType = woOrder.getProductCode().substring(2, 3);//沃家总管订购流量包
-					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
-					if(Constant.CYCLE_TYPE_01.equals(woCycleType) && woCycleType.equals(cycleType)){//包月
-						//判断wojia总管订购流量包为包月并且当前也为包月流量包
-						
-					}else if(Constant.CYCLE_TYPE_02.equals(woCycleType) && woCycleType.equals(cycleType)){//包半年
-						//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
-						
-					}else if(Constant.CYCLE_TYPE_03.equals(woCycleType) && woCycleType.equals(cycleType)){//包年
-						//判断wojia总管订购流量包为包年并且当前也为包年流量包
-						
-					}
-					return optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+//					String woCycleType = woOrder.getProductCode().substring(2, 3);//沃家总管订购流量包
+//					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
+					optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", woOrder.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+					orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管同步记录中存在订购关系：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+					return ;
 				}
 			}else {//支付失败
 				//更新在途订购订单状态4-付款失败
 				updateOrder(orderId,null, "4",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 				//将在途表信息存放在备份表中
-				orderPayFailBak(orderId, "2", "第三方支付失败");
+				orderPayBak(orderId, "2", "第三方支付失败");
 			}
 		} catch (Exception e) {
 			logger.error("orderService paySuccessOrderDeposition fail:"+e.getMessage(),e);
 			e.printStackTrace();
 		}
-		return false;
+		return;
 	}
 	
 	/**
@@ -402,11 +405,11 @@ public class OrderServiceImpl implements IOrderService{
 			//沉淀订购关系
 			int count = insertFromOrderRecordById(orderId, cycleType2, woOrder);//0-我方初始化订购
 			if(count > 0){
-				logger.error("orderService order product deposit orderRecord data success:orderId="+orderId);
+				logger.info("orderService order product deposit orderRecord data success:orderId="+orderId);
 				return true;
 			}
 		}
-		logger.error("orderService order product deposit orderRecord data fail:orderId="+orderId);
+		logger.info("orderService order product deposit orderRecord data fail:orderId="+orderId);
 		return false;
 	}
 	
@@ -487,13 +490,13 @@ public class OrderServiceImpl implements IOrderService{
 	* @param copyRemark  入表备注      
 	* @throws
 	 */
-	public void orderPayFailBak(String orderId,String copyType,String copyRemark){
+	public void orderPayBak(String orderId,String copyType,String copyRemark){
 		int num = orderMapper.insertFromHisOrderById(orderId, copyType, copyRemark);
 		if(num > 0){
 			orderMapper.deleteByPrimaryKey(orderId);//清除在途表信息
 		}
 	}
-	
+
 	/**
 	* @Title: closeOrder 
 	* @Description:定向流量退订接口
@@ -665,4 +668,5 @@ public class OrderServiceImpl implements IOrderService{
 			e.printStackTrace();
 		}
 	}
+	
 }

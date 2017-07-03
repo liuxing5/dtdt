@@ -9,6 +9,7 @@ import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.asiainfo.dtdt.api.IAuthoService;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
@@ -104,6 +105,14 @@ public class ConsumerConfig {
     public ReferenceBean<IPayService> configIPayServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
         ReferenceBean<IPayService> referenceBean = new ReferenceBean<IPayService>();
         referenceBean.setInterface(IPayService.class);
+        buildcommon(registryConfig, referenceBean);
+        return referenceBean;
+    }
+    
+    @Bean
+    public ReferenceBean<INoticeService> configINoticeServiceBean(@Qualifier("consumerRegistry") RegistryConfig registryConfig) {
+        ReferenceBean<INoticeService> referenceBean = new ReferenceBean<INoticeService>();
+        referenceBean.setInterface(INoticeService.class);
         buildcommon(registryConfig, referenceBean);
         return referenceBean;
     }

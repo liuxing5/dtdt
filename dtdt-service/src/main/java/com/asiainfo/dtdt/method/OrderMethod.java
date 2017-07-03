@@ -1,15 +1,14 @@
 package com.asiainfo.dtdt.method;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.MD5Util;
 import com.asiainfo.dtdt.common.UuidUtil;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
+import com.asiainfo.dtdt.config.woplat.WoplatConfig;
+
+import lombok.extern.log4j.Log4j2;
 
 
 /** 
@@ -20,9 +19,10 @@ import com.asiainfo.dtdt.common.request.HttpClientUtil;
 * @since 
 * @return 
 */
+@Log4j2
 public class OrderMethod {
 	
-	private final static Log logger = LogFactory.getLog(OrderMethod.class);
+	public static WoplatConfig woplatConfig = new WoplatConfig();
 	
 	/**
 	 * @throws Exception 
@@ -37,29 +37,29 @@ public class OrderMethod {
 	* @throws
 	 */
 	public static String order(String msisdn,String productCode,String subscriptionTime,String orderChannel){
-		logger.info("**********请求沃家总管进行定向流量订购开始***********");
+		log.info("**********请求沃家总管进行定向流量订购开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", Constant.APPID);
-			jsonObject.put("operType", "1");
+			jsonObject.put("appId", woplatConfig.getWoAppId());
+			jsonObject.put("operType", 1);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("productId", productCode);
 			jsonObject.put("subscriptionTime", subscriptionTime);
 			jsonObject.put("orderMethod",orderChannel);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
-			logger.info("post wojia order param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
-			logger.info("wojia order return result:"+result);
+			log.info("post wojia order param:"+jsonObject.toString());
+			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
+			log.info("wojia order return result:"+result);
 		} catch (Exception e) {
-			logger.error("post wojia order error:"+e.getMessage(), e);
+			log.error("post wojia order error:"+e.getMessage(), e);
 			return null;
 		}
-		logger.info("**********请求我家总管进行定向流量订购结束***********");
+		log.info("**********请求我家总管进行定向流量订购结束***********");
 		return result;
 	}
 	
@@ -77,12 +77,12 @@ public class OrderMethod {
 	* @throws
 	 */
 	public static String closeOrder(String msisdn,String productId,String orderId,String subscriptionTime,String orderMethod){
-		logger.info("**********请求沃家总管进行定向流量退订开始***********");
+		log.info("**********请求沃家总管进行定向流量退订开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("appId", woplatConfig.getWoAppId());
 			jsonObject.put("operType", "2");
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("productId", productId);
@@ -91,16 +91,16 @@ public class OrderMethod {
 			jsonObject.put("orderMethod",orderMethod);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
-			logger.info("post wojia closeOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
-			logger.info("wojia closeOrder return result:"+result);
+			log.info("post wojia closeOrder param:"+jsonObject.toString());
+			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
+			log.info("wojia closeOrder return result:"+result);
 		} catch (Exception e) {
-			logger.error("post wojia closeOrder error:"+e.getMessage(), e);
+			log.error("post wojia closeOrder error:"+e.getMessage(), e);
 			return null;
 		}
-		logger.info("**********请求沃家总管进行定向流量退订结束***********");
+		log.info("**********请求沃家总管进行定向流量退订结束***********");
 		return result;
 	}
 	
@@ -119,32 +119,32 @@ public class OrderMethod {
 	* @throws
 	 */
 	public static String queryOrder(String msisdn,String orderId){
-		logger.info("**********请求沃家总管进行定向流量查询订购信息开始***********");
+		log.info("**********请求沃家总管进行定向流量查询订购信息开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("appId", woplatConfig.getWoAppId());
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("orderId", orderId);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
-			logger.info("wojia post queryOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonObject);
-			logger.info("wojia queryOrder return result:"+result);
+			log.info("wojia post queryOrder param:"+jsonObject.toString());
+			result = HttpClientUtil.httpPost(woplatConfig.getQueryOrder(), jsonObject);
+			log.info("wojia queryOrder return result:"+result);
 		} catch (Exception e) {
-			logger.error("post wojia queryOrder error:"+e.getMessage(), e);
+			log.error("post wojia queryOrder error:"+e.getMessage(), e);
 			return null;
 		}
-		logger.info("**********请求沃家总管进行定向流量查询订购信息结束***********");
+		log.info("**********请求沃家总管进行定向流量查询订购信息结束***********");
 		return result;
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(DateUtil.getSysdateYYYYMMDDHHMMSS());
-		System.out.println(order("18516222334", "1000", "201706271303010201", "1"));
-		System.out.println(closeOrder( "18516222334", "1000", "3453445467665434567", "201706271303010201", "1"));
+//		System.out.println(DateUtil.getSysdateYYYYMMDDHHMMSS());
+		System.out.println(order("18516222334", "cc0ad6fb167742e185d85f511e26c80d", "201706271303010201", "1"));
+//		System.out.println(closeOrder( "18516222334", "1000", "3453445467665434567", "201706271303010201", "1"));
 	}
 }

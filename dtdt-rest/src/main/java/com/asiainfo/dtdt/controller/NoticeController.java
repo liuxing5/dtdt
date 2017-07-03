@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.asiainfo.dtdt.interfaces.order.INoticeService;
 
 /** 
 * @author 作者 : xiangpeng
@@ -34,9 +37,12 @@ public class NoticeController {
 	
 	private Logger logger = Logger.getLogger(NoticeController.class);
 	
+	@Resource
+	private INoticeService noticeService;
+	
 	@RequestMapping("/all")
 	@ResponseBody
-	public String notice(HttpServletRequest request, HttpServletResponse response) throws IOException{
+	public synchronized String notice(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
         BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
         StringBuilder sb = new StringBuilder();
@@ -49,12 +55,13 @@ public class NoticeController {
         JSONObject jsonObject =new JSONObject(notifyJson);
 		String seq = jsonObject.get("seq").toString();
 		String appId = jsonObject.get("msisdn").toString();
-		String orderId = jsonObject.get("orderId").toString();
+		String orderId = jsonObject.get("orderId").toString();//沃家总管返回的orderId
 		String productId = jsonObject.get("productId").toString();
 		String subscriptionTime = jsonObject.get("subscriptionTime").toString();
 		String feeStartDate = jsonObject.get("feeStartDate").toString();
 		String validExpireDate = jsonObject.get("validExpireDate").toString();
 		String orderDesc = jsonObject.get("orderDesc").toString();
+		String orderState = jsonObject.get("orderState").toString();//订单状态： 2，订购成功 5，退订成功（可再订购）6，订购失败7，退订失败。
 		String productAttrValues = jsonObject.get("productAttrValues").toString();
 		JSONArray jsonArray = new JSONArray(productAttrValues);
 		Map<String,Object> mapList  = new HashMap();
@@ -67,8 +74,7 @@ public class NoticeController {
 			list.add(mapList);
 		}
 		/**处理业务开始*/
-		
-		
+		noticeService.optNoticeOrder(orderState, orderId);
 		/**处理业务结束*/
 		JSONObject returnJson = new JSONObject();
 		returnJson.append("ecode", "0");

@@ -2,16 +2,28 @@ package com.asiainfo.dtdt.common.request;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.nio.charset.Charset;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
+import com.asiainfo.dtdt.common.RechargeSignUtil;
 
 
 /** 
@@ -23,8 +35,9 @@ import com.asiainfo.dtdt.common.Constant;
 * @return 
 */
 public class HttpClientUtil {
-	private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
+	private final static Log logger = LogFactory.getLog(HttpClientUtil.class);
+	
 	/** 
      * httpPost 
      * @param url  路径 
@@ -105,4 +118,65 @@ public class HttpClientUtil {
     	
     	return jsonResult;
     }
+    
+    public static String doRestChargeSys(String uri, Map<String,Object> paramMap)
+			throws Exception
+	{
+		String timestamp = RechargeSignUtil.create_timestamp();
+		String sign = RechargeSignUtil.createSign("utf-8",paramMap,timestamp);
+		String param = RechargeSignUtil.mapToJsonStr(paramMap);
+		String user = (String) paramMap.get("user");
+		String data = "";
+		@SuppressWarnings("resource")
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost post = new HttpPost(uri);
+		post.setEntity(new StringEntity(param, Charset.forName("UTF-8")));
+		post.setHeader("Connection", "Keep-Alive");
+		post.setHeader("Content-Type","application/json");
+		post.setHeader("timestamp", timestamp);
+		post.setHeader("Authorization", user + ":" + sign);
+		try
+		{
+			HttpResponse response = httpClient.execute(post);
+			logger.info(response);
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != 200)
+			{
+				logger.error("Method failed: " + response.getStatusLine() + " for url " + uri);
+				throw new Exception("Method failed: " + response.getStatusLine() + " for url " + uri);
+			}
+			InputStream inputStream = response.getEntity().getContent();
+			BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+			StringBuffer stringBuffer = new StringBuffer();
+			String str = "";
+			while ((str = br.readLine()) != null)
+			{
+				stringBuffer.append(str);
+			}
+			data = stringBuffer.toString();
+		} catch (HttpException e)
+		{
+			logger.error("Please check your provided http address!");
+			throw e;
+		} catch (IOException e)
+		{
+			logger.error(e);
+			throw e;
+		} catch (Exception e)
+		{
+			logger.error(e);
+			throw e;
+		} finally
+		{
+			try
+			{
+				httpClient.getConnectionManager().shutdown();
+			} catch (Exception ignore)
+			{
+			}
+		}
+		logger.debug("rest data:" + data);
+		return data;
+	}
+	
 }

@@ -272,7 +272,7 @@
       FROM t_s_order WHERE order_id = #{orderId,jdbcType=VARCHAR});
   </insert>
   <insert id="insertFromOrderRecordById" parameterType="java.lang.String">
-      INSERT INTO t_s_his_order 
+      INSERT INTO t_s_order_record 
       (   order_id,wo_order_id, partner_code, app_key, partner_order_id, product_code,oper_source,
        state, mobilephone, order_channel, price, count, money, is_need_charge, 
      allow_auto_pay, remark,  valid_time, invalid_time, update_time, create_time,redirect_url,cycle_type2,wo_order
