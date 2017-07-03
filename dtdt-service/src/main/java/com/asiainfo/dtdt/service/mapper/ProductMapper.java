@@ -8,8 +8,6 @@ import com.asiainfo.dtdt.entity.Product;
 
 public interface ProductMapper {
 	
-	Product queryProduct(@Param("productCode")String productCode);
-	
 	Product selectByPrimaryKey(Long id);
 	
 	/**
@@ -19,5 +17,13 @@ public interface ProductMapper {
 	* @throws
 	 */
 	List<Product> getProductList();
+	
+	/**
+	* @Title: queryProduct 
+	* @Description: 根据产品 编码查询产品
+	* @return Product
+	* @throws
+	 */
+	Product queryProduct(@Param("productCode")String productCode);
 	
 }

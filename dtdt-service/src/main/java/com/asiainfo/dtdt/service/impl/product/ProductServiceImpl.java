@@ -34,17 +34,29 @@ public class ProductServiceImpl implements IProductService {
 			List<Product> list = productMapper.getProductList();
 			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, list);
 		} catch (Exception e) {
+			logger.info("ProductServiceImpl getProductList() Exception e" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-		
 	}
 
+	/**
+	* @Title: queryProduct 
+	* @Description: 根据产品 编码查询产品
+	* @return String
+	* @throws
+	 */
 	public String queryProduct(String productCode) {
 		logger.info("ProductServiceImpl queryProduct param:productCode="+productCode);
-		Product product = productMapper.queryProduct(productCode);
-		if(product == null){
-			return null;
+		
+		try {
+			Product product = productMapper.queryProduct(productCode);
+			if(product == null){
+				return null;
+			}
+			return JSONObject.toJSONString(product);
+		} catch (Exception e) {
+			logger.info("ProductServiceImpl queryProduct() Exception e" + e);
+			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-		return JSONObject.toJSONString(product);
 	}
 }

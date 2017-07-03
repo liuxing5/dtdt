@@ -19,12 +19,7 @@
     ID, product_code,wo_product_code, product_name, price,wo_product_price, state, cycle_type, type, can_unsubscribe, 
     create_time, update_time
   </sql>
-  <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    <include refid="Base_Column_List" />
-    from t_s_product
-    where product_code = #{productCode}
-  </select>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
@@ -37,5 +32,12 @@
     product_code,product_name,cycle_type
     from t_s_product
     where state = 0
+  </select>
+  <!-- 根据产品 编码查询产品 -->
+  <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_product
+    where product_code = #{productCode}
   </select>
 </mapper>

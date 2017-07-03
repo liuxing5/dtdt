@@ -10,5 +10,13 @@ public interface IProductService {
 	 */
 	String getProductList();
 	
+	/**
+	 * 
+	* @Title: queryProduct 
+	* @Description: (根据产品 编码查询产品)
+	* @param productCode
+	* @return String
+	* @throws
+	 */
 	String queryProduct(String productCode);
 }
