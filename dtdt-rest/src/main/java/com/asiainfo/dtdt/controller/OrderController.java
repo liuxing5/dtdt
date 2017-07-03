@@ -69,7 +69,7 @@ public class OrderController {
 	* @throws IOException        
 	* @throws
 	 */
-	@RequestMapping("/closeOrder")
+	@RequestMapping(value = "/closeOrder", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String closeOrder(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
@@ -79,27 +79,8 @@ public class OrderController {
         while ((line = in.readLine()) != null) {
         	sb.append(line);
         }
-        String orderJson = sb.toString(); //接收到通知信息。
-        logger.info("notice data:"+orderJson);
-        JSONObject jsonObject =new JSONObject(orderJson);
-		String seq = jsonObject.getString("seq");
-		String pertnerCode = jsonObject.getString("pertnerCode").toString();
-		String appKey = jsonObject.getString("appKey").toString();
-		String token = jsonObject.getString("token").toString();
-		String phone = jsonObject.getString("orderId").toString();
-		String productCode = jsonObject.getString("productCode").toString();
-		String timeStamp = jsonObject.get("timeStamp").toString();
-		String appSignature = jsonObject.get("appSignature").toString();
-		/**验签开始*/
-		
-		/**验签结束*/
-		/**处理业务开始*/
-		
-		/**处理业务结束*/
-		JSONObject returnJson = new JSONObject();
-		returnJson.append("code", "00000");
-		returnJson.append("msg", "成功");
-		returnJson.append("seq", seq);
-		return returnJson.toString();
+        String orderJson = sb.toString();
+        logger.info("closeOrder param data:" + orderJson);
+        return orderService.closeOrder(orderJson);
 	}
 }

@@ -518,7 +518,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			orderRecord = orderRecordMapper.selectMonthProduct(orderId);
 			if (null == orderRecord) {
-				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
 			}
 		} catch (Exception e) {
 			logger.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
@@ -610,10 +610,9 @@ public class OrderServiceImpl implements IOrderService{
 		jsonParam.put("appSignature", appSignature);
 		
 		//请求接口并返回
-		String url = "http://120.52.120.106:9008/order";
 		String response = "";
 		try {
-			response = HttpClientUtil.httpPost(url, jsonParam);
+			response = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonParam);
 		} catch (Exception e) {
 			logger.info("OrderServiceImpl closeOrderFromWojia() httpPost Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
