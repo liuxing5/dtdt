@@ -7,8 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
+import com.asiainfo.dtdt.common.MD5Util;
 import com.asiainfo.dtdt.common.UuidUtil;
-import com.asiainfo.dtdt.common.encode.MD5Util;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
 
 

@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.asiainfo.dtdt.common.encode.MD5Util;
+import com.asiainfo.dtdt.common.MD5Util;
 
 
 /**
