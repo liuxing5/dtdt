@@ -12,4 +12,14 @@ public interface VcodeMapper {
 	* @throws
 	 */
     int insertVcode(Vcode record);
+    
+	/**
+	* @Title: selectByOrderId 
+	* @Description: (根据orderId查询验证码) 
+	* @param record
+	* @return        
+	* @throws
+	 */
+    Vcode selectByOrderId(String orderId);
+    
 }

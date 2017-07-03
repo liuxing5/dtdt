@@ -1,7 +1,7 @@
 package com.asiainfo.dtdt.interfaces.order;
 /**
 * @ClassName: IOrderService 
-* @Description: TODO(这里用一句话描述这个类的作用) 
+* @Description: 订单查询接口 
 * @author liuxing5
 * @date 2017年6月30日 下午6:55:14 
 *

@@ -55,4 +55,13 @@ public interface OrderRecordMapper {
      * @throws
       */
  	List<OrderRecord> queryOrderRecord(String phone);
+ 	
+ 	/**
+ 	* @Title: selectMonthProduct 
+ 	* @Description: 校验包月类订购
+ 	* @param orderId
+ 	* @return OrderRecord
+ 	* @throws
+ 	 */
+ 	OrderRecord selectMonthProduct(String orderId);
 }

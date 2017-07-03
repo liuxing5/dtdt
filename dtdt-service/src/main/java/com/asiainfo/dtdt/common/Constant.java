@@ -9,8 +9,8 @@ package com.asiainfo.dtdt.common;
 */
 public class Constant {
 
-	public static final String APPID = "9000012012";
-	public static final String  APPKEY = "213456gtr4";
+	public static final String APPID = "209b6980-d0d5-4b64-a8e0-1eb384ad9de7";
+	public static final String  APPKEY = "38d3e80a-e1e7-4b50-b50d-158c51b5bb0f";
 	
 	public static final String WJZG_RETURN_SUCCESS_CODE	= "0";
 	
@@ -40,7 +40,7 @@ public class Constant {
 	public static final String ERROR_MSG			= "异常";
 	
 	/**沃家总管订购退订接口**/
-	public static final String ORDER_URL  			= "http://<url>/<path>/order";
+	public static final String ORDER_URL  			= "http://120.52.120.106:9008/order";
 	/**沃家总管查询订购信息接口**/
 	public static final String QUERYORDER_URL  		= "http://<url>/<path>/queryorder";
 	

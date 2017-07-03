@@ -13,6 +13,13 @@
   <sql id="Base_Column_List" >
     ID, order_id, vcode_send_time, lvcode, user_input_vcode, user_input_time, vcode_valid_resut
   </sql>
+  <!-- 根据orderId查询验证码 -->
+  <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_vcode
+    where order_id = #{order_id,jdbcType=VARCHAR}
+  </select>
   <insert id="insertVcode" parameterType="com.asiainfo.dtdt.entity.Vcode" >
     insert into t_s_vcode
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -59,5 +59,14 @@ public interface IOrderService {
     * @throws
      */
     int insertFromOrderRecordById(String orderId,byte cycleType,String woOrder);
+    
+	/**
+	* @Title: closeOrder 
+	* @Description: (定向流量退订接口) 
+	* @param orderStr
+	* @return        
+	* @throws
+	 */
+	String closeOrder(String orderStr);
 	
 }

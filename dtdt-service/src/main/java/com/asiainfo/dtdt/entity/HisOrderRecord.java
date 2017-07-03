@@ -65,5 +65,7 @@ public class HisOrderRecord implements Serializable {
 	private String copyRemark;
 
 	private String redirectUrl;
+	
+	private String woOrderId;
 
 }
