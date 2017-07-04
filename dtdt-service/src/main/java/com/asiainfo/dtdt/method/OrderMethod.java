@@ -2,8 +2,10 @@ package com.asiainfo.dtdt.method;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.MD5Util;
+import com.asiainfo.dtdt.common.RestClient;
 import com.asiainfo.dtdt.common.UuidUtil;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
@@ -42,7 +44,8 @@ public class OrderMethod {
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", woplatConfig.getWoAppId());
+//			jsonObject.put("appId", woplatConfig.getWoAppId());
+			jsonObject.put("appId", Constant.APPID);
 			jsonObject.put("operType", 1);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("productId", productCode);
@@ -50,10 +53,12 @@ public class OrderMethod {
 			jsonObject.put("orderMethod",orderChannel);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
+//			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
+			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia order param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
+//			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
+			result = RestClient.doRest(Constant.ORDER_URL, "POST", jsonObject.toString());
 			log.info("wojia order return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia order error:"+e.getMessage(), e);
@@ -94,7 +99,8 @@ public class OrderMethod {
 			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia closeOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
+//			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
+			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
 			log.info("wojia closeOrder return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia closeOrder error:"+e.getMessage(), e);

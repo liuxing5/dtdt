@@ -26,4 +26,10 @@ public class WoplatConfig {
 	private String orderUrl;
 	
 	private String queryOrder;
+	
+	private String recharge_success_code;
+	
+	private String recharge_fail_code;
+	
+	private String recharge_timeout_code;
 }

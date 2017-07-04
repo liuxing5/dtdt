@@ -1,13 +1,10 @@
 package com.asiainfo.dtdt.common;
 
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
-import org.apache.ibatis.javassist.expr.NewArray;
 
 /**
  * 
