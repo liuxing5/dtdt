@@ -10,13 +10,11 @@ package com.asiainfo.dtdt.interfaces.order;
 public interface INoticeService {
 	
 	/**
-	* @Title: OrderServiceImpl 
-	* @Description: (将在途订单订购信息存放在备份表中并删除在途表信息) 
-	* @param orderId 订单ID
-	* @param copyType	入表方式（0：订单完工 1：未支付失效 2：支付失败 3：人工操作）
-	* @param copyRemark  入表备注      
+	* @Title: INoticeService 
+	* @Description: (沃家总管回调通知) 
+	* @param notifyJson        
 	* @throws
 	 */
-	void optNoticeOrder(String resultCode,String orderId);
+	String optNoticeOrder(String notifyJson);
 	
 }

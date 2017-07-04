@@ -39,6 +39,11 @@ public class Constant {
 	/**参数错误描述**/
 	public static final String PARAM_ERROR_MSG		= "参数错误";
 	
+	/**参数错误码**/
+	public static final String PARAM_ILLEGAL_CODE		= "20001";
+	/**参数错误描述**/
+	public static final String PARAM_ILLEGAL_MSG		= "消息体不是合法的json字符串";
+	
 	/**签名错误码**/
 	public static final String SIGN_ERROR_CODE		= "99998";
 	/**签名错误描述**/
@@ -157,6 +162,19 @@ public class Constant {
 	public static final String HISORDER_TYPE_1	= "1";
 	/**2：人工操作**/
 	public static final String HISORDER_TYPE_2	= "2";
+	
+	/**支付类型，1-支付，2退款**/
+	public static final byte PAY_OPER_TYPE	=	1;
+	public static final byte PAY_REFUND_OPER_TYPE	=	2;
+	
+	/**支付状态0-初始化，1-支付中，2-支付成功，3-支付失败，4-退款中，5退款成功，6退款失败**/
+	public static final String PAY_STATE_INIT		=	"0";
+	public static final String PAYMENT_STATE		=	"1";
+	public static final String PAY_STATE_SUCCESS	=	"2";
+	public static final String PAY_STATE_FAIL		=	"3";
+	public static final String PAY_STATE_REFUND		=	"4";
+	public static final String PAY_STATE_REFUND_SUCCESS	=	"5";
+	public static final String PAY_STATE_REFUND_FAIL	=	"6";
 	
 	/**
      * 充值失败

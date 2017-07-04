@@ -38,4 +38,22 @@ public interface IPayService {
 	* @throws
 	 */
 	boolean isProcessed(String out_trade_no);
+	
+	/**
+	* @Title: IPayService 
+	* @Description: (这里用一句话描述这个方法的作用) 
+	* @param jsonStr
+	* @return        
+	* @throws
+	 */
+	boolean wcPayNotify(String jsonStr);
+	
+	/**
+	* @Title: IPayService 
+	* @Description: (这里用一句话描述这个方法的作用) 
+	* @param jsonStr
+	* @return        
+	* @throws
+	 */
+	boolean aliPayNotify(Map<String,String> params);
 }

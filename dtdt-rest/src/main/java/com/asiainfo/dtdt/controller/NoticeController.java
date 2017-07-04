@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
+
+import lombok.extern.log4j.Log4j2;
 
 /** 
 * @author 作者 : xiangpeng
@@ -32,15 +33,14 @@ import com.asiainfo.dtdt.interfaces.order.INoticeService;
 * @return 
 */
 @Controller
+@Log4j2
 @RequestMapping(value="/notice",method=RequestMethod.POST)
 public class NoticeController {
-	
-	private Logger logger = Logger.getLogger(NoticeController.class);
 	
 	@Resource
 	private INoticeService noticeService;
 	
-	@RequestMapping("/all")
+	@RequestMapping("/order")
 	@ResponseBody
 	public synchronized String notice(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
@@ -51,35 +51,10 @@ public class NoticeController {
         	sb.append(line);
         }
         String notifyJson = sb.toString(); //接收到通知信息。
-        logger.info("notice data:"+notifyJson);
-        JSONObject jsonObject =new JSONObject(notifyJson);
-		String seq = jsonObject.get("seq").toString();
-		String appId = jsonObject.get("msisdn").toString();
-		String orderId = jsonObject.get("orderId").toString();//沃家总管返回的orderId
-		String productId = jsonObject.get("productId").toString();
-		String subscriptionTime = jsonObject.get("subscriptionTime").toString();
-		String feeStartDate = jsonObject.get("feeStartDate").toString();
-		String validExpireDate = jsonObject.get("validExpireDate").toString();
-		String orderDesc = jsonObject.get("orderDesc").toString();
-		String orderState = jsonObject.get("orderState").toString();//订单状态： 2，订购成功 5，退订成功（可再订购）6，订购失败7，退订失败。
-		String productAttrValues = jsonObject.get("productAttrValues").toString();
-		JSONArray jsonArray = new JSONArray(productAttrValues);
-		Map<String,Object> mapList  = new HashMap();
-		List list  = new ArrayList();
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject json = jsonArray.getJSONObject(i);
-			mapList.put("attrTypeId",json.getString("attrTypeId"));//产品编码
-			mapList.put("attrValue",json.getString("attrValue"));//产品属性值
-			mapList.put("attrDesc",json.getString("attrDesc"));//产品属性描述
-			list.add(mapList);
-		}
+        log.info("notice data:"+notifyJson);
 		/**处理业务开始*/
-		noticeService.optNoticeOrder(orderState, orderId);
+		String result = noticeService.optNoticeOrder(notifyJson);
 		/**处理业务结束*/
-		JSONObject returnJson = new JSONObject();
-		returnJson.append("ecode", "0");
-		returnJson.append("emsg", "成功");
-		returnJson.append("seq", seq);
-		return returnJson.toString();
+		return result;
 	}
 }

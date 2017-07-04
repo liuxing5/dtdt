@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Pattern.Flag;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.util.AliPayCommonUtil;
 import com.asiainfo.dtdt.common.util.WcPayCommonUtil;
-import com.asiainfo.dtdt.common.util.XmlUtils;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayService;
@@ -77,51 +77,14 @@ public class PayController {
         	sb.append(line);
         }
         String payNotifyXml = sb.toString(); //接收到支付相应信息。
-        Map map = XmlUtils.doXMLParse(payNotifyXml);
-        logger.info("==wcPayNotify==weChatCheckSign success=="+" map:"+map);
-        String returnCode = (String) map.get("return_code");
-		if (returnCode.equals("SUCCESS")) {
-			//验签不通过
-			if(!payService.weChatCheckSign(map)){
-				logger.error("==wcPayNotify==weChatCheckSign fail=="+" map:"+map);
-				WcPayCommonUtil.weChatPayResponse("FAIL","WRONG_SIGN", response);
-				return;
-			}
-				
-			String resultCode = (String) map.get("result_code");
-			// 获取商户订单号(payId)
-			String out_trade_no = (String) map.get("out_trade_no");
-			String transaction_id = (String) map.get("transaction_id");
-			//判断业务是否已经处理过
-			if(payService.isProcessed(out_trade_no)){
-				logger.info("==wcPayNotify==isProcessed==微信回调,业务已经处理过");
-				WcPayCommonUtil.weChatPayResponse("SUCCESS","OK", response);
-				return;
-			}
-			logger.info("==wcPayNotify==isProcessed==微信回调,业务正常处理");
-			
-			try {
-				logger.info("==wcPayNotify==updatePayOrderStatusAfterPayNotify==begin");
-				//数据沉淀
-				/**更新充值状态 start**/
-				payOrderService.updatePayOrderStatusAfterPayNotify(resultCode, out_trade_no,transaction_id);
-				/**更新充值状态 end**/
-				logger.info("==wcPayNotify==updatePayOrderStatusAfterPayNotify==success");
-				//响应微信
-				WcPayCommonUtil.weChatPayResponse("SUCCESS","OK", response);
-			} catch (Exception e) {
-				logger.error("==wcPayNotify==updatePayOrderStatusAfterPayNotify==exception",e);
-				WcPayCommonUtil.weChatPayResponse("FAIL","EXCEPTION", response);
-				return;
-			}
-			if("SUCCESS".equals(resultCode)){
-				/**支付成功沉淀订购关系数据 start**/
-				String orderId = (String) map.get("out_trade_no");
-				orderService.paySuccessOrderDeposition(resultCode, orderId);
-				/**支付成功沉淀订购关系数据 end**/
-			}
-			
-		}
+        boolean flag = payService.wcPayNotify(payNotifyXml);
+        if(flag){
+        	WcPayCommonUtil.weChatPayResponse("SUCCESS","OK", response);
+        	return ;
+        }else{
+        	WcPayCommonUtil.weChatPayResponse("FAIL","EXCEPTION", response);
+        	return ;
+        }
 	}
 	
 	/**
@@ -161,37 +124,14 @@ public class PayController {
 			AliPayCommonUtil.aliPayResponse("wrong sign", response);
 			return;
 		}
-		//商户订单号
-		String out_trade_no = params.get("out_trade_no");
-		//判断业务是否已经处理过
-		if(payService.isProcessed(out_trade_no)){
-			logger.info("==aliPayNotify==isProcessed==支付宝回调,业务已经处理过");
+		boolean flag = payService.aliPayNotify(params);
+		if(flag){
 			AliPayCommonUtil.aliPayResponse("success", response);
-			return;
-		}
-		logger.info("==aliPayNotify==isProcessed==支付宝回调,业务正常处理");
-		//支付宝交易号  
-		String trade_no = params.get("trade_no");
-		//交易状态
-		String trade_status = params.get("trade_status");
-		try {
-			logger.info("==aliPayNotify==updateRedpacketPayStatus==begin,trade_status:"+trade_status);
-			//数据沉淀
-			if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-				orderService.paySuccessOrderDeposition("SUCCESS", out_trade_no);
-			}else{
-				orderService.paySuccessOrderDeposition("FAIL", out_trade_no);
-			}
-			logger.info("==aliPayNotify==updateRedpacketPayStatus==success");
-			//响应支付宝
-			AliPayCommonUtil.aliPayResponse("success", response);
-		} catch (Exception e) {
-			logger.error("==aliPayNotify==updateRedpacketPayStatus==exception",e);
-			//响应支付宝
+			return ;
+		}else{
 			AliPayCommonUtil.aliPayResponse("fail", response);
-			return;
+			return ;
 		}
-		
 	}
 	
 }

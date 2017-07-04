@@ -63,5 +63,27 @@ public class PayOrderServiceImpl implements IPayOrderService {
 		payorderMapper.updatePayOrder(payorder);
 		logger.info("payOrderService updatePayOrderStatusAfterPayNotify end");
 	}
+	
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: insertPayOrder</p> 
+	* @Description: (记录支付信息) 
+	* @param payId 支付id
+	* @param orderId 支付订单号
+	* @param payMoney	支付金额
+	* @param operType	支付类型
+	* @param state	支付状态0-初始化，1-支付中，2-支付成功，3-支付失败，4-退款中，5退款成功，6退款失败
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.pay.IPayOrderService#insertPayOrder(java.lang.String, java.lang.String, java.lang.Long, byte, java.lang.String)
+	 */
+	public int insertPayOrder(String payId,String orderId,Long payMoney,byte operType,String state){
+		Payorder payorder = new Payorder();
+		payorder.setPayId(payId);
+		payorder.setOrderId(orderId);
+		payorder.setPayMoney(payMoney);
+		payorder.setOperType(operType);
+		payorder.setState(state);
+		return payorderMapper.insertSelective(payorder);
+	}
 
 }
