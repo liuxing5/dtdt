@@ -32,7 +32,7 @@
   <sql id="Base_Column_List" >
     order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
-    update_time, valid_time, invalid_time, price, count, money, is_need_charge, charge_type, 
+    update_time, valid_time, invalid_time, price, count, money, is_need_charge,
     remark, copy_time2, copy_type, copy_remark , allow_auto_pay,redirect_url
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -103,9 +103,6 @@
       </if>
       <if test="isNeedCharge != null" >
         is_need_charge,
-      </if>
-      <if test="chargeType != null" >
-        charge_type,
       </if>
       <if test="remark != null" >
         remark,
@@ -186,9 +183,6 @@
       </if>
       <if test="isNeedCharge != null" >
         #{isNeedCharge,jdbcType=TINYINT},
-      </if>
-      <if test="chargeType != null" >
-        #{chargeType,jdbcType=TINYINT},
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},

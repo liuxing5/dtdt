@@ -50,8 +50,6 @@ public class HisOrder implements Serializable {
 
 	private Byte isNeedCharge;
 
-	private Byte chargeType;
-
 	private String remark;
 
 	private Date copyTime2;
