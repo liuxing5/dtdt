@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +38,16 @@ public class AuthoController {
 	@Resource//(name="redisObject")
 	private RedisTemplate<String, Object> redisTemplate;
 	
-	@Resource
+	//@Resource
 	private RedisUtil redisUtil;  
 	
     @RequestMapping(value = "smscode", method = POST)
     public String getSMSCode(@RequestBody JSONObject json) {
     	log.debug("directional data traffic!");
+    	if(!json.containsKey("phone") || StringUtils.isEmpty(json.getString("phone")))
+    	{
+    		
+    	}
     	redisUtil.get("elf");
 		return authoService.getSMSCode("123");
     }
