@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
-import com.asiainfo.dtdt.api.IAuthoService;
 import com.asiainfo.dtdt.interfaces.IAppService;
+import com.asiainfo.dtdt.interfaces.IAuthoService;
 import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;

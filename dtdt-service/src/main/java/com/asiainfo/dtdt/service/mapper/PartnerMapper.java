@@ -14,4 +14,6 @@ public interface PartnerMapper {
     int updateByPrimaryKeySelective(Partner record);
 
     int updateByPrimaryKey(Partner record);
+    
+    Partner getByPartnerCode(String partnerCode);
 }

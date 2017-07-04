@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import com.asiainfo.dtdt.common.util.MD5Util;
+
 /**
 * @ClassName: RechargeSignUtil 
 * @Description: (充值接口签名工具) 

@@ -150,4 +150,11 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where partner_id = #{partnerId,jdbcType=BIGINT}
   </update>
+  
+  <select id="getByPartnerCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="Base_Column_List" />
+      from t_s_partner
+      where state = 0
+      and partner_code = #{partnerCode}
+  </select>
 </mapper>
