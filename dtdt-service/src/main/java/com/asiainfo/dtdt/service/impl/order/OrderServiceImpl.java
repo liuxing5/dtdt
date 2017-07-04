@@ -5,10 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -33,12 +30,15 @@ import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
+import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.service.mapper.VcodeMapper;
+
+import lombok.extern.log4j.Log4j2;
 
 /** 
 * @author 作者 : xiangpeng
@@ -48,11 +48,10 @@ import com.asiainfo.dtdt.service.mapper.VcodeMapper;
 * @since 
 * @return 
 */
+@Log4j2
 @Service
 public class OrderServiceImpl implements IOrderService{
 
-	private static final Logger logger = Logger.getLogger(OrderServiceImpl.class);
-	
 //	@Autowired
 //	private ICache cache;
 	
@@ -86,6 +85,9 @@ public class OrderServiceImpl implements IOrderService{
 	@Autowired
 	private IAppService appService;
 	
+	@Autowired
+	private IPayOrderService payOrderService;
+	
 	/**
 	 * (非 Javadoc) 
 	* <p>Title: order</p> 
@@ -95,18 +97,39 @@ public class OrderServiceImpl implements IOrderService{
 	* @see com.asiainfo.dtdt.interfaces.order.IOrderService#order(java.lang.String)
 	 */
 	public String preOrder(String jsonStr) {
-		logger.info("OrderServiceImpl preOrder() jsonStr:" + jsonStr);
+		log.info("OrderServiceImpl preOrder() jsonStr:" + jsonStr);
+		JSONObject jsonObject = null;
 		/**获取接口中传递的参数  start*/
-		JSONObject jsonObject =JSONObject.parseObject(jsonStr);
-		String seq = jsonObject.getString("seq");
-		String partnerCode = jsonObject.getString("partnerCode").toString();
-		String appKey = jsonObject.getString("appKey").toString();
-		String phone = jsonObject.getString("phone").toString();
-		String productCode = jsonObject.getString("productCode").toString();
-		String orderMethod = jsonObject.get("orderMethod").toString();
-		String allowAutoPay = jsonObject.get("allowAutoPay").toString();
-		String vcode = jsonObject.get("vcode").toString();
-		String redirectUrl = jsonObject.get("redirectUrl").toString();
+		try {
+			jsonObject =JSONObject.parseObject(jsonStr);
+		} catch (Exception e) {
+			log.error("orderService preOrder check param is json error；"+e.getMessage(),e);
+			e.printStackTrace();
+			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		}
+		String seq = null;
+		String partnerCode = null;
+		String appKey = null;
+		String phone = null;
+		String productCode = null;
+		String orderMethod = null;
+		String allowAutoPay = null;
+		String vcode = null;
+		String redirectUrl = null;
+		try {
+			seq = jsonObject.getString("seq");
+			partnerCode = jsonObject.getString("partnerCode").toString();
+			appKey = jsonObject.getString("appKey").toString();
+			phone = jsonObject.getString("phone").toString();
+			productCode = jsonObject.getString("productCode").toString();
+			orderMethod = jsonObject.get("orderMethod").toString();
+			allowAutoPay = jsonObject.get("allowAutoPay").toString();
+			vcode = jsonObject.get("vcode").toString();
+			redirectUrl = jsonObject.get("redirectUrl").toString();
+		} catch (NullPointerException e) {
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
 		if (StringUtils.isBlank(seq)) {
@@ -185,7 +208,7 @@ public class OrderServiceImpl implements IOrderService{
 		listItem.put("productName", product.getProductName());
 		listItem.put("productType", product.getCycleType());
 		listItem.put("status", order.getState());
-		listItem.put("amount", order.getPrice());
+		listItem.put("price", order.getPrice());
 		listItem.put("count", order.getCount());
 		listItem.put("allowAutoPay", order.getAllowAutoPay());
 		listItem.put("validTime", DateUtil.getDateTime(order.getValidTime()));
@@ -209,7 +232,7 @@ public class OrderServiceImpl implements IOrderService{
 		order.setProductCode(product.getProductCode());//定向流量产品编码
 		order.setOperType(Constant.ORDER_OPER_TYPE_0);//订购类型 订购：0，退订：1
 		order.setIsRealRequestWoplat(Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);//是否真实请求沃家总管
-		order.setState("0");//状态
+		order.setState("1");//状态
 		order.setMobilephone(phone);//订购手机号码
 		order.setOrderChannel(orderMethod);//订购渠道
 		order.setCreateTime(new Date());//订购时间
@@ -220,11 +243,11 @@ public class OrderServiceImpl implements IOrderService{
 		}else{
 			order.setAllowAutoPay((byte)1);
 		}
-		if(StringUtils.contains(product.getProductCode().substring(2, 3), Constant.CYCLE_TYPE_01)){
+		if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_01)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月当月失效时间
-		}else if(StringUtils.contains(product.getProductCode().substring(2, 3), Constant.CYCLE_TYPE_02)){
+		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
-		}else if(StringUtils.contains(product.getProductCode().substring(2, 3), Constant.CYCLE_TYPE_03)){
+		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_03)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),12)));//包年失效时间
 		}
 		order.setPrice(product.getPrice());//产品价格
@@ -236,7 +259,7 @@ public class OrderServiceImpl implements IOrderService{
 		/**查询接入方设置的信息 end**/
 		order.setAppKey(appKey);//合作方产品ID
 		order.setIsNeedCharge(app.getIsNeedCharge());//是否需要返充话费
-		orderMapper.insertOrder(order);
+		insertOrder(JSONObject.toJSONString(order));
 		return order;
 	}
 	
@@ -249,13 +272,13 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public List<OrderRecord> checkOrderRecord(String appKey,String phone,String productCode){
-		logger.info("orderServiceImpl preOrder checkOrderRecord is param:{productCode:"+productCode+",phone:"+phone+"}");
+		log.info("orderServiceImpl preOrder checkOrderRecord is param:{productCode:"+productCode+",phone:"+phone+"}");
 		List<OrderRecord> orderRecordList = orderRecordService.queryOrderRecordByParam(appKey,productCode, phone);
 		if(orderRecordList.size() == 0){
-			logger.info("orderServiceImpl preOrder checkOrderRecord not Existence order message;");
+			log.info("orderServiceImpl preOrder checkOrderRecord not Existence order message;");
 			return null;
 		}
-		logger.info("orderServiceImpl preOrder checkOrderRecord Existence order message;");
+		log.info("orderServiceImpl preOrder checkOrderRecord Existence order message;");
 		return orderRecordList;
 	}
 
@@ -269,13 +292,13 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public String checkWoplatOrderRecord(String phone,String productCode,String state){
-		logger.info("orderServiceImpl preOrder checkWoplatOrderRecord is param:{productCode:"+productCode+",phone:"+phone+",state:"+state+"}");
+		log.info("orderServiceImpl preOrder checkWoplatOrderRecord is param:{productCode:"+productCode+",phone:"+phone+",state:"+state+"}");
 		String woplatOrder = woplatOrderService.queryWoplatOrderByParam(productCode, phone, state);//查询是否有同步的订购信息
 		if(StringUtils.isBlank(woplatOrder)){
-			logger.info("orderServiceImpl preOrder checkWoplatOrderRecord not Existence order message;");
+			log.info("orderServiceImpl preOrder checkWoplatOrderRecord not Existence order message;");
 			return null;
 		}
-		logger.info("orderServiceImpl preOrder checkWoplatOrderRecord Existence order message");
+		log.info("orderServiceImpl preOrder checkWoplatOrderRecord Existence order message");
 		return woplatOrder;
 	}
 	
@@ -289,6 +312,9 @@ public class OrderServiceImpl implements IOrderService{
 	 */
 	public int insertOrder(String orderStr) {
 		Order order = JSONObject.parseObject(orderStr, Order.class);
+		if(Constant.ORDER_OPER_TYPE_0 == order.getOperType()){//如果是订购需要插入支付信息
+			payOrderService.insertPayOrder(BaseSeq.getLongSeq(), order.getOrderId(), order.getMoney(), Constant.PAY_OPER_TYPE, Constant.PAY_STATE_INIT);
+		}
 		return orderMapper.insertOrder(order);
 	}
 
@@ -302,30 +328,30 @@ public class OrderServiceImpl implements IOrderService{
 	* @see com.asiainfo.dtdt.interfaces.order.IOrderService#paySuccessOrderDeposition(java.lang.String, java.lang.String)
 	 */
 	public void paySuccessOrderDeposition(String resultCode,String orderId) {
-		logger.info("begin orderService paySuccessOrderDeposition param: resultCode="+resultCode+",orderId="+orderId);
+		log.info("begin orderService paySuccessOrderDeposition param: resultCode="+resultCode+",orderId="+orderId);
 		try {
 			if("SUCCESS".equals(resultCode)){//支付返回成功
 				/**检查是否存在互斥产品并存储在途数据**/
 				Order order = orderMapper.selectByPrimaryKey(orderId);
 				String woplatOrder = checkWoplatOrderRecord(order.getMobilephone(), null,"2");//订购成功
 				if(StringUtils.isBlank(woplatOrder)){//检查沃家总管同步是否存在已订购的产品 不存在true 存在false
-					logger.info("begin orderService paySuccessOrderDeposition checkWoplatOrderRecord not Existence woplatOrder");
+					log.info("begin orderService paySuccessOrderDeposition checkWoplatOrderRecord not Existence woplatOrder");
 					if(checkOrderRecord(order.getAppKey(),order.getMobilephone(), order.getProductCode()).size() <= 0){//检查我方是否存在已订购的产品 不存在true 存在false
-						logger.info("begin orderService paySuccessOrderDeposition checkOrderRecord not Existence order");
+						log.info("begin orderService paySuccessOrderDeposition checkOrderRecord not Existence order");
 						String proStr  = productService.queryProduct(order.getProductCode());
 						Product product = JSONObject.parseObject(proStr, Product.class);
 						//不存在订购信息，调用沃家总管订购接口
 						String wjzgResult = OrderMethod.order(order.getMobilephone(), product.getWoProductCode(), DateUtil.getDateTime(order.getCreateTime()),order.getOrderChannel() );
 						if(StringUtils.isBlank(wjzgResult)){
 							//订购接口处理异常
-							logger.info("orderService order product post wojia return fail param:orderId="+orderId);
+							log.info("orderService order product post wojia return fail param:orderId="+orderId);
 							return;
 						}
 						JSONObject wjzgJson = JSONObject.parseObject(wjzgResult);
 						String ecode = wjzgJson.getString("ecode");
 						String woOrderId = wjzgJson.getString("orderId");
 						if("0".equals(ecode)){
-							logger.info("orderService order product post wojia return success param:orderId="+orderId);
+							log.info("orderService order product post wojia return success param:orderId="+orderId);
 							//订购成功，处理数据
 							//woOrder 0-我方初始化订购
 							//沉淀订购关系数据成功
@@ -334,7 +360,7 @@ public class OrderServiceImpl implements IOrderService{
 							return;
 						}else if("4001".equals(ecode)){
 							//存在重复订购，处理业务
-							logger.info("orderService order product post wojia return repeat order param:orderId="+orderId);
+							log.info("orderService order product post wojia return repeat order param:orderId="+orderId);
 							//沃家返回重复订购，邮箱侧创建订购关系，返回订购成功，当前月不用反冲话费
 							//*状态13：邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功
 							//疑问？：重复订购
@@ -344,7 +370,7 @@ public class OrderServiceImpl implements IOrderService{
 						}else if("4005".equals(ecode)){
 							//订购互斥产品
 							//存在重复订购，处理业务
-							logger.info("orderService order product post wojia return mutex order param:orderId="+orderId);
+							log.info("orderService order product post wojia return mutex order param:orderId="+orderId);
 							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
@@ -352,7 +378,7 @@ public class OrderServiceImpl implements IOrderService{
 						}
 					}else {//存在介入方产品使用此免流产品,重复订购
 						//optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-						logger.info("orderService order product repeat order param:appkey="+order.getAppKey()+",orderId="+orderId);
+						log.info("orderService order product repeat order param:appkey="+order.getAppKey()+",orderId="+orderId);
 						return ;
 					}
 				}else {//沃家总管存在已订购产品
@@ -370,7 +396,7 @@ public class OrderServiceImpl implements IOrderService{
 				orderPayBak(orderId, "2", "第三方支付失败");
 			}
 		} catch (Exception e) {
-			logger.error("orderService paySuccessOrderDeposition fail:"+e.getMessage(),e);
+			log.error("orderService paySuccessOrderDeposition fail:"+e.getMessage(),e);
 			e.printStackTrace();
 		}
 		return;
@@ -405,11 +431,11 @@ public class OrderServiceImpl implements IOrderService{
 			//沉淀订购关系
 			int count = insertFromOrderRecordById(orderId, cycleType2, woOrder);//0-我方初始化订购
 			if(count > 0){
-				logger.info("orderService order product deposit orderRecord data success:orderId="+orderId);
+				log.info("orderService order product deposit orderRecord data success:orderId="+orderId);
 				return true;
 			}
 		}
-		logger.info("orderService order product deposit orderRecord data fail:orderId="+orderId);
+		log.info("orderService order product deposit orderRecord data fail:orderId="+orderId);
 		return false;
 	}
 	
@@ -505,7 +531,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public String closeOrder(String orderStr) {
-		logger.info("OrderServiceImpl closeOrder() orderStr:" + orderStr);
+		log.info("OrderServiceImpl closeOrder() orderStr:" + orderStr);
 		
 		//获取参数
 		JSONObject jsonObject = JSONObject.parseObject(orderStr);
@@ -524,7 +550,7 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
 			}
 		} catch (Exception e) {
-			logger.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
+			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 		
@@ -536,7 +562,7 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 			}
 		} catch (Exception e) {
-			logger.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
+			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 				
@@ -549,7 +575,7 @@ public class OrderServiceImpl implements IOrderService{
 		//调用wojia退订接口：成功更新状态并迁移到历史表，返回接口成功信息
 		String responseStr = closeOrderFromWojia(orderRecord);
 		JSONObject responseJson = JSONObject.parseObject(responseStr);
-		logger.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
+		log.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
 		if (!StringUtils.isBlank(responseStr) && responseJson.getString("ecode").equals("0")) {
 			try {
 				orderRecord.setState("19");//设置状态为19-退订成功
@@ -557,7 +583,7 @@ public class OrderServiceImpl implements IOrderService{
 				insertHisOrderRecord(orderRecord);
 				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
 			} catch (Exception e) {
-				logger.info("OrderServiceImpl closeOrder() updateTables Exception e=" + e);
+				log.info("OrderServiceImpl closeOrder() updateTables Exception e=" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
@@ -568,7 +594,7 @@ public class OrderServiceImpl implements IOrderService{
 		}else {
 			//如果退订失败需返回失败原因
 			data.put("invalidTime", orderRecord.getInvalidTime());
-			logger.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
+			log.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
 			data.put("failMsg", responseJson.getString("emsg"));
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, data.toString());
 		}
@@ -583,7 +609,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	private String closeOrderFromWojia(OrderRecord orderRecord) {
-		logger.info("OrderServiceImpl closeOrderFromWojia() orderRecord:" + orderRecord);
+		log.info("OrderServiceImpl closeOrderFromWojia() orderRecord:" + orderRecord);
 		
 		JSONObject jsonParam = new JSONObject();
 		String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
@@ -603,7 +629,7 @@ public class OrderServiceImpl implements IOrderService{
 			Vcode vcode = vcodeMapper.selectByOrderId(orderRecord.getOrderId());
 			jsonParam.put("vcode", vcode.getLvcode());
 		} catch (Exception e) {
-			logger.info("OrderServiceImpl closeOrderFromWojia() selectByOrderId() Exception e=" + e);
+			log.info("OrderServiceImpl closeOrderFromWojia() selectByOrderId() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 		
@@ -617,7 +643,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			response = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonParam);
 		} catch (Exception e) {
-			logger.info("OrderServiceImpl closeOrderFromWojia() httpPost Exception e=" + e);
+			log.info("OrderServiceImpl closeOrderFromWojia() httpPost Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 		return response;
@@ -631,7 +657,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	private void insertHisOrderRecord(OrderRecord orderRecord) {
-		logger.info("OrderServiceImpl insertHisOrderRecord() orderRecord:" + orderRecord);
+		log.info("OrderServiceImpl insertHisOrderRecord() orderRecord:" + orderRecord);
 		Date date = new Date();
 		
 		HisOrderRecord hisOrderRecord = new HisOrderRecord();
@@ -664,7 +690,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			hisOrderRecordMapper.insertSelective(hisOrderRecord);
 		} catch (Exception e) {
-			logger.info("OrderServiceImpl insertHisOrderRecord() Exception e=" + e);
+			log.info("OrderServiceImpl insertHisOrderRecord() Exception e=" + e);
 			e.printStackTrace();
 		}
 	}
