@@ -17,4 +17,12 @@ public interface INoticeService {
 	 */
 	String optNoticeOrder(String notifyJson);
 	
+	/**
+	* @Title: INoticeService 
+	* @Description: (免流平台回调通知接入方) 
+	* @param orderId
+	* @return        
+	* @throws
+	 */
+	void dtdtNoticeOrder(String orderId);
 }

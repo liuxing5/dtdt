@@ -14,11 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONException;
 import com.asiainfo.dtdt.common.Constant;
+import com.asiainfo.dtdt.common.RestClient;
 import com.asiainfo.dtdt.entity.Order;
+import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
+import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
+import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -40,9 +44,23 @@ public class NotcieServiceImpl implements INoticeService {
 	@Autowired
 	private OrderMapper orderMapper;
 	
+	@Autowired
+	private OrderRecordMapper orderRecordMapper;
+	
 	@Autowired 
 	private IChargeService chargeService;
 	
+	@Autowired
+	private IPayOrderService payOrderService;
+	
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: optNoticeOrder</p> 
+	* <p>Description: 沃家总管回调通知</p> 
+	* @param notifyJson
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.order.INoticeService#optNoticeOrder(java.lang.String)
+	 */
 	public String optNoticeOrder(String notifyJson){
 		//返回的json申明
 		JSONObject returnJson = new JSONObject();
@@ -80,6 +98,13 @@ public class NotcieServiceImpl implements INoticeService {
 		return returnJson.toString();
 	}
 	
+	/**
+	* @Title: NotcieServiceImpl 
+	* @Description: (沃家总管回调处理业务) 
+	* @param resultCode
+	* @param orderId        
+	* @throws
+	 */
 	public void optNoticeOrder(String resultCode, String orderId) {
 		
 		log.info("begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
@@ -113,6 +138,36 @@ public class NotcieServiceImpl implements INoticeService {
 			log.error("NoticeService optNoticeOrder fail:"+e.getMessage(),e);
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: dtdtNoticeOrder</p> 
+	* <p>Description: 免流平台回调通知接入方</p> 
+	* @param orderId
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.order.INoticeService#dtdtNoticeOrder(java.lang.String)
+	 */
+	@Override
+	public void dtdtNoticeOrder(String orderId) {
+		try {
+			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
+			String state = orderRecord.getState();
+			log.info("NoticeServiceImpl dtdtNoticeOrder() state=" + state);
+			JSONObject json = new JSONObject();
+			switch (Integer.valueOf(state)) {
+			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:
+				json.put("orderId", orderRecord.getOrderId());
+				json.put("productCode", orderRecord.getProductCode());
+				json.put("stateName", "订购成功");
+				RestClient.doRest(orderRecord.getRedirectUrl(), "POST", json.toString());
+				break;
+			default:break;
+			}
+		} catch (Exception e) {
+			log.error("noticeService dtdtNoticeOrder fail by orderId="+orderId);
+		}
+		
 	}
 
 }
