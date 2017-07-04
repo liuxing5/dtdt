@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,9 @@ import com.asiainfo.dtdt.common.BaseSeq;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.IsMobileNo;
-import com.asiainfo.dtdt.common.MD5Util;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
+import com.asiainfo.dtdt.common.util.MD5Util;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
@@ -28,7 +26,6 @@ import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.Vcode;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
-import com.asiainfo.dtdt.interfaces.ICodeService;
 import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
