@@ -15,14 +15,11 @@ import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
-import com.asiainfo.dtdt.common.request.HttpClientUtil;
-import com.asiainfo.dtdt.common.util.MD5Util;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Product;
-import com.asiainfo.dtdt.entity.Vcode;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.IProductService;
@@ -62,9 +59,6 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private ProductMapper productMapper;
-	
-	@Autowired
-	private VcodeMapper vcodeMapper;
 	
 	@Autowired
 	private HisOrderRecordMapper hisOrderRecordMapper;
@@ -534,119 +528,170 @@ public class OrderServiceImpl implements IOrderService{
 		
 		//获取参数
 		JSONObject jsonObject = JSONObject.parseObject(orderStr);
-		String orderId = jsonObject.getString("orderId");
+		String woOrderId = jsonObject.getString("orderId");
 		
 		//参数校验
-		if (StringUtils.isBlank(orderId)) {
+		if (StringUtils.isBlank(woOrderId)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		
 		//查询订购关系表：校验包月类订购为成功，只限包月类产产品
 		OrderRecord orderRecord = null;
 		try {
-			orderRecord = orderRecordMapper.selectMonthProduct(orderId);
-			if (null == orderRecord) {
+			orderRecord = orderRecordMapper.selectMonthProduct(woOrderId);
+			if (null == orderRecord)
 				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
-			}
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-		
+			
 		//查询产品表
 		Product product = null;
 		try {
 			product = productMapper.queryProduct(orderRecord.getProductCode());
-			if (null == product) {
-				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
-			}
+			if (null == product) 
+					return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-				
+			
 		//设置返回参数
 		JSONObject data = new JSONObject();
 		data.put("partnerOrderId", orderRecord.getParentOrderId());
 		data.put("orderId", orderRecord.getOrderId());
 		data.put("timeStamp", DateUtil.getSysdateYYYYMMDDHHMMSS());
-		
-		//调用wojia退订接口：成功更新状态并迁移到历史表，返回接口成功信息
-		String responseStr = closeOrderFromWojia(orderRecord);
-		JSONObject responseJson = JSONObject.parseObject(responseStr);
-		log.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
-		if (!StringUtils.isBlank(responseStr) && responseJson.getString("ecode").equals("0")) {
-			try {
-				orderRecord.setState("19");//设置状态为19-退订成功
-				orderRecordMapper.updateOrderRecord(orderRecord);
-				insertHisOrderRecord(orderRecord);
-				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
-			} catch (Exception e) {
-				log.info("OrderServiceImpl closeOrder() updateTables Exception e=" + e);
-				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+			
+		//拼装在途表数据，退订完成移历史表
+		Order order = closeOrderParams(orderRecord);
+			
+		boolean flag = true;
+		while (flag) {
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder request start" + orderRecord);
+			String wojiaStr = OrderMethod.closeOrder(orderRecord.getMobilephone(), orderRecord.getProductCode(), woOrderId, DateUtil.getSysdateYYYYMMDDHHMMSS(), orderRecord.getOrderChannel());
+					
+			JSONObject wojiaJson = JSONObject.parseObject(wojiaStr);
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder response wojiaJson" + wojiaJson);
+					
+			String ecode = wojiaJson.getString("ecode");
+			if("0".equals(ecode)){
+				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order success ecode=" + ecode);
+				//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
+				data.put("productName", product.getProductName());
+				data.put("refundTime", orderRecord.getRefundTime());
+				data.put("refundValidTime", orderRecord.getRefundValidTime());	
+				updateTable(orderRecord, "19", order, woOrderId);
+				flag = false;
+				return ReturnUtil.returnJsonInfo(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data.toJSONString());
+			} else {
+				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail ecode=" + ecode);
+				try {
+					Thread.sleep(3000);//过3秒再次请求
+				} catch (InterruptedException e) {
+					log.info("OrderServiceImpl closeOrder() InterruptedException e" + e);
+				}
+				
+				//查询wojia订购状态
+				log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder request start");
+				String queryWojiaStr = OrderMethod.queryOrder(orderRecord.getMobilephone(), woOrderId);
+						
+				JSONObject queryWojiaJson = JSONObject.parseObject(queryWojiaStr);
+				log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder response queryWojiaJson" + queryWojiaJson);
+						
+				String qryEcode = queryWojiaJson.getString("ecode");
+				String qryEmsg = queryWojiaJson.getString("emsg");
+				if("0".equals(qryEcode)){
+					log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder order success ecode=" + ecode);
+					//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
+					data.put("productName", product.getProductName());
+					data.put("refundTime", orderRecord.getRefundTime());
+					data.put("refundValidTime", orderRecord.getRefundValidTime());
+					updateTable(orderRecord, "19", order, woOrderId);
+					flag = false;
+					return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, data.toString());
+				} else {
+					//如果退订失败需返回失败原因
+					data.put("failMsg", qryEmsg);
+					updateTable(orderRecord, "23", order, woOrderId);
+					return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, data.toString());
+				} 
 			}
-			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
-			data.put("productName", product.getProductName());
-			data.put("refundTime", orderRecord.getRefundTime());
-			data.put("refundValidTime", orderRecord.getRefundValidTime());
-			return ReturnUtil.returnJsonInfo(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data.toString());
-		}else {
-			//如果退订失败需返回失败原因
-			data.put("invalidTime", orderRecord.getInvalidTime());
-			log.info("responseJson ecode = " + responseJson.getString("ecode") + " responseJson emsg = " + responseJson.getString("emsg"));
-			data.put("failMsg", responseJson.getString("emsg"));
-			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, data.toString());
 		}
-		
+		return ReturnUtil.returnJsonInfo(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data.toJSONString());
 	}
 	
 	/**
-	* @Title: closeOrder 
-	* @Description: 调wojia退订接口
+	* @Title: updateTable 
+	* @Description: 调用wojia退订接口：成功更新 order和orderRecord表为已退订	状态并迁移到历史表，返回接口成功信息
+	* @param orderId
 	* @param orderRecord
+	* @param product
+	* @param data
+	* @param order
+	* @param woOrderId
 	* @return String
 	* @throws
 	 */
-	private String closeOrderFromWojia(OrderRecord orderRecord) {
-		log.info("OrderServiceImpl closeOrderFromWojia() orderRecord:" + orderRecord);
-		
-		JSONObject jsonParam = new JSONObject();
-		String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
-		jsonParam.put("seq", UUID.randomUUID());
-		jsonParam.put("appId", Constant.APPID);
-		jsonParam.put("operType", 2);//1.订购，2.退订
-		jsonParam.put("msisdn", orderRecord.getMobilephone());
-		jsonParam.put("productId", orderRecord.getProductCode());
-//		jsonParam.put("productId", "fd3cd79e20c14728-984f32dbfa56713c");//TODO
-		jsonParam.put("orderId", orderRecord.getWoOrderId());//订购id，operType为2时必填
-		jsonParam.put("subscriptionTime", timeStamp);
-		jsonParam.put("orderMethod", orderRecord.getOrderChannel());
-		jsonParam.put("timeStamp", timeStamp);
-		
-		//vcode设置
+	private void updateTable(OrderRecord orderRecord, String state, Order order, String woOrderId) {
+		log.info("OrderServiceImpl updateTable() orderRecord =" + orderRecord + "woOrderId=" + woOrderId);
+
 		try {
-			Vcode vcode = vcodeMapper.selectByOrderId(orderRecord.getOrderId());
-			jsonParam.put("vcode", vcode.getLvcode());
+			order.setWoOrderId(woOrderId);
+			insertFromHisOrderById(orderRecord.getOrderId(), "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+			orderMapper.deleteByPrimaryKey(orderRecord.getOrderId());
+				
+			orderRecord.setState(state);//设置状态：19-退订成功
+			orderRecordMapper.updateOrderRecord(orderRecord);
+			insertHisOrderRecord(orderRecord);
+			orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
 		} catch (Exception e) {
-			log.info("OrderServiceImpl closeOrderFromWojia() selectByOrderId() Exception e=" + e);
-			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+			log.info("OrderServiceImpl updateTable() Exception e=" + e);
 		}
-		
-		//应用签名 MD5：（appId + msisdn + timeStamp + appkey）
-		String signStr = Constant.APPID + orderRecord.getMobilephone() + timeStamp + Constant.APPKEY;
-		String appSignature = MD5Util.MD5Encode(signStr);
-		jsonParam.put("appSignature", appSignature);
-		
-		//请求接口并返回
-		String response = "";
-		try {
-			response = HttpClientUtil.httpPost(Constant.ORDER_URL, jsonParam);
-		} catch (Exception e) {
-			log.info("OrderServiceImpl closeOrderFromWojia() httpPost Exception e=" + e);
-			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
-		}
-		return response;
+	}
 	
+	/**
+	 * 
+	* @Title: closeOrderParams 
+	* @Description: 根据订购关系表数据，在请求退订后新生成一条在途数据
+	* @param orderRecord void
+	* @throws
+	 */
+	private Order closeOrderParams(OrderRecord orderRecord) {
+		Order order = new Order();
+		String order_id = String.valueOf(UUID.randomUUID());
+		Date now = new Date();
+		
+		order.setOrderId(order_id);
+		order.setPartnerCode(orderRecord.getPartnerCode());
+		order.setAppKey(orderRecord.getAppKey());
+		order.setPartnerOrderId(orderRecord.getPartnerOrderId());
+		order.setProductCode(orderRecord.getProductCode());
+		order.setOperType((byte)1);
+		order.setRefundOrderId(order_id);
+		/**
+		 * 是否真实请求沃家总管（0：真实请求 1：未请求）
+            	如果我方同一手机号码，在多个app下订购了同一流量产品，
+            	则1、只有第一次订购会像沃家总管发起订购请求；
+            	2、只有最后一个退订时，才能真实像沃家总管发起退订请求；
+		 */
+		order.setIsRealRequestWoplat((byte)1);
+		order.setState(orderRecord.getState());
+		order.setMobilephone(orderRecord.getMobilephone());
+		order.setOrderChannel(orderRecord.getOrderChannel());
+		order.setCreateTime(now);
+		order.setUpdateTime(now);
+		order.setValidTime(now);
+		order.setInvalidTime(now);
+		order.setPrice(orderRecord.getPrice());
+		order.setCount(orderRecord.getCount());
+		order.setMoney(orderRecord.getMoney());
+		order.setIsNeedCharge(orderRecord.getIsNeedCharge());
+		order.setAllowAutoPay(orderRecord.getAllowAutoPay());
+		order.setRedirectUrl(orderRecord.getRedirectUrl());
+		order.setIsRealRequestWoplat((byte)1);
+		order.setRemark("");
+		return order;
 	}
 	
 	/**

@@ -93,14 +93,18 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 						HisOrder hisOrder = hisOrderMapper.selectByPrimaryKey(orderId);
 						if (null == hisOrder) {
 							return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
+						}else {
+							state = hisOrder.getState();
 						}
-						state = hisOrder.getState();
+					} else {
+						state = hisOrderRecord.getState();
 					}
-					state = hisOrderRecord.getState();
+				} else {
+					state = orderRecord.getState();
 				}
-				state = orderRecord.getState();
-			}
-			state = order.getState();
+			} else {
+				state = order.getState();
+			} 
 			
 			logger.info("OrderServiceImpl queryOrderState() state=" + state);
 			
@@ -117,13 +121,13 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			
 			case 9:json.put("stateMsg", "订购受理中");break;
 			
-			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:json.put("state", "订购成功");break;
+			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:json.put("stateMsg", "订购成功");break;
 			
 			case 19:json.put("stateMsg", "退订成功");break;
 			case 20:json.put("stateMsg", "退订中");break;
 			case 21:json.put("stateMsg", "订购作废");break;
 			case 22:json.put("stateMsg", "服务到期");break;
-			default:break;
+			default:json.put("stateMsg", "此订单状态异常");break;
 			}
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
 		} catch (Exception e) {

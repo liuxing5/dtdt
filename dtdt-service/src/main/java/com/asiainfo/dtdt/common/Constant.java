@@ -102,10 +102,10 @@ public class Constant {
 	/**包年**/
 	public static final String CYCLE_TYPE_03	=	"03";
 	
-	/**订购类型：0-订购**/
-	public static final byte ORDER_OPER_TYPE_0	= 0;
-	/**订购类型：1-退订**/
-	public static final byte ORDER_OPER_TYPE_1	= 1;
+	/**订购类型：1-订购**/
+	public static final byte ORDER_OPER_TYPE_0	= 1;
+	/**订购类型：2-退订**/
+	public static final byte ORDER_OPER_TYPE_1	= 2;
 	
 	/***是否真实请求沃家总管（0：真实请求 1：未请求）如果我方同一手机号码，在多个app下订购了同一流量产品，则1、只有第一次订购会像沃家总管发起订购请求；2、只有最后一个退订时，才能真实像沃家总管发起退订请求；**/
 	/**是否真实请求沃家总管 0-真实请求**/
