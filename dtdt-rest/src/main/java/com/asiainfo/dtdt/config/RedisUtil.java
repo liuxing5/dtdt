@@ -27,9 +27,6 @@ public class RedisUtil {
     public  void main(String[] args) {
 		
 	}
-    {
-       // pool = private JedisPool jedisPool; 
-    }
 
     public  JedisPool getPool() {
         return pool;

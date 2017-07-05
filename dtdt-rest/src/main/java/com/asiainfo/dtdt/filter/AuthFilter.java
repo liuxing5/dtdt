@@ -37,7 +37,7 @@ import com.asiainfo.dtdt.interfaces.IAuthoService;
 public class AuthFilter implements Filter{
 
 
-	private static final String[] IGNORE_URI = { };
+	private static final String[] IGNORE_URI = {"/test/getSign" };
 	
 	private IAuthoService authoService;
 	
@@ -96,8 +96,8 @@ public class AuthFilter implements Filter{
 					requestJson = myRequestWrapper.getBody();
 				} else
 				{
-					requestJson.put("pertnerCode",
-							hrequest.getHeader("pertnerCode"));
+					requestJson.put("partnerCode",
+							hrequest.getHeader("partnerCode"));
 					requestJson.put("appkey", hrequest.getHeader("appkey"));
 					requestJson.put("timestamp",
 							hrequest.getHeader("timestamp"));
@@ -150,8 +150,8 @@ public class AuthFilter implements Filter{
 				return checkResult;
 			}
 			
-			if ((!requestJson.containsKey("pertnerCode") || StringUtils
-					.isEmpty(requestJson.getString("pertnerCode")))
+			if ((!requestJson.containsKey("partnerCode") || StringUtils
+					.isEmpty(requestJson.getString("partnerCode")))
 					|| (!requestJson.containsKey("appkey") || StringUtils
 							.isEmpty(requestJson.getString("appkey")))
 					|| (!requestJson.containsKey("timestamp") || StringUtils
@@ -160,7 +160,7 @@ public class AuthFilter implements Filter{
 							.isEmpty(requestJson.getString("appSignature"))))
 			{
 				checkResult.put("10000",
-						"pertnerCode,appkey,timestamp,appSignature必传参数，请检查参数！");
+						"partnerCode,appkey,timestamp,appSignature必传参数，请检查参数！");
 				return checkResult;
 			}
 			

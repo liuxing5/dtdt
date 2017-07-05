@@ -40,12 +40,12 @@ public class AuthoServiceImpl implements IAuthoService
 		JSONObject result = new JSONObject();
 		try
 		{
-			String partnerCode = reqjson.getString("pertnerCode");
+			String partnerCode = reqjson.getString("partnerCode");
 			Partner partner = partnerMapper.getByPartnerCode(partnerCode);
 			if (null == partner
 					|| StringUtils.isEmpty(partner.getPartnerCode()))
 			{
-				result.put("20000", "pertnerCode非法！");
+				result.put("20000", "partnerCode非法！");
 				return result;
 			}
 			String appkey = reqjson.getString("appkey");
