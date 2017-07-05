@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.dtdt.common.BaseSeq;
 import com.asiainfo.dtdt.common.Constant;
-import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
+import com.asiainfo.dtdt.common.util.BaseSeq;
+import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
@@ -23,6 +23,7 @@ import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
@@ -80,6 +81,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private IPayOrderService payOrderService;
+	
+	@Autowired
+	private INoticeService noticeService;
 	
 	/**
 	 * (非 Javadoc) 
@@ -359,6 +363,7 @@ public class OrderServiceImpl implements IOrderService{
 							//疑问？：重复订购
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费");
+							noticeService.dtdtNoticeOrder(woOrderId);
 							return;
 						}else if("4005".equals(ecode)){
 							//订购互斥产品
@@ -367,6 +372,7 @@ public class OrderServiceImpl implements IOrderService{
 							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+							noticeService.dtdtNoticeOrder(orderId);
 							return ;
 						}
 					}else {//存在介入方产品使用此免流产品,重复订购
@@ -380,6 +386,7 @@ public class OrderServiceImpl implements IOrderService{
 //					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
 					optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", woOrder.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 					orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管同步记录中存在订购关系：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+					noticeService.dtdtNoticeOrder(orderId);
 					return ;
 				}
 			}else {//支付失败
