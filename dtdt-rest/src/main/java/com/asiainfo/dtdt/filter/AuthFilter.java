@@ -1,7 +1,10 @@
 package com.asiainfo.dtdt.filter;
 
+import io.undertow.servlet.util.IteratorEnumeration;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.Filter;
@@ -17,6 +20,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+
+import scala.annotation.meta.getter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
@@ -103,7 +108,15 @@ public class AuthFilter implements Filter{
 							hrequest.getHeader("timestamp"));
 					requestJson.put("appSignature",
 							hrequest.getHeader("appSignature"));
-					requestJson.putAll(m);
+					IteratorEnumeration ite = (IteratorEnumeration) hrequest.getParameterNames();
+					while(ite.hasMoreElements())
+					{
+						String key = ite.nextElement().toString();
+						String value = hrequest.getParameter(key);
+						requestJson.put(key, value);
+					}
+					//requestJson.putAll(m);
+					hrequest.getQueryString();
 				}
 
 				JSONObject checkResult = checkCommonParam(requestJson);
@@ -164,7 +177,21 @@ public class AuthFilter implements Filter{
 				return checkResult;
 			}
 			
-			// 校验timestamp
+			// 校验timestamp(配置已秒为单位)
+			String validTimeStr = redisUtil.get("ser_v_t");
+			if(StringUtils.isEmpty(validTimeStr))
+			{
+				validTimeStr = "60";
+				redisUtil.set("ser_v_t", validTimeStr);
+			}
+			long timestamp = Long.valueOf(requestJson.getString("timestamp"));
+			long validTime = Long.valueOf(validTimeStr) * 1000l;
+			long nowtimestamp = new Date().getTime();
+			if(timestamp > nowtimestamp || (nowtimestamp - timestamp) > validTime)
+			{
+				checkResult.put("30002", "请求链接失效！");
+				return checkResult;
+			}
 			
 			// 校验数据库是否存在，并且配对以及签名
 			return authoService.validPartnerAndAPP(requestJson);
@@ -172,7 +199,7 @@ public class AuthFilter implements Filter{
 		catch (Exception e)
 		{
 			log.error("参数校验错误！", e);
-			checkResult.put("20000", "参数错误！");
+			checkResult.put("99999", "系统错误！");
 		}
 		
 		return checkResult;
@@ -199,6 +226,14 @@ public class AuthFilter implements Filter{
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	
+	
+	public static void main(String[] ag)
+	{
+		System.out.println(new Date().getTime());
+		
+		System.out.println(new Date().getTime());
 	}
 
 }
