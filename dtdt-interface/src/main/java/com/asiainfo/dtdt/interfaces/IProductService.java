@@ -8,7 +8,7 @@ public interface IProductService {
 	* @return String
 	* @throws
 	 */
-	String getProductList();
+	String getProductList(String appkey);
 	
 	/**
 	 * 

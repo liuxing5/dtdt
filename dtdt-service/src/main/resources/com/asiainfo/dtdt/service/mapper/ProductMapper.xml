@@ -12,12 +12,14 @@
     <result column="cycle_type" property="cycleType" jdbcType="TINYINT" />
     <result column="type" property="type" jdbcType="TINYINT" />
     <result column="can_unsubscribe" property="canUnsubscribe" jdbcType="TINYINT" />
+    <result column="area_code" property="areaCode" jdbcType="VARCHAR"/>
+    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, product_code,wo_product_code, product_name, price,wo_product_price, state, cycle_type, type, can_unsubscribe, 
-    create_time, update_time
+    ID, product_code,wo_product_code, product_name, price,wo_product_price, state, cycle_type, type, 
+    can_unsubscribe, area_code, area_name, create_time, update_time
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -28,10 +30,16 @@
   </select>
   <!-- 查询可订购产品列表服务 -->
   <select id="getProductList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
-    product_code,product_name,cycle_type
-    from t_s_product
-    where state = 0
+	SELECT 
+	  pd.product_code,
+	  pd.product_name,
+	  pd.cycle_type
+	FROM
+	  t_s_product_price pp,
+	  t_s_product pd 
+	WHERE pp.product_id = pd.id
+	AND pp.state = 0 
+	AND app_id = #{appId,jdbcType=BIGINT}
   </select>
   <!-- 根据产品 编码查询产品 -->
   <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >

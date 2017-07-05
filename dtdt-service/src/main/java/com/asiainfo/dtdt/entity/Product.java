@@ -29,6 +29,10 @@ public class Product implements Serializable{
     private Byte type;
 
     private Byte canUnsubscribe;
+    
+    private String area_code;
+    
+    private String area_name;
 
     private Date createTime;
 
