@@ -8,6 +8,18 @@ spring:
       enabled: true
       charset: utf-8
       force: true
+  redis:
+    host: 120.52.120.162
+    port: 51005
+jedis :  
+  pool :  
+    host : 120.52.120.162 
+    port : 51005  
+    config :  
+      maxTotal: 100  
+      maxIdle: 10  
+      maxWaitMillis : 100000    
 server:
   context-path: /dtdt-rest
-  port: 8083
+  port: 8088
+
