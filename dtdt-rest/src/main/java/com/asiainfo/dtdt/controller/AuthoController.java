@@ -2,6 +2,8 @@ package com.asiainfo.dtdt.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.io.File;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.constants.RedisKey;
+import com.asiainfo.dtdt.common.util.PhoneUtil;
 import com.asiainfo.dtdt.common.util.SignUtil;
 import com.asiainfo.dtdt.config.RedisUtil;
+import com.asiainfo.dtdt.config.SMSContentConfig;
 import com.asiainfo.dtdt.entity.ResponseCode;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
 import com.huawei.insa2.util.SGIPSendMSGUtil;
@@ -46,6 +50,9 @@ public class AuthoController extends BaseController{
 	@Resource
 	private RedisUtil redisUtil; 
 	
+	@Resource
+	private SMSContentConfig smsContentConfig;
+	
     @RequestMapping(value = "getCode", method = RequestMethod.GET)
 	public JSONObject getSMSCode(HttpServletRequest request)
 	{
@@ -62,11 +69,18 @@ public class AuthoController extends BaseController{
 				result.put("msg", "手机号号码为空！");
 				return result;
 			}
+			
+			if(!PhoneUtil.isCUCMobile(phone))
+			{
+				result.put("code", "20001");
+				result.put("msg", "非联通号码！");
+				return result;
+			}
 
 			StringBuilder sb = new StringBuilder(RedisKey.SMSC);
 			sb.append("_").append(headers.getString("partnerCode"));
 			sb.append("_").append(headers.getString("appkey"));
-			sb.append("_").append(headers.getString("phone"));
+			sb.append("_").append(phone);
 			int code = (int) ((Math.random() * 9 + 1) * 100000);
 
 			/*
@@ -89,24 +103,39 @@ public class AuthoController extends BaseController{
 			redisUtil.set(sb.toString(), String.valueOf(code),
 					Integer.valueOf(smsvalidStr) * 60);
 
-			SGIPSendMSGUtil.sendMsg(phone, String.valueOf(code));
+			String path = "";
+			if (System.getProperty("os.name").startsWith("win") || System.getProperty("os.name").startsWith("Win")){
+				path = AuthoController.class.getResource("/").getPath();
+			}else{
+				path = System.getProperty("user.dir");
+			}
+
+			log.info("configPath:{}", path);
+			String content = smsContentConfig.getCodeContent();
+			if(StringUtils.isEmpty(content))
+			{
+				content = "";
+			}
+			SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
+			log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
+			SGIPSendMSGUtil.sendMsg(phone, content.replace("{0}", String.valueOf(code)));
 
 			result.put("code", "00000");
 			result.put("msg", "成功");
 			//result.put("SmdCode", code);
 
-			log.info("getsmscode", "{}|{}|{}",
+			log.info("{}|{}|{}|{}",
 					headers.getString("partnerCode"),
-					headers.getString("appkey"), headers.getString("phone"));
+					headers.getString("appkey"), phone, code);
 
 			return result;
 		} catch (Exception e)
 		{
 			result.put(ResponseCode.CODE, ResponseCode.COMMON_ERROR_CODE);
 			result.put(ResponseCode.MSG, "系统异常");
-			log.error("getSMSCode error!", "{}|{}|{}|{}|{}",
+			log.error("{}|{}|{}|{}|{}",
 					headers.getString("partnerCode"),
-					headers.getString("appkey"), headers.getString("phone"),
+					headers.getString("appkey"), phone,
 					result.get("smsCode"), e);
 		}
 		return result;

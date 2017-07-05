@@ -17,11 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-
-import scala.annotation.meta.getter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
@@ -80,7 +77,7 @@ public class AuthFilter implements Filter{
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException
 	{
-		log.info("LoginFilter doFilter()");
+		log.info("AuthFilter doFilter()");
 		HttpServletRequest hrequest = (HttpServletRequest) request;
 		String url = hrequest.getServletPath();
 		String requestType = hrequest.getMethod();
