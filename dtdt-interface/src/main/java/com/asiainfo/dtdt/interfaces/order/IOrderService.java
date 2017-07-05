@@ -64,10 +64,11 @@ public interface IOrderService {
 	* @Title: closeOrder 
 	* @Description: (定向流量退订接口) 
 	* @param orderStr
+	* @param appkey
 	* @return        
 	* @throws
 	 */
-	String closeOrder(String orderStr);
+	String closeOrder(String orderStr, String appkey);
 	
 	/**
 	* @Title: OrderServiceImpl 
