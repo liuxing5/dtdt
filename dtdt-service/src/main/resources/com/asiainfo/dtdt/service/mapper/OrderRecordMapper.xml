@@ -45,9 +45,10 @@
     select 
     <include refid="Base_Column_List" />
     from t_s_order_record
-    where wo_order_id = #{woOrderId,jdbcType=VARCHAR}
+    where order_id = #{orderId,jdbcType=VARCHAR}
+    and app_key = #{appkey,jdbcType=VARCHAR}
     and cycle_type2 = 0
-    and parent_order_id is null
+    and parent_order_id is null or parent_order_id=''
   </select>
   <select id="queryOrderRecordByParam" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -71,7 +72,7 @@
     	price,count,money,valid_time,invalid_time
     from t_s_order_record
     where mobilephone = #{mobilephone,jdbcType=VARCHAR}
-    and  app_key = #{appKey,jdbcType=VARCHAR}
+    and  app_key = #{appkey,jdbcType=VARCHAR}
   </select>
   <delete id="deleteOrderRecord" parameterType="java.lang.String" >
     delete from t_s_order_record
