@@ -12,10 +12,11 @@ public interface IQueryOrderService {
 	* @Title: queryOrderRecord 
 	* @Description: 查询订单状态服务
 	* @param phone
+	* @param appkey
 	* @return String
 	* @throws
 	 */
-	String queryOrderRecord(String phone);
+	String queryOrderRecord(String phone, String appkey);
 	
 	/**
 	* @Title: queryOrderState 

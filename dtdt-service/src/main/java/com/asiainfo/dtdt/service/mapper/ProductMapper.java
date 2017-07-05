@@ -16,7 +16,7 @@ public interface ProductMapper {
 	* @return List
 	* @throws
 	 */
-	List<Product> getProductList();
+	List<Product> getProductList(@Param("appId") Long appId);
 	
 	/**
 	* @Title: queryProduct 

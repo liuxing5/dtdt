@@ -71,6 +71,7 @@
     	price,count,money,valid_time,invalid_time
     from t_s_order_record
     where mobilephone = #{mobilephone,jdbcType=VARCHAR}
+    and  app_key = #{appKey,jdbcType=VARCHAR}
   </select>
   <delete id="deleteOrderRecord" parameterType="java.lang.String" >
     delete from t_s_order_record
