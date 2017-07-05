@@ -2,7 +2,6 @@ package com.asiainfo.dtdt.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
 * @ClassName: QueryOrderController 
 * @Description: 订单查询控制类
@@ -18,11 +19,10 @@ import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
 * @date 2017年6月30日 下午3:49:39 
 *
  */
+@Log4j2
 @Controller
 @RequestMapping(value="/queryOrder", method=RequestMethod.GET)
 public class QueryOrderController {
-	
-	private final static Logger logger = Logger.getLogger(QueryOrderController.class);
 	
 	@Autowired
 	private IQueryOrderService queryOrderService;
@@ -33,11 +33,11 @@ public class QueryOrderController {
 	* @return String
 	* @throws
 	 */
-	@RequestMapping(value="/queryOrderRecord", produces = "application/json; charset=utf-8")
+	@RequestMapping(value="/queryOrderRecord")
 	@ResponseBody
 	public String queryOrder(HttpServletRequest request) {
-		logger.info("OrderController queryOrderRecord() phone=" + request.getParameter("phone"));
-		return queryOrderService.queryOrderRecord(request.getParameter("phone"));
+		log.info("OrderController queryOrderRecord() phone=" + request.getParameter("phone"));
+		return queryOrderService.queryOrderRecord(request.getParameter("phone"), request.getHeader("appkey"));
 	}
 	
 	/**
@@ -46,10 +46,10 @@ public class QueryOrderController {
 	* @return String
 	* @throws
 	 */
-	@RequestMapping(value="/queryOrderState", produces = "application/json; charset=utf-8")
+	@RequestMapping(value="/queryOrderState")
 	@ResponseBody
 	public String queryOrderState(HttpServletRequest request) {
-		logger.info("OrderController queryOrderState() orderId=" + request.getParameter("orderId"));
+		log.info("OrderController queryOrderState() orderId=" + request.getParameter("orderId"));
 		return queryOrderService.queryOrderState(request.getParameter("orderId"));
 	}
 }
