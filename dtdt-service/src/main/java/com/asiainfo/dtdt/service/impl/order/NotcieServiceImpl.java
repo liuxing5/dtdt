@@ -122,7 +122,9 @@ public class NotcieServiceImpl implements INoticeService {
 				log.info("NoticeService optNoticeOrder wojia return resultCode 2-订购成功");
 				//沃家总管异步回调返回订购成功，我们需要生成订购关系，并且反冲话费
 				/**调用反冲话费 start**/
-				chargeService.backChargeBill(orderId,Integer.parseInt(String.valueOf(order.getMoney())) , order.getMobilephone());
+				if(Constant.IS_NEED_CHARGE_0 == order.getIsNeedCharge()){
+					chargeService.backChargeBill(orderId,Integer.parseInt(String.valueOf(order.getMoney())) , order.getMobilephone());
+				}
 				/**调用反冲话费 end**/
 				orderService.updateOrder(orderId, null, "11", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 				orderService.orderPayBak(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费成功");

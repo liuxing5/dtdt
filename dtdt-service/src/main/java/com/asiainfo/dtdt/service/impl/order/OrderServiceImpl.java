@@ -239,8 +239,8 @@ public class OrderServiceImpl implements IOrderService{
 		}else{
 			order.setAllowAutoPay((byte)1);
 		}
-		if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_01)){
-			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月当月失效时间
+		if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_01) && order.getAllowAutoPay() == 1){
+			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月不续订失效时间，续订无失效时间
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_03)){
@@ -416,7 +416,7 @@ public class OrderServiceImpl implements IOrderService{
 	public boolean optOrderRecord(String orderId,String woOrderId,String woOrder,String state,String productCode,byte isNeedCharge,byte isRealRequestWoplat){
 		int num = updateOrder(orderId, woOrderId, state,isNeedCharge,isRealRequestWoplat);
 		if(num > 0){
-			String cycleType = productCode.substring(2, 3);//当前订购流量包
+			String cycleType = productCode.substring(2, 4);//当前订购流量包
 			byte cycleType2 = 0;
 			if(Constant.CYCLE_TYPE_01.equals(cycleType)){//包月
 				//判断wojia总管订购流量包为包月并且当前也为包月流量包
