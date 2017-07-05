@@ -1,8 +1,11 @@
 package com.asiainfo.dtdt.common;
 
+import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 
 /**
 * @ClassName: ReturnUtil 
@@ -10,6 +13,15 @@ import com.alibaba.fastjson.JSONObject;
 public class ReturnUtil {
 	
 	//JSON.toJSONStringWithDateFormat(new Date(), "yyyy-MM-dd HH:mm:ss")
+	
+	private static SerializeConfig mapping = new SerializeConfig();
+	
+	private static String dateFormat;  
+	
+	static {  
+	    dateFormat = "yyyy-MM-dd HH:mm:ss";  
+	    mapping.put(Date.class, new SimpleDateFormatSerializer(dateFormat));
+	}
 	
 	/**
 	* @Title: returnJsonError 
@@ -20,6 +32,7 @@ public class ReturnUtil {
 	* @return String
 	* @throws
 	 */
+	@SuppressWarnings("static-access")
 	public static String returnJsonError(Object code, String msg, String data)
 	{
 		JSONObject json = new JSONObject();
@@ -31,9 +44,9 @@ public class ReturnUtil {
 		json.put("msg", msg);
 		if (null == data)
 		{
-			json.put("data", "");
+			json.put("data", null);
 		}else{
-			json.put("data", data);
+			json.put("data", json.parse(json.toJSONString(data, mapping)));
 		}
 		return json.toString();
 	}
@@ -47,6 +60,7 @@ public class ReturnUtil {
 	 * @return String
 	 * @throws
 	 */
+	@SuppressWarnings("static-access")
 	public static String returnJsonInfo(Object code, String msg, String data)
 	{	
 		JSONObject json = new JSONObject();
@@ -58,9 +72,9 @@ public class ReturnUtil {
 		json.put("msg", msg);
 		if (null == data)
 		{
-			json.put("data", "");
+			json.put("data", null);
 		}else{
-			json.put("data", data);
+			json.put("data", json.parse(json.toJSONString(data, mapping)));
 		}
 		return json.toString();
 	}
@@ -73,6 +87,7 @@ public class ReturnUtil {
 	* @return String
 	* @throws
 	 */
+	@SuppressWarnings("static-access")
 	public static String returnJsonList(Object code, String msg, List<?> list)
 	{
 		JSONObject json = new JSONObject();
@@ -80,11 +95,10 @@ public class ReturnUtil {
 		json.put("msg", msg);
 		if (null == list)
 		{
-			json.put("data", "");
+			json.put("data", null);
 		}else{
-			json.put("data", list);
+			json.put("data", json.parse(json.toJSONString(list, mapping)));
 		}
-		
 		return json.toString();
 	}
     
@@ -110,9 +124,9 @@ public class ReturnUtil {
 		json.put("msg", msg);
 		if (null == obj)
 		{
-			json.put("data", "");
+			json.put("data", null);
 		}else{
-			json.put("data", json.toJSON(obj));
+			json.put("data", json.parse(json.toJSONString(obj, mapping)));
 		}
 		return json.toString();
 	}

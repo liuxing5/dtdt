@@ -80,6 +80,6 @@ public class OrderController {
         }
         String orderJson = sb.toString();
         logger.info("closeOrder param data:" + orderJson);
-        return orderService.closeOrder(orderJson);
+        return orderService.closeOrder(orderJson, request.getHeader("appkey"));
 	}
 }

@@ -60,8 +60,10 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		
 		try {
 			List<OrderRecord> list = orderRecordMapper.queryOrderRecord(phone, appkey);
+			log.info("OrderServiceImpl queryOrderState() list=" + list);
 			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, list);
 		} catch (Exception e) {
+			log.error("OrderServiceImpl queryOrderRecord() Exception e=" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 	}

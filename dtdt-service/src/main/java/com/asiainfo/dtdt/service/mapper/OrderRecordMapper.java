@@ -54,14 +54,15 @@ public interface OrderRecordMapper {
      * @return List<OrderRecord>
      * @throws
       */
- 	List<OrderRecord> queryOrderRecord(String phone, String appKey);
+ 	List<OrderRecord> queryOrderRecord(@Param("mobilephone")String phone, @Param("appkey")String appkey);
  	
  	/**
  	* @Title: selectMonthProduct 
  	* @Description: 校验包月类订购
  	* @param orderId
+ 	* @param appkey
  	* @return OrderRecord
  	* @throws
  	 */
- 	OrderRecord selectMonthProduct(String orderId);
+ 	OrderRecord selectMonthProduct(@Param("orderId")String orderId, @Param("appkey")String appkey);
 }
