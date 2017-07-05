@@ -54,7 +54,7 @@ public interface OrderRecordMapper {
      * @return List<OrderRecord>
      * @throws
       */
- 	List<OrderRecord> queryOrderRecord(String phone);
+ 	List<OrderRecord> queryOrderRecord(String phone, String appKey);
  	
  	/**
  	* @Title: selectMonthProduct 

@@ -89,6 +89,11 @@ public class Constant {
 	/**订购免流产品不存在编码描述**/
 	public static final String PRODUCT_EXISTENCE_MSG	=	"订购产品不存在";
 	
+	/**产品不存在编码**/
+	public static final String NO_PRODUCT_CODE	=	"40002";
+	/**产品不存在编码描述**/
+	public static final String NO_PRODUCT_MSG	=	"无可订购产品";
+	
 	/**订单不存在编码**/
 	public static final String NO_ORDER_CODE	=	"40010";
 	/**订单不存在编码描述**/

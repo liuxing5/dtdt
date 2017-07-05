@@ -3,7 +3,6 @@ package com.asiainfo.dtdt.service.impl.order;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -21,10 +20,11 @@ import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service
 public class QueryOrderServiceImpl implements IQueryOrderService {
-	
-	private static final Logger logger = Logger.getLogger(QueryOrderServiceImpl.class);
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -46,9 +46,9 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	* @return String
 	* @throws
 	 */
-	public String queryOrderRecord(String phone) {
+	public String queryOrderRecord(String phone, String appkey) {
 		
-		logger.info("OrderServiceImpl queryOrderRecord() phone=" + phone);
+		log.info("OrderServiceImpl queryOrderRecord() phone=" + phone + " appkey=" + appkey);
 		
 		if (StringUtils.isEmpty(phone)) {
 			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
@@ -59,7 +59,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		try {
-			List<OrderRecord> list = orderRecordMapper.queryOrderRecord(phone);
+			List<OrderRecord> list = orderRecordMapper.queryOrderRecord(phone, appkey);
 			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, list);
 		} catch (Exception e) {
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -74,7 +74,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	* @throws
 	 */
 	public String queryOrderState(String orderId) {
-		logger.info("OrderServiceImpl queryOrderState() orderId=" + orderId);
+		log.info("OrderServiceImpl queryOrderState() orderId=" + orderId);
 		
 		if (StringUtils.isEmpty(orderId)) {
 			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
@@ -106,7 +106,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 				state = order.getState();
 			} 
 			
-			logger.info("OrderServiceImpl queryOrderState() state=" + state);
+			log.info("OrderServiceImpl queryOrderState() state=" + state);
 			
 			JSONObject json = new JSONObject();
 			json.put("state", state);

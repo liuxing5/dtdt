@@ -2,24 +2,31 @@ package com.asiainfo.dtdt.service.impl.product;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.ReturnUtil;
+import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service
 public class ProductServiceImpl implements IProductService {
 	
-	private static final Logger logger = Logger.getLogger(ProductServiceImpl.class);
 	
 	@Autowired
 	private ProductMapper productMapper;
+	
+	@Autowired
+	private AppMapper appMapper;
 	
 	/**
 	* @Title: getProductList 
@@ -27,14 +34,24 @@ public class ProductServiceImpl implements IProductService {
 	* @return List
 	* @throws
 	 */
-	public String getProductList() {
-		logger.info("ProductServiceImpl getProductList()");
+	public String getProductList(String appkey) {
+		log.info("ProductServiceImpl getProductList() appkey=" + appkey);
+		
+		//参数校验
+		if (StringUtils.isEmpty(appkey)) {
+			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, "appkey" + Constant.PARAM_NULL_MSG, null);
+		}
 		
 		try {
-			List<Product> list = productMapper.getProductList();
+			App app = appMapper.queryAppInfo(appkey);
+			List<Product> list = productMapper.getProductList(app.getAppId());
+			if (list.size() == 0) {
+				return ReturnUtil.returnJsonList(Constant.NO_PRODUCT_CODE, Constant.NO_PRODUCT_MSG, null);
+			}
+			log.info("ProductServiceImpl getProductList() list=" + list);
 			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, list);
 		} catch (Exception e) {
-			logger.info("ProductServiceImpl getProductList() Exception e" + e);
+			log.info("ProductServiceImpl getProductList() Exception e" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 	}
@@ -46,7 +63,7 @@ public class ProductServiceImpl implements IProductService {
 	* @throws
 	 */
 	public String queryProduct(String productCode) {
-		logger.info("ProductServiceImpl queryProduct param:productCode="+productCode);
+		log.info("ProductServiceImpl queryProduct param:productCode="+productCode);
 		
 		try {
 			Product product = productMapper.queryProduct(productCode);
@@ -55,7 +72,7 @@ public class ProductServiceImpl implements IProductService {
 			}
 			return JSONObject.toJSONString(product);
 		} catch (Exception e) {
-			logger.info("ProductServiceImpl queryProduct() Exception e" + e);
+			log.info("ProductServiceImpl queryProduct() Exception e" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 	}

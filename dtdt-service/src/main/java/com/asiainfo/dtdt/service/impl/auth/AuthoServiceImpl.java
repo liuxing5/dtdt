@@ -75,7 +75,7 @@ public class AuthoServiceImpl implements IAuthoService
 		} catch (Exception e)
 		{
 			log.error("参数校验错误！", e);
-			result.put("20000", "参数错误！");
+			result.put("99999", "系统错误");
 		}
 		return result;
 	}
