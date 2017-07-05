@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.asiainfo.dtdt.common.util.MD5Util;
+import com.asiainfo.dtdt.common.util.UuidUtil;
 
 /**
 * @ClassName: RechargeSignUtil 

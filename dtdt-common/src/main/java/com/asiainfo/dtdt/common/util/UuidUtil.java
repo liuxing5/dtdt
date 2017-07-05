@@ -1,4 +1,4 @@
-package com.asiainfo.dtdt.common;
+package com.asiainfo.dtdt.common.util;
 
 import java.util.UUID;
 

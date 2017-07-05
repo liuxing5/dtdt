@@ -5,11 +5,11 @@ import lombok.extern.log4j.Log4j2;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
-import com.asiainfo.dtdt.common.DateUtil;
 import com.asiainfo.dtdt.common.RestClient;
-import com.asiainfo.dtdt.common.UuidUtil;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
+import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
+import com.asiainfo.dtdt.common.util.UuidUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 
 

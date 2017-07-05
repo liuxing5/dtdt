@@ -25,4 +25,13 @@ public interface INoticeService {
 	* @throws
 	 */
 	void dtdtNoticeOrder(String orderId);
+	
+	/**
+	* @Title: INoticeService 
+	* @Description: (支付插件通知) 
+	* @param params
+	* @return        
+	* @throws
+	 */
+	boolean thirdPayNotice(String params);
 }

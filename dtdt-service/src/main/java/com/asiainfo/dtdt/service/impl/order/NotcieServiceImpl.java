@@ -7,20 +7,22 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
+import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
+import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 
@@ -53,6 +55,12 @@ public class NotcieServiceImpl implements INoticeService {
 	@Autowired
 	private IPayOrderService payOrderService;
 	
+	@Autowired
+	private INoticeService noticeService;
+	
+	@Autowired
+	private AppMapper appMapper;
+	
 	/**
 	 * (非 Javadoc) 
 	* <p>Title: optNoticeOrder</p> 
@@ -65,7 +73,7 @@ public class NotcieServiceImpl implements INoticeService {
 		//返回的json申明
 		JSONObject returnJson = new JSONObject();
 		try {
-			JSONObject jsonObject =new JSONObject(notifyJson);
+			JSONObject jsonObject =JSONObject.parseObject(notifyJson);
 			String seq = jsonObject.get("seq").toString();
 			String appId = jsonObject.get("msisdn").toString();
 			String orderId = jsonObject.get("orderId").toString();//沃家总管返回的orderId
@@ -76,10 +84,10 @@ public class NotcieServiceImpl implements INoticeService {
 			String orderDesc = jsonObject.get("orderDesc").toString();
 			String orderState = jsonObject.get("orderState").toString();//订单状态： 2，订购成功 5，退订成功（可再订购）6，订购失败7，退订失败。
 			String productAttrValues = jsonObject.get("productAttrValues").toString();
-			JSONArray jsonArray = new JSONArray(productAttrValues);
+			JSONArray jsonArray = JSONArray.parseArray(productAttrValues);
 			Map<String,Object> mapList  = new HashMap();
 			List list  = new ArrayList();
-			for (int i = 0; i < jsonArray.length(); i++) {
+			for (int i = 0; i < jsonArray.size(); i++) {
 				JSONObject json = jsonArray.getJSONObject(i);
 				mapList.put("attrTypeId",json.getString("attrTypeId"));//产品编码
 				mapList.put("attrValue",json.getString("attrValue"));//产品属性值
@@ -89,9 +97,9 @@ public class NotcieServiceImpl implements INoticeService {
 			/**处理业务开始*/
 			optNoticeOrder(orderState, orderId);
 			/**处理业务结束*/
-			returnJson.append("ecode", "0");
-			returnJson.append("emsg", "成功");
-			returnJson.append("seq", seq);
+			returnJson.put("ecode", "0");
+			returnJson.put("emsg", "成功");
+			returnJson.put("seq", seq);
 		} catch (JSONException jsone) {
 			log.error("wojia notice check param json is error:"+jsone.getMessage(),jsone);
 		}
@@ -118,6 +126,8 @@ public class NotcieServiceImpl implements INoticeService {
 				/**调用反冲话费 end**/
 				orderService.updateOrder(orderId, null, "11", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 				orderService.orderPayBak(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费成功");
+				/**订购成功回调通知**/
+				noticeService.dtdtNoticeOrder(orderId);
 				
 			}else if(resultCode.equals("5")){//退订成功（可再订购）
 				log.info("NoticeService optNoticeOrder wojia return resultCode 5-退订成功（可再订购）");
@@ -152,6 +162,7 @@ public class NotcieServiceImpl implements INoticeService {
 	public void dtdtNoticeOrder(String orderId) {
 		try {
 			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
+			App app = appMapper.queryAppInfo(orderRecord.getAppKey());
 			String state = orderRecord.getState();
 			log.info("NoticeServiceImpl dtdtNoticeOrder() state=" + state);
 			JSONObject json = new JSONObject();
@@ -160,7 +171,7 @@ public class NotcieServiceImpl implements INoticeService {
 				json.put("orderId", orderRecord.getOrderId());
 				json.put("productCode", orderRecord.getProductCode());
 				json.put("stateName", "订购成功");
-				RestClient.doRest(orderRecord.getRedirectUrl(), "POST", json.toString());
+				RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
 				break;
 			default:break;
 			}
@@ -170,4 +181,31 @@ public class NotcieServiceImpl implements INoticeService {
 		
 	}
 
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: thirdPayNotice</p> 
+	* <p>Description: </p> 
+	* @param params
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.order.INoticeService#thirdPayNotice(java.lang.String)
+	 */
+	@Override
+	public boolean thirdPayNotice(String params) {
+		try {
+			JSONObject jsonParam = JSONObject.parseObject(params);
+			String orderId = jsonParam.getString("orderId");
+			String resultCode = jsonParam.getString("resultCode");
+			String thirdOrderId = jsonParam.getString("thirdOrderId");
+			/**更新充值状态 start**/
+			payOrderService.updatePayOrderStatusAfterPayNotify(resultCode, orderId,thirdOrderId);
+			/**更新充值状态 end**/
+			//订购数据沉淀
+			orderService.paySuccessOrderDeposition("SUCCESS", orderId);
+			//订购数据沉淀
+			return true;
+		} catch (Exception e) {
+			log.error("noticeService thirdPayNotice Exception:"+e.getMessage(),e);
+		}
+		return false;
+	}
 }

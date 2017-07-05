@@ -1,9 +1,10 @@
-package com.asiainfo.dtdt.common;
+package com.asiainfo.dtdt.common.util;
 
 import java.util.Random;
 import java.util.UUID;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * Description: 生成ID

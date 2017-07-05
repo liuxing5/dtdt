@@ -183,18 +183,25 @@ public class PayServiceImpl implements IPayService {
 		//交易状态
 		String trade_status = params.get("trade_status");
 		try {
-			log.info("==aliPayNotify==updateRedpacketPayStatus==begin,trade_status:"+trade_status);
-			//数据沉淀
+			log.info("==aliPayNotify==paySuccessOrderDeposition==begin,trade_status:"+trade_status);
+			String flag = null;
 			if("TRADE_FINISHED".equals(trade_status) || "TRADE_SUCCESS".equals(trade_status)){
-				orderService.paySuccessOrderDeposition("SUCCESS", out_trade_no);
+				flag = "SUCCESS";
 			}else{
-				orderService.paySuccessOrderDeposition("FAIL", out_trade_no);
+				flag = "FAIL";
 			}
-			log.info("==aliPayNotify==updateRedpacketPayStatus==success");
+			/**更新充值状态 start**/
+			payOrderService.updatePayOrderStatusAfterPayNotify(flag, out_trade_no,trade_no);
+			/**更新充值状态 end**/
+			//数据沉淀
+			String payStr = payOrderService.queryPayOrderByPayId(out_trade_no);
+			Payorder payorder = JSONObject.parseObject(payStr, Payorder.class);
+			orderService.paySuccessOrderDeposition(flag, payorder.getOrderId());
+			log.info("==aliPayNotify==paySuccessOrderDeposition==success");
 			//响应支付宝
 			return true;
 		} catch (Exception e) {
-			log.error("==aliPayNotify==updateRedpacketPayStatus==exception"+e.getMessage(),e);
+			log.error("==aliPayNotify==paySuccessOrderDeposition==exception"+e.getMessage(),e);
 			e.printStackTrace();
 		}
 		return false;
