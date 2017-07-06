@@ -993,6 +993,8 @@ public class OrderServiceImpl implements IOrderService{
 		order = order(appkey, partnerCode, partnerOrderId, phone, product, orderMethod, allowAutoPay,null,"4");//待订购
 		//记录验证码信息
 		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
+		//清除redis中的验证码
+		redisUtil.delKey(vcodeKey);
 		//发沃家起订购请求
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
 		String woResult = null;
