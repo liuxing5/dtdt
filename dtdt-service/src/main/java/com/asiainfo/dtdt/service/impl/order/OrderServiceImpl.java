@@ -112,7 +112,7 @@ public class OrderServiceImpl implements IOrderService{
 		} catch (Exception e) {
 			log.error("orderService preOrder check param is json error；"+e.getMessage(),e);
 			e.printStackTrace();
-			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
 		}
 		String seq = null;
 		String partnerCode = null;
@@ -135,44 +135,44 @@ public class OrderServiceImpl implements IOrderService{
 			redirectUrl = jsonObject.get("redirectUrl").toString();
 		} catch (NullPointerException e) {
 			log.error("get param error is null");
-			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
 		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
 		if (StringUtils.isBlank(seq)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(partnerCode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(appKey)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "appKey"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(phone)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (!IsMobileNo.isMobile(phone)) {
 			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
 		}
 		if (StringUtils.isBlank(productCode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(orderMethod)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
 		}
 		if(StringUtils.isBlank(allowAutoPay)){
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "allowAutoPay"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "allowAutoPay"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(vcode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
 		}
 		/**校验验证码是否正确 start*/
 //		if(cache.exists("Y_" + partnerCode + appKey + phone)){//判断验证码是否存在
-//			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
+//			return ReturnUtil.returnJsonInfo(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
 //		}
 //		String vaildateCode = (String) cache.getItem("Y_" + partnerCode + appKey + phone);//获取有效的验证码
 //		if(!StringUtils.equals(vcode, vaildateCode)){
-//			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
+//			return ReturnUtil.returnJsonInfo(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
 //		}
 		/**校验验证码是否正确 end*/
 		/**校验接口中传递的参数是否合法  end*/
@@ -182,7 +182,7 @@ public class OrderServiceImpl implements IOrderService{
 		/**查询产品价格信息 start**/
 		String strProduct = productService.queryProduct(productCode);
 		if(StringUtils.isBlank(strProduct)){
-			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
 		/**查询产品价格信息 end**/
@@ -195,7 +195,7 @@ public class OrderServiceImpl implements IOrderService{
 				//检查沃家总管和我方都不存在需要记录预订购信息
 				order = order(appKey, partnerCode, seq, phone, product, orderMethod, allowAutoPay,redirectUrl,"1");
 			}else {
-				return ReturnUtil.returnJsonError(Constant.VALIDATE_ORDER_EXISTENCE_CODE, Constant.VALIDATE_ORDER_EXISTENCE_MSG+productCode, null);
+				return ReturnUtil.returnJsonInfo(Constant.VALIDATE_ORDER_EXISTENCE_CODE, Constant.VALIDATE_ORDER_EXISTENCE_MSG+productCode, null);
 			}
 		}else {//沃家总管存在已订购产品
 			//沉淀订购信息
@@ -542,7 +542,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public String closeOrder(String orderStr, String appkey) {
-		log.info("OrderServiceImpl closeOrder() orderStr:" + orderStr);
+		log.info("OrderServiceImpl closeOrder() orderStr:" + orderStr + " appkey=" + appkey);
 		
 		//获取参数
 		JSONObject jsonObject = JSONObject.parseObject(orderStr);
@@ -550,17 +550,15 @@ public class OrderServiceImpl implements IOrderService{
 		
 		//参数校验
 		if (StringUtils.isBlank(orderId)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		
 		//查询订购关系表：校验包月类订购为成功，只限包月类产产品
 		OrderRecord orderRecord = null;
-		String woOrderId = null;
 		try {
 			orderRecord = orderRecordMapper.selectMonthProduct(orderId, appkey);
 			if (null == orderRecord)
-				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
-			woOrderId = orderRecord.getWoOrderId();
+				return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -571,9 +569,9 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			product = productMapper.queryProduct(orderRecord.getProductCode());
 			if (null == product) 
-					return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+					return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 		} catch (Exception e) {
-			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
+			log.info("OrderServiceImpl closeOrder() queryProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
 			
@@ -591,10 +589,12 @@ public class OrderServiceImpl implements IOrderService{
 		JSONObject data = new JSONObject();
 		data.put("partnerOrderId", orderRecord.getPartnerCode());
 		data.put("orderId", orderRecord.getOrderId());
+		
 		String ecode = wojiaJson.getString("ecode");
+		String emsg = wojiaJson.getString("emsg");
 		if("0".equals(ecode)){
-			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order success ecode=" + ecode);
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode);
 			try {
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
@@ -606,47 +606,98 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		} else {
-			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail ecode=" + ecode);
+			//如果退订失败需返回失败原因
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder fail ecode=" + ecode);
+			data.put("failMsg", emsg);
+			updateTable(orderRecord, "23");//退订失败
+			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
+		} 
+	}
+	
+	/**
+	* @Title: closeOrderNew
+	* @Description: (定向流量退订接口)-new
+	* @param orderStr
+	* @param appkey
+	* @return        
+	* @throws
+	 */
+	public String closeOrderNew(String orderStr, String appkey) {
+		log.info("OrderServiceImpl closeOrderNew() orderStr:" + orderStr + " appkey=" + appkey);
+		
+		//获取参数：合作方请求orderId（我方平台的orderId,对应订购的时候wijia返回的woorderId）
+		JSONObject jsonObject = JSONObject.parseObject(orderStr);
+		String orderId = jsonObject.getString("orderId");
+		
+		//参数校验
+		if (StringUtils.isBlank(orderId)) {
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
+		}
+		
+		//查询订购关系表：不校验包月类
+		OrderRecord orderRecord = null;
+		try {
+			orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
+			if (null == orderRecord)
+				return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+		} catch (Exception e) {
+			log.info("OrderServiceImpl closeOrderNew() selectByPrimaryKey() Exception e=" + e);
+			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+		}
+			
+		//查询产品表
+		Product product = null;
+		try {
+			product = productMapper.queryProduct(orderRecord.getProductCode());
+			if (null == product) 
+					return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+		} catch (Exception e) {
+			log.info("OrderServiceImpl closeOrderNew() queryProduct() Exception e=" + e);
+			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+		}
+			
+		log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder request start" + orderRecord);
+//		String wojiaStr = OrderMethod.closeOrder(orderRecord.getMobilephone(), orderRecord.getProductCode(), orderRecord.getWoOrderid(), DateUtil.getSysdateYYYYMMDDHHMMSS(), orderRecord.getOrderChannel());
+		
+		//TODO
+		JSONObject dataTest = new JSONObject();
+		dataTest.put("ecode", "0");
+		String wojiaStr = dataTest.toJSONString();
+		JSONObject wojiaJson = JSONObject.parseObject(wojiaStr);
+		log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder response wojiaJson" + wojiaJson);
+		
+		//设置返回参数
+		JSONObject data = new JSONObject();
+		data.put("partnerOrderId", orderRecord.getPartnerCode());
+		data.put("orderId", orderRecord.getOrderId());
+		
+		String ecode = wojiaJson.getString("ecode");
+		String emsg = wojiaJson.getString("emsg");
+		if("0".equals(ecode)){
+			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
+			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order success ecode=" + ecode);
 			try {
-				Thread.sleep(3000);//过3秒再次请求
-			} catch (InterruptedException e) {
-				log.info("OrderServiceImpl closeOrder() InterruptedException e" + e);
+				data.put("productName", product.getProductName());
+				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
+				data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
+				updateTable(orderRecord, "19");
+				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
+			} catch (Exception e) {
+				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder updateTable Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-			
-			//查询wojia订购状态
-			log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder request start");
-			String queryWojiaStr = OrderMethod.queryOrder(orderRecord.getMobilephone(), woOrderId);//TODO
-					
-			JSONObject queryWojiaJson = JSONObject.parseObject(queryWojiaStr);
-			log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder response queryWojiaJson" + queryWojiaJson);
-					
-			String qryEcode = queryWojiaJson.getString("ecode");
-			String qryEmsg = queryWojiaJson.getString("emsg");
-			if("0".equals(qryEcode)){
-				log.info("OrderServiceImpl closeOrder() OrderMethod.queryOrder order success ecode=" + ecode);
-				try {
-					data.put("productName", product.getProductName());
-					data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
-					data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
-					updateTable(orderRecord, "19");
-					return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
-				} catch (Exception e) {
-					log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder updateTable Exception e" + e);
-					return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
-				}
-			} else {
-				//如果退订失败需返回失败原因
-				data.put("failMsg", qryEmsg);
-				updateTable(orderRecord, "23");
-				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
-			} 
+		} else {
+			//如果退订失败需返回失败原因
+			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode);
+			data.put("failMsg", emsg);
+			updateTable(orderRecord, "23");//退订失败
+			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 		}
 	}
 	
 	/**
 	* @Title: updateTable 
-	* @Description: 调用wojia退订接口：成功更新 order和orderRecord表为已退订	状态并迁移到历史表，返回接口成功信息
+	* @Description: 调用wojia退订接口成功后，更新 order和orderRecord表为已退订	状态并迁移到历史表，返回接口成功信息
 	* @param orderRecord
 	* @param state
 	* @return String
@@ -657,16 +708,18 @@ public class OrderServiceImpl implements IOrderService{
 
 		try {
 			//t_s_order 表到 t_s_his_order 表
-			Order order = closeOrderParams(orderRecord);
-			orderMapper.insertOrder(order);
-			insertFromHisOrderById(order.getOrderId(), "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
-			orderMapper.deleteByPrimaryKey(order.getOrderId());
+			insertOrder(orderRecord);
+			insertFromHisOrderById(orderRecord.getOrderId(), "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+			orderMapper.deleteByPrimaryKey(orderRecord.getOrderId());
 			
 			//t_s_order_record 表到 t_s_his_order_record 表
-			orderRecord.setState(state);//设置状态：19-退订成功
+			orderRecord.setState(state);//设置状态：19-退订成功 23-退订失败
 			orderRecordMapper.updateOrderRecord(orderRecord);
-			insertHisOrderRecord(orderRecord);
-			orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
+			if ("19".equals(state)) {
+				orderRecord.setRemark("退订成功");
+				insertHisOrderRecord(orderRecord);
+				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
+			}
 		} catch (Exception e) {
 			log.info("OrderServiceImpl updateTable() Exception e=" + e);
 		}
@@ -674,12 +727,13 @@ public class OrderServiceImpl implements IOrderService{
 	
 	/**
 	 * 
-	* @Title: closeOrderParams 
+	* @Title: insertOrder 
 	* @Description: 根据订购关系表数据，在请求退订后新生成一条在途数据
 	* @param orderRecord void
 	* @throws
 	 */
-	private Order closeOrderParams(OrderRecord orderRecord) {
+	private void insertOrder(OrderRecord orderRecord) {
+		log.info("OrderServiceImpl closeOrderParams() orderRecord:" + orderRecord);
 		Order order = new Order();
 		String order_id = BaseSeq.getLongSeq();
 		Date now = new Date();
@@ -714,7 +768,7 @@ public class OrderServiceImpl implements IOrderService{
 		order.setRedirectUrl(orderRecord.getRedirectUrl());
 		order.setIsRealRequestWoplat((byte)1);
 		order.setRemark("退订");
-		return order;
+		orderMapper.insertOrder(order);
 	}
 	
 	/**
@@ -733,7 +787,7 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrderRecord.setPartnerCode(orderRecord.getPartnerCode());
 		hisOrderRecord.setAppKey(orderRecord.getAppKey());
 		hisOrderRecord.setPartnerOrderId(orderRecord.getPartnerOrderId());
-		hisOrderRecord.setCycleType2(orderRecord.getCycleType2());
+		hisOrderRecord.setCycleType(orderRecord.getCycleType());
 		hisOrderRecord.setProductCode(orderRecord.getProductCode());
 		hisOrderRecord.setState(orderRecord.getState());
 		hisOrderRecord.setMobilephone(orderRecord.getMobilephone());
@@ -745,7 +799,6 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrderRecord.setOperSource(orderRecord.getOperSource());
 		hisOrderRecord.setAllowAutoPay(orderRecord.getAllowAutoPay());
 		hisOrderRecord.setWoOrder(orderRecord.getWoOrder());
-		hisOrderRecord.setRemark(orderRecord.getRemark());
 		hisOrderRecord.setRefundValidTime(orderRecord.getRefundValidTime());;
 		hisOrderRecord.setRefundTime(orderRecord.getRefundTime());
 		hisOrderRecord.setValidTime(orderRecord.getValidTime());
@@ -754,6 +807,7 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrderRecord.setUpdateTime(date);
 		hisOrderRecord.setRedirectUrl(orderRecord.getRedirectUrl());
 		hisOrderRecord.setWoOrderId(orderRecord.getWoOrderId());
+		hisOrderRecord.setRemark("退订移历史表");
 		try {
 			hisOrderRecordMapper.insertSelective(hisOrderRecord);
 		} catch (Exception e) {
@@ -761,7 +815,7 @@ public class OrderServiceImpl implements IOrderService{
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * (非 Javadoc) 
 	* <p>Title: forwardOrder</p> 
@@ -941,4 +995,5 @@ public class OrderServiceImpl implements IOrderService{
 		log.info("**********请求我家总管进行定向流量订购结束***********");
 		return result;
 	}
+
 }

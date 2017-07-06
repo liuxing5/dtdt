@@ -109,4 +109,28 @@ public class OrderController extends BaseController{
         logger.info("closeOrder param data:" + orderJson);
         return orderService.closeOrder(orderJson, request.getHeader("appkey"));
 	}
+	
+	/**
+	* @Title: OrderController 
+	* @Description: (退订定向流量)-new 
+	* @param request
+	* @param response
+	* @return
+	* @throws IOException        
+	* @throws
+	 */
+	@RequestMapping(value = "/closeOrderNew", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String closeOrderNew(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		InputStream ins = request.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+        StringBuilder sb = new StringBuilder();
+        String line = "";
+        while ((line = in.readLine()) != null) {
+        	sb.append(line);
+        }
+        String orderJson = sb.toString();
+        logger.info("closeOrderNew param data:" + orderJson);
+        return orderService.closeOrderNew(orderJson, request.getHeader("appkey"));
+	}
 }

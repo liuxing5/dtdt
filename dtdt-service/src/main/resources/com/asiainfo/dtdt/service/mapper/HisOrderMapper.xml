@@ -25,7 +25,7 @@
     <result column="allow_auto_pay" property="allowAutoPay" jdbcType="TINYINT" />
     <result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR"/>
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="copy_time2" property="copyTime2" jdbcType="TIMESTAMP" />
+    <result column="copy_time" property="copyTime" jdbcType="TIMESTAMP" />
     <result column="copy_type" property="copyType" jdbcType="TINYINT" />
     <result column="copy_remark" property="copyRemark" jdbcType="VARCHAR" />
   </resultMap>
@@ -33,7 +33,7 @@
     order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
     update_time, valid_time, invalid_time, price, count, money, is_need_charge,
-    remark, copy_time2, copy_type, copy_remark , allow_auto_pay,redirect_url
+    remark, copy_time, copy_type, copy_remark , allow_auto_pay,redirect_url
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -107,8 +107,8 @@
       <if test="remark != null" >
         remark,
       </if>
-      <if test="copyTime2 != null" >
-        copy_time2,
+      <if test="copyTime != null" >
+        copy_time,
       </if>
       <if test="copyType != null" >
         copy_type,
@@ -187,8 +187,8 @@
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
       </if>
-      <if test="copyTime2 != null" >
-        #{copyTime2,jdbcType=TIMESTAMP},
+      <if test="copyTime != null" >
+        #{copyTime,jdbcType=TIMESTAMP},
       </if>
       <if test="copyType != null" >
         #{copyType,jdbcType=TINYINT},
@@ -273,8 +273,8 @@
       <if test="remark != null" >
         remark = #{remark,jdbcType=VARCHAR},
       </if>
-      <if test="copyTime2 != null" >
-        copy_time2 = #{copyTime2,jdbcType=TIMESTAMP},
+      <if test="copyTime != null" >
+        copy_time = #{copyTime,jdbcType=TIMESTAMP},
       </if>
       <if test="copyType != null" >
         copy_type = #{copyType,jdbcType=TINYINT},
