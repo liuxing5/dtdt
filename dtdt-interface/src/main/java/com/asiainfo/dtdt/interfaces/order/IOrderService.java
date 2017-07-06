@@ -21,6 +21,15 @@ public interface IOrderService {
 	String preOrder(String jsonStr);
 	
 	/**
+	 * @Title: IOrderService 
+	 * @Description: (后向流量单个订购接口) 
+	 * @param jsonStr
+	 * @return        
+	 * @throws
+	 */
+	String postfixOrder(String jsonStr);
+	
+	/**
 	* @Title: IOrderService 
 	* @Description: (插入在途订单信息) 
 	* @param orderStr
