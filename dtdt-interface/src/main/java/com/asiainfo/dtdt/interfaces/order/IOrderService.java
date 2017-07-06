@@ -112,4 +112,13 @@ public interface IOrderService {
 	 */
     int updateOrder(String orderId,String woOrderId,String state,byte isNeedCharge,byte isRealRequestWoplat);
 	
+    /**
+    * @Title: IOrderService 
+    * @Description: (前向订购接口) 
+    * @param jsonStr
+    * @return        
+    * @throws
+    * @version 0.0.5
+     */
+    String forwardOrder(String jsonStr,String appkey,String partnerCode);
 }

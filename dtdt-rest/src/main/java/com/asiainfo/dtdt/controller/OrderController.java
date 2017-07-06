@@ -27,7 +27,7 @@ import com.asiainfo.dtdt.interfaces.order.IOrderService;
 */
 @Controller
 @RequestMapping(value="/product",method=RequestMethod.POST)
-public class OrderController {
+public class OrderController extends BaseController{
 	
 	private Logger logger = Logger.getLogger(OrderController.class);
 	
@@ -43,7 +43,7 @@ public class OrderController {
 	* @throws IOException        
 	* @throws
 	 */
-	@RequestMapping(value="/pre-order",produces = "application/json; charset=utf-8")
+	/*@RequestMapping(value="/pre-order",produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String order(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
@@ -56,6 +56,33 @@ public class OrderController {
         String orderJson = sb.toString(); //接收到通知信息。
         logger.info("pre-order param data:"+orderJson);
         String result = orderService.preOrder(orderJson);
+		return result;
+	}*/
+	
+	/**
+	* @Title: OrderController 
+	* @Description: (这里用一句话描述这个方法的作用) 
+	* @param request
+	* @param response
+	* @return
+	* @throws IOException        
+	* @throws
+	 */
+	@RequestMapping(value="/pre-order",produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String order(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		getHeaderCommonData(request);
+		InputStream ins = request.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+        StringBuilder sb = new StringBuilder();
+        String line = "";
+        while ((line = in.readLine()) != null) {
+        	sb.append(line);
+        }
+        String orderJson = sb.toString(); //接收到通知信息。
+        logger.info("pre-order param data:"+orderJson);
+        String result = orderService.forwardOrder(orderJson, headers.getString("appkey"), headers.getString("partnerCode"));
+        logger.info("pre-order return data:"+result);
 		return result;
 	}
 	
