@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.awim.bean.SpringContextHolder;
 import com.asiainfo.dtdt.config.RedisUtil;
+import com.asiainfo.dtdt.holder.SpringContextHolder;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
 
 
