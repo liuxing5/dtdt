@@ -373,7 +373,7 @@ public class OrderServiceImpl implements IOrderService{
 							//*状态13：邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费，此时邮箱侧合作方查询该笔订购状态为：订购成功
 							//疑问？：重复订购
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费");
+							insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费");
 							noticeService.dtdtNoticeOrder(woOrderId);
 							return;
 						}else if("4005".equals(ecode)){
@@ -382,7 +382,7 @@ public class OrderServiceImpl implements IOrderService{
 							log.info("orderService order product post wojia return mutex order param:orderId="+orderId);
 							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-							orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+							insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
 							noticeService.dtdtNoticeOrder(orderId);
 							return ;
 						}
@@ -396,7 +396,7 @@ public class OrderServiceImpl implements IOrderService{
 //					String woCycleType = woOrder.getProductCode().substring(2, 3);//沃家总管订购流量包
 //					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
 					optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", woOrder.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-					orderPayBak(orderId, Constant.HISORDER_TYPE_0, "沃家总管同步记录中存在订购关系：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
+					insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "沃家总管同步记录中存在订购关系：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
 					noticeService.dtdtNoticeOrder(orderId);
 					return ;
 				}
@@ -404,7 +404,7 @@ public class OrderServiceImpl implements IOrderService{
 				//更新在途订购订单状态4-付款失败
 				updateOrder(orderId,null, "4",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 				//将在途表信息存放在备份表中
-				orderPayBak(orderId, "2", "第三方支付失败");
+				insertOrderBakAndDelOrder(orderId, "2", "第三方支付失败");
 			}
 		} catch (Exception e) {
 			log.error("orderService paySuccessOrderDeposition fail:"+e.getMessage(),e);
@@ -527,7 +527,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @param copyRemark  入表备注      
 	* @throws
 	 */
-	public void orderPayBak(String orderId,String copyType,String copyRemark){
+	public void insertOrderBakAndDelOrder(String orderId,String copyType,String copyRemark){
 		int num = orderMapper.insertFromHisOrderById(orderId, copyType, copyRemark);
 		if(num > 0){
 			orderMapper.deleteByPrimaryKey(orderId);//清除在途表信息
@@ -911,47 +911,59 @@ public class OrderServiceImpl implements IOrderService{
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
 		String woResult = null;
 		if(num > 0){
-			woResult = postWoplatOrder(phone, productCode, DateUtil.getDateTime(new Date()), order.getOrderChannel());
+			woResult = postWoplatOrder(phone, product.getWoProductCode(), DateUtil.getDateTime(new Date()), order.getOrderChannel());
 		}
 		/**组装支付订单信息返回给接入商 start**/
 		JSONObject json = new JSONObject();
 		JSONObject woJson = JSONObject.parseObject(woResult);
-		if(woplatConfig.getWoplat_error_code().indexOf(woJson.getString("ecode")) != -1){//表示处理失败的
-			//更新在途订购订单状态7-订购失败
-			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-			//将在途表信息存放在备份表中
-			orderPayBak(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
+		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
+			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			json.put("orderId", order.getOrderId());
-			return ReturnUtil.returnJsonError(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+woJson.getString("emsg").substring(woJson.getString("emsg").indexOf("："), woJson.getString("emsg").length()), json.toString());
+			json.put("status", order.getState());
+			json.put("money", order.getMoney());
+			json.put("createTime", order.getCreateTime());
+			List list = new ArrayList();
+			JSONObject listItem = new JSONObject();
+			listItem.put("productCode", order.getProductCode());
+			listItem.put("productName", product.getProductName());
+			listItem.put("productType", product.getCycleType());
+			listItem.put("status", order.getState());
+			listItem.put("price", order.getPrice());
+			listItem.put("count", order.getCount());
+			listItem.put("allowAutoPay", order.getAllowAutoPay());
+			listItem.put("validTime", order.getValidTime());
+			listItem.put("invalidTime", order.getInvalidTime());
+			list.add(listItem);
+			json.put("item", listItem);
+			/**组装支付订单信息返回给接入商 end**/
+			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
 		}
 		if(woJson.getString("ecode").equals(Constant.ERROR_CODE) || StringUtils.isBlank(woResult)){//请求沃家总管超时或者异常
 			//更新在途订购订单状态7-订购失败
 			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 			//将在途表信息存放在备份表中
-			orderPayBak(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
+			insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
 			json.put("orderId", order.getOrderId());
-			return ReturnUtil.returnJsonError(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+woJson.getString("emsg").substring(woJson.getString("emsg").indexOf("："), woJson.getString("emsg").length()), json.toString());
+			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, json.toString());
 		}
-		updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+		//更新在途订购订单状态7-订购失败
+		updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+		//将在途表信息存放在备份表中
+		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
 		json.put("orderId", order.getOrderId());
-		json.put("status", order.getState());
-		json.put("money", order.getMoney());
-		json.put("createTime", order.getCreateTime());
-		List list = new ArrayList();
-		JSONObject listItem = new JSONObject();
-		listItem.put("productCode", order.getProductCode());
-		listItem.put("productName", product.getProductName());
-		listItem.put("productType", product.getCycleType());
-		listItem.put("status", order.getState());
-		listItem.put("price", order.getPrice());
-		listItem.put("count", order.getCount());
-		listItem.put("allowAutoPay", order.getAllowAutoPay());
-		listItem.put("validTime", order.getValidTime());
-		listItem.put("invalidTime", order.getInvalidTime());
-		list.add(listItem);
-		json.put("item", listItem);
-		/**组装支付订单信息返回给接入商 end**/
-		return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
+		String msg = null;
+		if(woJson.getString("ecode").equals("1405")){
+			msg = "用户 "+phone+" 不存在";
+		}else if(woJson.getString("ecode").equals("4000")){
+			msg = "产品 "+product.getProductName()+" 不存在或已失效";
+		}else if(woJson.getString("ecode").equals("4001")){
+			msg = "产品重复订购";
+		}else if(woJson.getString("ecode").equals("4002")){
+			msg = "产品无法订购";
+		}else if(woJson.getString("ecode").equals("4005")){
+			msg = "不能同时订购互斥产品";
+		}
+		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, json.toString());
 	}
 	
 	/**

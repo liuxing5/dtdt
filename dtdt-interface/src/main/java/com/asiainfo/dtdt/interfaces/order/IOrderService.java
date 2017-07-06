@@ -88,7 +88,7 @@ public interface IOrderService {
 	* @param copyRemark  入表备注      
 	* @throws
 	 */
-    void orderPayBak(String orderId,String copyType,String copyRemark);
+    void insertOrderBakAndDelOrder(String orderId,String copyType,String copyRemark);
     
     /**
 	* @Title: OrderServiceImpl 
