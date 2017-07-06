@@ -23,6 +23,8 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
 import com.asiainfo.dtdt.config.RedisUtil;
+import com.asiainfo.dtdt.entity.ResponseCode;
+import com.asiainfo.dtdt.entity.ResponseData;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
 
 
@@ -113,7 +115,7 @@ public class AuthFilter implements Filter{
 						requestJson.put(key, value);
 					}
 					//requestJson.putAll(m);
-					hrequest.getQueryString();
+					//hrequest.getQueryString();
 				}
 
 				JSONObject checkResult = checkCommonParam(requestJson);
@@ -149,6 +151,7 @@ public class AuthFilter implements Filter{
 
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private JSONObject checkCommonParam(JSONObject requestJson)
 	{
 		JSONObject checkResult = new JSONObject();
@@ -156,7 +159,8 @@ public class AuthFilter implements Filter{
 		{
 			if(null == requestJson || requestJson.isEmpty())
 			{
-				checkResult.put("10000", "参数为空，请检查参数！");
+				checkResult.put("code", "10000");
+				checkResult.put("msg", "参数为空，请检查参数！");
 				return checkResult;
 			}
 			
@@ -169,7 +173,8 @@ public class AuthFilter implements Filter{
 					|| (!requestJson.containsKey("appSignature") || StringUtils
 							.isEmpty(requestJson.getString("appSignature"))))
 			{
-				checkResult.put("10000",
+				checkResult.put("code", "10000");
+				checkResult.put("msg",
 						"partnerCode,appkey,timestamp,appSignature必传参数，请检查参数！");
 				return checkResult;
 			}
@@ -186,16 +191,26 @@ public class AuthFilter implements Filter{
 			long nowtimestamp = new Date().getTime();
 			if(timestamp > nowtimestamp || (nowtimestamp - timestamp) > validTime)
 			{
-				checkResult.put("30002", "请求链接失效！");
+				checkResult.put("code", "30002");
+				checkResult.put("msg", "请求链接失效！");
 				return checkResult;
 			}
 			
 			// 校验数据库是否存在，并且配对以及签名
-			return authoService.validPartnerAndAPP(requestJson);
+			ResponseData res = authoService.validPartnerAndAPP(requestJson);
+			if(ResponseCode.COMMON_SUCCESS_CODE.equals(res.getCode()))
+			{
+				return checkResult;
+			}
+			else
+			{
+				return (JSONObject) JSONObject.toJSON(res);
+			}
 		}
 		catch (Exception e)
 		{
 			log.error("参数校验错误！", e);
+			checkResult.put("code", "99999");
 			checkResult.put("99999", "系统错误！");
 		}
 		

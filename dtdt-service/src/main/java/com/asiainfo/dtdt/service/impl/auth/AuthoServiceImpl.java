@@ -11,6 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.util.SignUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Partner;
+import com.asiainfo.dtdt.entity.ResponseCode;
+import com.asiainfo.dtdt.entity.ResponseData;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.PartnerMapper;
@@ -34,10 +36,10 @@ public class AuthoServiceImpl implements IAuthoService
 		return "hello elf!";
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public JSONObject validPartnerAndAPP(JSONObject reqjson)
+	public ResponseData<?> validPartnerAndAPP(JSONObject reqjson)
 	{
-		JSONObject result = new JSONObject();
 		try
 		{
 			String partnerCode = reqjson.getString("partnerCode");
@@ -45,21 +47,18 @@ public class AuthoServiceImpl implements IAuthoService
 			if (null == partner
 					|| StringUtils.isEmpty(partner.getPartnerCode()))
 			{
-				result.put("20000", "partnerCode非法！");
-				return result;
+				return new ResponseData("20000", "partnerCode非法！");
 			}
 			String appkey = reqjson.getString("appkey");
 			App appinfo = appMapper.queryAppInfo(appkey);
 			if (null == appinfo || StringUtils.isEmpty(appinfo.getAppKey()))
 			{
-				result.put("20000", "appkey非法！");
-				return result;
+				return new ResponseData("20000", "appkey非法！");
 			}
 
 			if (!appinfo.getPartnerId().equals(partner.getPartnerId()))
 			{ 
-				result.put("20000", "partnerCode与appkey错误！");
-				return result;
+				return new ResponseData("20000", "partnerCode与appkey错误！");
 			}
 
 			// 验证签名
@@ -69,15 +68,14 @@ public class AuthoServiceImpl implements IAuthoService
 			if (!StringUtils.pathEquals(singstr,
 					reqjson.getString("appSignature")))
 			{
-				result.put("20000", "签名错误！");
-				return result;
+				return new ResponseData("20000", "签名错误！");
 			}
 		} catch (Exception e)
 		{
 			log.error("参数校验错误！", e);
-			result.put("99999", "系统错误");
+			return new ResponseData(ResponseCode.COMMON_ERROR_CODE, "系统错误");
 		}
-		return result;
+		return new ResponseData(ResponseCode.COMMON_SUCCESS_CODE, "成功");
 	}
 	
 	

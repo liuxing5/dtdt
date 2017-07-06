@@ -23,6 +23,7 @@ import com.asiainfo.dtdt.common.util.SignUtil;
 import com.asiainfo.dtdt.config.RedisUtil;
 import com.asiainfo.dtdt.config.SMSContentConfig;
 import com.asiainfo.dtdt.entity.ResponseCode;
+import com.asiainfo.dtdt.entity.ResponseData;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
 import com.huawei.insa2.util.SGIPSendMSGUtil;
 
@@ -53,8 +54,9 @@ public class AuthoController extends BaseController{
 	@Resource
 	private SMSContentConfig smsContentConfig;
 	
-    @RequestMapping(value = "getCode", method = RequestMethod.GET)
-	public JSONObject getSMSCode(HttpServletRequest request)
+    @SuppressWarnings("rawtypes")
+	@RequestMapping(value = "getCode", method = RequestMethod.GET)
+	public ResponseData<?> getSMSCode(HttpServletRequest request)
 	{
 		log.debug("directional data traffic!");
 
@@ -65,16 +67,12 @@ public class AuthoController extends BaseController{
 		{
 			if (StringUtils.isEmpty(phone))
 			{
-				result.put("code", "10000");
-				result.put("msg", "手机号号码为空！");
-				return result;
+				return new ResponseData("10000", "手机号号码为空！");
 			}
 			
 			if(!PhoneUtil.isCUCMobile(phone))
 			{
-				result.put("code", "20001");
-				result.put("msg", "非联通号码！");
-				return result;
+				return new ResponseData("10000", "非联通号码！");
 			}
 
 			StringBuilder sb = new StringBuilder(RedisKey.SMSC);
@@ -121,15 +119,11 @@ public class AuthoController extends BaseController{
 			log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
 			SGIPSendMSGUtil.sendMsg(phone, content);
 
-			result.put("code", "00000");
-			result.put("msg", "成功");
-			//result.put("SmdCode", code);
-
 			log.info("{}|{}|{}|{}",
 					headers.getString("partnerCode"),
 					headers.getString("appkey"), phone, content);
 
-			return result;
+			//return result;
 		} catch (Exception e)
 		{
 			result.put(ResponseCode.CODE, ResponseCode.COMMON_ERROR_CODE);
@@ -138,22 +132,16 @@ public class AuthoController extends BaseController{
 					headers.getString("partnerCode"),
 					headers.getString("appkey"), phone,
 					result.get("smsCode"), e);
+			return new ResponseData(ResponseCode.CODE, ResponseCode.COMMON_ERROR_CODE);
 		}
-		return result;
+		return new ResponseData(ResponseCode.COMMON_SUCCESS_CODE, "成功");
 	}
     
-    public static void main(String[] ag)
-    {
-    	for(int i=0; i<1000; i++)
-    	{
-    		//System.out.println(new Random().nextInt(999999));
-    		System.out.println((int)((Math.random()*9 + 1) * 100000));
-    	}
-    }
     
     @RequestMapping(value = "/test/getSign", method = POST)
     public String getSign(@RequestBody JSONObject json)
     {
+    	log.info(json.toJSONString());
     	return SignUtil.createSign(json, "UTF-8");
     }
 	

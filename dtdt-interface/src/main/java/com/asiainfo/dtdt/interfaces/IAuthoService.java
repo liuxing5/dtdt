@@ -1,6 +1,7 @@
 package com.asiainfo.dtdt.interfaces;
 
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.dtdt.entity.ResponseData;
 
 
 public interface IAuthoService {
@@ -17,5 +18,5 @@ public interface IAuthoService {
 	 * Date: 2017年7月4日 
 	 * @author Liuys5
 	 */
-	public JSONObject validPartnerAndAPP(JSONObject reqjson);
+	public ResponseData<?> validPartnerAndAPP(JSONObject reqjson);
 }
