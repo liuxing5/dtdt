@@ -34,7 +34,8 @@ public class ConsumerConfig {
         referenceBean.setRetries(0);
         referenceBean.setFilter("simpleconsumerfilter");
         referenceBean.setCheck(false);
-        referenceBean.setGroup("elf");
+        //referenceBean.setGroup("elf");
+        referenceBean.setGroup("test");
     }
 
     @Bean
