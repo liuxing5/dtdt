@@ -71,6 +71,16 @@ public interface IOrderService {
 	String closeOrder(String orderStr, String appkey);
 	
 	/**
+	* @Title: closeOrderNew
+	* @Description: (定向流量退订接口)-new
+	* @param orderStr
+	* @param appkey
+	* @return        
+	* @throws
+	 */
+	String closeOrderNew(String orderStr, String appkey);
+	
+	/**
 	* @Title: OrderServiceImpl 
 	* @Description: (将在途订单订购信息存放在备份表中并删除在途表信息) 
 	* @param orderId 订单ID
