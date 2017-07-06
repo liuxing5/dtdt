@@ -20,7 +20,7 @@ public class HisOrderRecord implements Serializable {
 
 	private String partnerOrderId;
 
-	private Byte cycleType2;
+	private Byte cycleType;
 
 	private String productCode;
 

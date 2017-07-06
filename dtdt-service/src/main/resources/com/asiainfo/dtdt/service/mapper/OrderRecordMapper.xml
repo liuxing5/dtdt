@@ -8,7 +8,7 @@
     <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
     <result column="app_key" property="appKey" jdbcType="VARCHAR" />
     <result column="partner_order_id" property="partnerOrderId" jdbcType="VARCHAR" />
-    <result column="cycle_type2" property="cycleType2" jdbcType="TINYINT" />
+    <result column="cycle_type" property="cycleType" jdbcType="TINYINT" />
     <result column="product_code" property="productCode" jdbcType="VARCHAR" />
     <result column="state" property="state" jdbcType="VARCHAR" />
     <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
@@ -30,7 +30,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    order_id, wo_order_id,parent_order_id, partner_code, app_key, partner_order_id, cycle_type2, 
+    order_id, wo_order_id,parent_order_id, partner_code, app_key, partner_order_id, cycle_type, 
     product_code, state, mobilephone, order_channel, price, count, money, is_need_charge, 
     oper_source, allow_auto_pay, wo_order, remark, refund_valid_time, refund_time, valid_time, 
     invalid_time, update_time, create_time,redirect_url
@@ -47,7 +47,7 @@
     from t_s_order_record
     where order_id = #{orderId,jdbcType=VARCHAR}
     and app_key = #{appkey,jdbcType=VARCHAR}
-    and cycle_type2 = 0
+    and cycle_type = 0
     and parent_order_id is null or parent_order_id=''
   </select>
   <select id="queryOrderRecordByParam" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -68,7 +68,7 @@
   <!-- 查询订购信息服务 -->
   <select id="queryOrderRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
-    	app_key,partner_order_id,cycle_type2,product_code,mobilephone,order_channel,
+    	app_key,partner_order_id,cycle_type,product_code,mobilephone,order_channel,
     	price,count,money,valid_time,invalid_time
     from t_s_order_record
     where mobilephone = #{mobilephone,jdbcType=VARCHAR}
@@ -99,8 +99,8 @@
       <if test="partnerOrderId != null" >
         partner_order_id,
       </if>
-      <if test="cycleType2 != null" >
-        cycle_type2,
+      <if test="cycleType != null" >
+        cycle_type,
       </if>
       <if test="productCode != null" >
         product_code,
@@ -179,8 +179,8 @@
       <if test="partnerOrderId != null" >
         #{partnerOrderId,jdbcType=VARCHAR},
       </if>
-      <if test="cycleType2 != null" >
-        #{cycleType2,jdbcType=TINYINT},
+      <if test="cycleType != null" >
+        #{cycleType,jdbcType=TINYINT},
       </if>
       <if test="productCode != null" >
         #{productCode,jdbcType=VARCHAR},
@@ -259,8 +259,8 @@
       <if test="partnerOrderId != null" >
         partner_order_id = #{partnerOrderId,jdbcType=VARCHAR},
       </if>
-      <if test="cycleType2 != null" >
-        cycle_type2 = #{cycleType2,jdbcType=TINYINT},
+      <if test="cycleType != null" >
+        cycle_type = #{cycleType,jdbcType=TINYINT},
       </if>
       <if test="productCode != null" >
         product_code = #{productCode,jdbcType=VARCHAR},

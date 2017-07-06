@@ -18,7 +18,7 @@ public interface HisOrderRecordMapper {
 
     /**
      * @Title: queryOrderRecord 
-     * @Description: 鏌ヨ璁㈣喘淇℃伅鏈嶅姟--澶辫触
+     * @Description: 查询订购信息服务--失败
      * @param mobilephone
      * @param appkey
      * @return List<HisOrderRecord>
