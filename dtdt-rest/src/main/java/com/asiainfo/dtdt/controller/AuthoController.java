@@ -116,10 +116,9 @@ public class AuthoController extends BaseController{
 			{
 				content = "";
 			}
-			content = content.replace("{0}", String.valueOf(code));
 			SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
 			log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
-			SGIPSendMSGUtil.sendMsg(phone, content);
+			SGIPSendMSGUtil.sendMsg(phone, content.replace("{0}", String.valueOf(code)));
 
 			result.put("code", "00000");
 			result.put("msg", "成功");
@@ -127,7 +126,7 @@ public class AuthoController extends BaseController{
 
 			log.info("{}|{}|{}|{}",
 					headers.getString("partnerCode"),
-					headers.getString("appkey"), phone, content);
+					headers.getString("appkey"), phone, code);
 
 			return result;
 		} catch (Exception e)

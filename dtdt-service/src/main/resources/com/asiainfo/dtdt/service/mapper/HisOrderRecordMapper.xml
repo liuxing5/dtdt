@@ -43,15 +43,6 @@
     from t_s_his_order_record
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
-  <!-- 查询订购失败信息服务 -->
-  <select id="queryOrderRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    	app_key,partner_order_id,cycle_type2,product_code,mobilephone,order_channel,
-    	price,count,money,valid_time,invalid_time
-    from t_s_his_order_record
-    where mobilephone = #{mobilephone,jdbcType=VARCHAR}
-    and  app_key = #{appkey,jdbcType=VARCHAR}
-  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from t_s_his_order_record
     where order_id = #{orderId,jdbcType=VARCHAR}
