@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/7/6 17:05:12                            */
+/* Created on:     2017/7/6 19:33:17                            */
 /*==============================================================*/
 
 
@@ -28,6 +28,10 @@ drop table if exists t_s_param;
 
 drop table if exists t_s_partner;
 
+drop table if exists t_s_partner_his_order_resources;
+
+drop table if exists t_s_partner_order_resources;
+
 drop table if exists t_s_payorder;
 
 drop table if exists t_s_product;
@@ -43,15 +47,15 @@ drop table if exists t_s_woplat_order;
 /*==============================================================*/
 create table t_s_app
 (
-   app_id               bigint not null comment 'åº”ç”¨ID',
-   app_key              varchar(36) not null comment 'åº”ç”¨key',
-   secret               varchar(32) comment 'ç§˜é’¥',
-   partner_id           bigint comment 'åˆä½œæ–¹ID',
-   app_name             varchar(50) comment 'åº”ç”¨åç§°',
-   state                tinyint comment 'çŠ¶æ€ï¼ˆæœ‰æ•ˆï¼š0ï¼Œå¤±æ•ˆï¼š1ï¼‰',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   create_time          timestamp comment 'åˆ›å»ºæ—¶é—´',
-   notice_url           varchar(100) comment 'é€šçŸ¥å›è°ƒåœ°å€',
+   app_id               bigint not null comment 'Ó¦ÓÃID',
+   app_key              varchar(36) not null comment 'Ó¦ÓÃkey',
+   secret               varchar(32) comment 'ÃØÔ¿',
+   partner_id           bigint comment 'ºÏ×÷·½ID',
+   app_name             varchar(50) comment 'Ó¦ÓÃÃû³Æ',
+   state                tinyint comment '×´Ì¬£¨ÓĞĞ§£º0£¬Ê§Ğ§£º1£©',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   create_time          timestamp comment '´´½¨Ê±¼ä',
+   notice_url           varchar(100) comment 'Í¨Öª»Øµ÷µØÖ·',
    primary key (app_id)
 );
 
@@ -60,19 +64,19 @@ create table t_s_app
 /*==============================================================*/
 create table t_s_charge
 (
-   charge_id            varchar(22) not null comment 'å……å€¼ID',
+   charge_id            varchar(22) not null comment '³äÖµID',
    order_id             varchar(22),
-   recharge_parent_id   varchar(22) comment 'å……å€¼æ‹†åˆ†çˆ¶ID',
-   recharge_phone_num   varchar(11) comment 'å……å€¼æ‰‹æœºå·',
-   recharge_money       int(11) comment 'å……å€¼é‡‘é¢',
-   rechage_time         timestamp comment 'å……å€¼æ—¶é—´',
-   rechage_num          int comment 'å……å€¼æ¬¡æ•°',
-   state                varchar(2) comment 'çŠ¶æ€ï¼ˆ1ï¼šå……å€¼ä¸­ 2ï¼šæˆåŠŸ 3ï¼šå¤±è´¥ 4ï¼šè¶…æ—¶ï¼‰',
-   result               varchar(500) comment 'ç»“æœ',
-   return_time          timestamp comment 'è¿”å›æ—¶é—´',
-   charge_sys_username  varchar(20) comment 'ä¼ä¸šç”¨æˆ·å',
-   charge_sys_pwd       varchar(100) comment 'ä¼ä¸šç”¨æˆ·å¯†ç ',
-   remark               varchar(500) comment 'å¤‡æ³¨',
+   recharge_parent_id   varchar(22) comment '³äÖµ²ğ·Ö¸¸ID',
+   recharge_phone_num   varchar(11) comment '³äÖµÊÖ»úºÅ',
+   recharge_money       int(11) comment '³äÖµ½ğ¶î',
+   rechage_time         timestamp comment '³äÖµÊ±¼ä',
+   rechage_num          int comment '³äÖµ´ÎÊı',
+   state                varchar(2) comment '×´Ì¬£¨1£º³äÖµÖĞ 2£º³É¹¦ 3£ºÊ§°Ü 4£º³¬Ê±£©',
+   result               varchar(500) comment '½á¹û',
+   return_time          timestamp comment '·µ»ØÊ±¼ä',
+   charge_sys_username  varchar(20) comment 'ÆóÒµÓÃ»§Ãû',
+   charge_sys_pwd       varchar(100) comment 'ÆóÒµÓÃ»§ÃÜÂë',
+   remark               varchar(500) comment '±¸×¢',
    primary key (charge_id)
 );
 
@@ -81,24 +85,24 @@ create table t_s_charge
 /*==============================================================*/
 create table t_s_his_charge
 (
-   charge_id            varchar(22) comment 'å……å€¼ID',
+   charge_id            varchar(22) comment '³äÖµID',
    order_id             varchar(22),
-   recharge_parent_id   varchar(22) comment 'å……å€¼æ‹†åˆ†çˆ¶ID',
-   recharge_phone_num   varchar(11) comment 'å……å€¼æ‰‹æœºå·',
-   recharge_money       int(11) comment 'å……å€¼é‡‘é¢',
-   rechage_time         timestamp comment 'å……å€¼æ—¶é—´',
-   rechage_num          int comment 'å……å€¼æ¬¡æ•°',
-   state                varchar(2) comment 'çŠ¶æ€ï¼ˆ1ï¼šå……å€¼ä¸­ 2ï¼šæˆåŠŸ 3ï¼šå¤±è´¥ 4ï¼šè¶…æ—¶ï¼‰',
-   result               varchar(500) comment 'ç»“æœ',
-   return_time          timestamp comment 'è¿”å›æ—¶é—´',
-   charge_sys_username  varchar(20) comment 'ä¼ä¸šç”¨æˆ·å',
-   charge_sys_pwd       varchar(100) comment 'ä¼ä¸šç”¨æˆ·å¯†ç ',
-   remark               varchar(500) comment 'å¤‡æ³¨',
-   copy_time            timestamp comment 'ç§»å…¥æ—¶é—´',
+   recharge_parent_id   varchar(22) comment '³äÖµ²ğ·Ö¸¸ID',
+   recharge_phone_num   varchar(11) comment '³äÖµÊÖ»úºÅ',
+   recharge_money       int(11) comment '³äÖµ½ğ¶î',
+   rechage_time         timestamp comment '³äÖµÊ±¼ä',
+   rechage_num          int comment '³äÖµ´ÎÊı',
+   state                varchar(2) comment '×´Ì¬£¨1£º³äÖµÖĞ 2£º³É¹¦ 3£ºÊ§°Ü 4£º³¬Ê±£©',
+   result               varchar(500) comment '½á¹û',
+   return_time          timestamp comment '·µ»ØÊ±¼ä',
+   charge_sys_username  varchar(20) comment 'ÆóÒµÓÃ»§Ãû',
+   charge_sys_pwd       varchar(100) comment 'ÆóÒµÓÃ»§ÃÜÂë',
+   remark               varchar(500) comment '±¸×¢',
+   copy_time            timestamp comment 'ÒÆÈëÊ±¼ä',
    copy_remark          varchar(100)
 );
 
-alter table t_s_his_charge comment 'è¿”å……è¯è´¹å†å²è®°å½•è¡¨ï¼ˆæŒ‰æœˆè¿ç§»ï¼‰';
+alter table t_s_his_charge comment '·µ³ä»°·ÑÀúÊ·¼ÇÂ¼±í£¨°´ÔÂÇ¨ÒÆ£©';
 
 /*==============================================================*/
 /* Table: t_s_his_order                                         */
@@ -106,38 +110,38 @@ alter table t_s_his_charge comment 'è¿”å……è¯è´¹å†å²è®°å½•è¡¨ï¼ˆæŒ‰æœˆè¿ç§»ï¼
 create table t_s_his_order
 (
    order_id             varchar(22) not null,
-   wo_order_id          varchar(36) comment 'æ²ƒå®¶æ€»ç®¡è¿”å›çš„ID',
-   partner_code         varchar(12) comment 'åˆä½œæ–¹ç¼–ç ',
-   app_key              varchar(36) comment 'åˆä½œä¼™ä¼´äº§å“ID',
-   partner_order_id     varchar(36) comment 'åˆä½œä¼™ä¼´è®¢å•ID',
+   wo_order_id          varchar(36) comment 'ÎÖ¼Ò×Ü¹Ü·µ»ØµÄID',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   app_key              varchar(36) comment 'ºÏ×÷»ï°é²úÆ·ID',
+   partner_order_id     varchar(36) comment 'ºÏ×÷»ï°é¶©µ¥ID',
    product_code         varchar(6),
-   oper_type            tinyint default 0 comment 'è®¢è´­ï¼š1ï¼Œé€€è®¢ï¼š2',
-   refund_order_id      varchar(22) comment 'oper_typeæœª1æ—¶ï¼Œå¿…é¡»æœ‰',
-   is_real_request_woplat tinyint comment 'æ˜¯å¦çœŸå®è¯·æ±‚æ²ƒå®¶æ€»ç®¡ï¼ˆ0ï¼šçœŸå®è¯·æ±‚ 1ï¼šæœªè¯·æ±‚ï¼‰
-            å¦‚æœæˆ‘æ–¹åŒä¸€æ‰‹æœºå·ç ï¼Œåœ¨å¤šä¸ªappä¸‹è®¢è´­äº†åŒä¸€æµé‡äº§å“ï¼Œ
-            åˆ™1ã€åªæœ‰ç¬¬ä¸€æ¬¡è®¢è´­ä¼šåƒæ²ƒå®¶æ€»ç®¡å‘èµ·è®¢è´­è¯·æ±‚ï¼›
-            2ã€åªæœ‰æœ€åä¸€ä¸ªé€€è®¢æ—¶ï¼Œæ‰èƒ½çœŸå®åƒæ²ƒå®¶æ€»ç®¡å‘èµ·é€€è®¢è¯·æ±‚ï¼›',
+   oper_type            tinyint default 0 comment '¶©¹º£º1£¬ÍË¶©£º2',
+   refund_order_id      varchar(22) comment 'oper_typeÎ´1Ê±£¬±ØĞëÓĞ',
+   is_real_request_woplat tinyint comment 'ÊÇ·ñÕæÊµÇëÇóÎÖ¼Ò×Ü¹Ü£¨0£ºÕæÊµÇëÇó 1£ºÎ´ÇëÇó£©
+            Èç¹ûÎÒ·½Í¬Ò»ÊÖ»úºÅÂë£¬ÔÚ¶à¸öappÏÂ¶©¹ºÁËÍ¬Ò»Á÷Á¿²úÆ·£¬
+            Ôò1¡¢Ö»ÓĞµÚÒ»´Î¶©¹º»áÏñÎÖ¼Ò×Ü¹Ü·¢Æğ¶©¹ºÇëÇó£»
+            2¡¢Ö»ÓĞ×îºóÒ»¸öÍË¶©Ê±£¬²ÅÄÜÕæÊµÏñÎÖ¼Ò×Ü¹Ü·¢ÆğÍË¶©ÇëÇó£»',
    state                varchar(2),
-   mobilephone          varchar(11) comment 'è®¢è´­æ‰‹æœºå·ç ',
-   order_channel        varchar(8) comment 'è®¢è´­æ¸ é“ï¼ˆAPPã€WEBã€FILEï¼šæ–‡ä»¶æ¥å£ã€Othersï¼šå…¶ä»–ï¼‰',
-   create_time          timestamp comment 'è®¢è´­æ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   valid_time           timestamp comment 'æœ‰æ•ˆæ—¶é—´',
-   invalid_time         timestamp comment 'å¤±æ•ˆæ—¶é—´',
-   price                int comment 'è®¢è´­äº§å“ä»·æ ¼',
-   count                int default 1 comment 'è®¢è´­æ•°é‡',
-   money                bigint comment 'è®¢å•ä»·æ ¼',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   allow_auto_pay       tinyint comment 'æ¯æœˆå›ºå®šæ—¶é—´ï¼š0ï¼Œä¸€æ¬¡æ€§ï¼š1',
+   mobilephone          varchar(11) comment '¶©¹ºÊÖ»úºÅÂë',
+   order_channel        varchar(8) comment '¶©¹ºÇşµÀ£¨APP¡¢WEB¡¢FILE£ºÎÄ¼ş½Ó¿Ú¡¢Others£ºÆäËû£©',
+   create_time          timestamp comment '¶©¹ºÊ±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   valid_time           timestamp comment 'ÓĞĞ§Ê±¼ä',
+   invalid_time         timestamp comment 'Ê§Ğ§Ê±¼ä',
+   price                int comment '¶©¹º²úÆ·¼Û¸ñ',
+   count                int default 1 comment '¶©¹ºÊıÁ¿',
+   money                bigint comment '¶©µ¥¼Û¸ñ',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   allow_auto_pay       tinyint comment 'Ã¿ÔÂ¹Ì¶¨Ê±¼ä£º0£¬Ò»´ÎĞÔ£º1',
    redirect_url         varchar(100),
    remark               varchar(100),
-   copy_time            timestamp comment 'å…¥è¡¨æ—¶é—´',
-   copy_type            tinyint default 0 comment 'å…¥è¡¨æ–¹å¼ï¼ˆ0ï¼šè®¢å•å®Œå·¥ 1ï¼šæœªæ”¯ä»˜å¤±æ•ˆ 2ï¼šäººå·¥æ“ä½œï¼‰',
+   copy_time            timestamp comment 'Èë±íÊ±¼ä',
+   copy_type            tinyint default 0 comment 'Èë±í·½Ê½£¨0£º¶©µ¥Íê¹¤ 1£ºÎ´Ö§¸¶Ê§Ğ§ 2£ºÈË¹¤²Ù×÷£©',
    copy_remark          varchar(100),
    primary key (order_id)
 );
 
-alter table t_s_his_order comment 'è®¢å•å†å²æ•°æ®è¡¨ï¼ˆæŒ‰æœˆè¿ç§»ï¼‰';
+alter table t_s_his_order comment '¶©µ¥ÀúÊ·Êı¾İ±í£¨°´ÔÂÇ¨ÒÆ£©';
 
 /*==============================================================*/
 /* Table: t_s_his_order_record                                  */
@@ -146,68 +150,68 @@ create table t_s_his_order_record
 (
    order_id             varchar(22) not null,
    wo_order_id          varchar(22),
-   parent_order_id      varchar(22) comment 'çˆ¶è®¢å•IDï¼Œå½“åŠå¹´åŒ…ï¼Œæˆ–è€…å¹´åŒ…æ‹†åˆ†æ—¶å‡ºç°æ­¤å­—æ®µï¼Œæ­¤æ—¶è¯¥è®°å½•æœªæœ¬ç³»ç»Ÿå†…ä¸ç”Ÿæˆï¼Œ
-            éç”¨æˆ·è¯·æ±‚ç”Ÿæˆ',
-   partner_code         varchar(12) comment 'åˆä½œæ–¹ç¼–ç ',
-   app_key              varchar(36) comment 'åˆä½œä¼™ä¼´äº§å“ID',
-   partner_order_id     varchar(36) comment 'åˆä½œä¼™ä¼´è®¢å•ID',
-   cycle_type           tinyint default 0 comment 'åŒ…æœˆï¼š0ï¼ŒåŒ…åŠå¹´ï¼š1ï¼ŒåŒ…å¹´ï¼š2',
-   product_code         varchar(6) comment 'å®šå‘æµé‡äº§å“ç¼–ç ',
+   parent_order_id      varchar(22) comment '¸¸¶©µ¥ID£¬µ±°ëÄê°ü£¬»òÕßÄê°ü²ğ·ÖÊ±³öÏÖ´Ë×Ö¶Î£¬´ËÊ±¸Ã¼ÇÂ¼Î´±¾ÏµÍ³ÄÚ²»Éú³É£¬
+            ·ÇÓÃ»§ÇëÇóÉú³É',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   app_key              varchar(36) comment 'ºÏ×÷»ï°é²úÆ·ID',
+   partner_order_id     varchar(36) comment 'ºÏ×÷»ï°é¶©µ¥ID',
+   cycle_type           tinyint default 0 comment '°üÔÂ£º0£¬°ü°ëÄê£º1£¬°üÄê£º2',
+   product_code         varchar(6) comment '¶¨ÏòÁ÷Á¿²úÆ·±àÂë',
    state                varchar(2),
-   mobilephone          varchar(11) comment 'è®¢è´­æ‰‹æœºå·ç ',
-   order_channel        varchar(8) comment 'è®¢è´­æ¸ é“ï¼ˆAPPã€WEBã€FILEï¼šæ–‡ä»¶æ¥å£ã€Othersï¼šå…¶ä»–ï¼‰',
-   price                int comment 'è®¢è´­äº§å“ä»·æ ¼',
-   count                int default 1 comment 'è®¢è´­æ•°é‡',
-   money                bigint comment 'è®¢å•ä»·æ ¼',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   oper_source          tinyint default 0 comment 'æ“ä½œæ¥æºï¼ˆ0ï¼šå®šå‘æµé‡å¹³å°å†… 1ï¼šæ²ƒå®¶æ€»ç®¡åŒæ­¥ ï¼‰',
-   allow_auto_pay       tinyint default 0 comment '0ï¼šå…è®¸ 1ï¼šä¸å…è®¸',
+   mobilephone          varchar(11) comment '¶©¹ºÊÖ»úºÅÂë',
+   order_channel        varchar(8) comment '¶©¹ºÇşµÀ£¨APP¡¢WEB¡¢FILE£ºÎÄ¼ş½Ó¿Ú¡¢Others£ºÆäËû£©',
+   price                int comment '¶©¹º²úÆ·¼Û¸ñ',
+   count                int default 1 comment '¶©¹ºÊıÁ¿',
+   money                bigint comment '¶©µ¥¼Û¸ñ',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   oper_source          tinyint default 0 comment '²Ù×÷À´Ô´£¨0£º¶¨ÏòÁ÷Á¿Æ½Ì¨ÄÚ 1£ºÎÖ¼Ò×Ü¹ÜÍ¬²½ £©',
+   allow_auto_pay       tinyint default 0 comment '0£ºÔÊĞí 1£º²»ÔÊĞí',
    redirect_url         varchar(100),
-   wo_order             tinyint default 0 comment '0ï¼šæˆ‘æ–¹åˆå§‹åŒ–è®¢è´­ 
-            1ï¼šå…¶ä»–ä»£ç†å•†è®¢è´­ 
-            2ï¼šå…¶ä»–ä»£ç†å•†è®¢è´­å¤±æ•ˆã€åˆ°æœŸæˆ–é€€è®¢ç”±æˆ‘æ–¹ç»­è®¢',
+   wo_order             tinyint default 0 comment '0£ºÎÒ·½³õÊ¼»¯¶©¹º 
+            1£ºÆäËû´úÀíÉÌ¶©¹º 
+            2£ºÆäËû´úÀíÉÌ¶©¹ºÊ§Ğ§¡¢µ½ÆÚ»òÍË¶©ÓÉÎÒ·½Ğø¶©',
    remark               varchar(100),
-   refund_valid_time    timestamp comment 'é€€è®¢ç”Ÿæ•ˆæ—¶é—´',
-   refund_time          timestamp comment 'é€€è®¢æ—¶é—´',
-   valid_time           timestamp comment 'æœ‰æ•ˆæ—¶é—´',
-   invalid_time         timestamp comment 'å¤±æ•ˆæ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   create_time          timestamp comment 'è®¢è´­æ—¶é—´',
-   copy_time            timestamp comment 'å…¥è¡¨æ—¶é—´',
-   copy_type            tinyint default 0 comment 'å…¥è¡¨æ–¹å¼ï¼ˆ0ï¼šåŒ…æœˆé€€è®¢ 1ï¼šåŒ…åŠå¹´ã€åŒ…å¹´åˆ°æœŸå¤±æ•ˆ 2ï¼šäººå·¥æ“ä½œï¼‰',
+   refund_valid_time    timestamp comment 'ÍË¶©ÉúĞ§Ê±¼ä',
+   refund_time          timestamp comment 'ÍË¶©Ê±¼ä',
+   valid_time           timestamp comment 'ÓĞĞ§Ê±¼ä',
+   invalid_time         timestamp comment 'Ê§Ğ§Ê±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   create_time          timestamp comment '¶©¹ºÊ±¼ä',
+   copy_time            timestamp comment 'Èë±íÊ±¼ä',
+   copy_type            tinyint default 0 comment 'Èë±í·½Ê½£¨0£º°üÔÂÍË¶© 1£º°ü°ëÄê¡¢°üÄêµ½ÆÚÊ§Ğ§ 2£ºÈË¹¤²Ù×÷£©',
    copy_remark          varchar(100),
    primary key (order_id)
 );
 
-alter table t_s_his_order_record comment 'äº§å“è®¢è´­å…³ç³»å†å²æ•°æ®è®°å½•è¡¨,é€€è®¢çš„åŒ…æœˆè®¢è´­ï¼Œå¤±æ•ˆçš„åŒ…åŠå¹´ã€åŒ…å¹´äº§å“è®¢è´­å…³ç³»';
+alter table t_s_his_order_record comment '²úÆ·¶©¹º¹ØÏµÀúÊ·Êı¾İ¼ÇÂ¼±í,ÍË¶©µÄ°üÔÂ¶©¹º£¬Ê§Ğ§µÄ°ü°ëÄê¡¢°üÄê²úÆ·¶©¹º¹ØÏµ';
 
 /*==============================================================*/
 /* Table: t_s_his_payorder                                      */
 /*==============================================================*/
 create table t_s_his_payorder
 (
-   pay_id               varchar(22) not null comment 'æ”¯ä»˜ID',
-   order_id             varchar(22) comment 'è®¢å•ID',
-   pay_account          varchar(32) comment 'æ”¯ä»˜è´¦æˆ·ID',
-   pay_money            bigint comment 'æ”¯ä»˜é’±æ•°',
-   pay_type             varchar(3) comment 'å¾®ä¿¡æ”¯ä»˜ï¼šWCPï¼Œæ”¯ä»˜å®æ”¯ä»˜ï¼šALP',
-   oper_type            tinyint comment 'æ”¯ä»˜ï¼š1  ï¼Œé€€æ¬¾ï¼š2',
+   pay_id               varchar(22) not null comment 'Ö§¸¶ID',
+   order_id             varchar(22) comment '¶©µ¥ID',
+   pay_account          varchar(32) comment 'Ö§¸¶ÕË»§ID',
+   pay_money            bigint comment 'Ö§¸¶Ç®Êı',
+   pay_type             varchar(3) comment 'Î¢ĞÅÖ§¸¶£ºWCP£¬Ö§¸¶±¦Ö§¸¶£ºALP',
+   oper_type            tinyint comment 'Ö§¸¶£º1  £¬ÍË¿î£º2',
    state                varchar(2),
-   origin_refound_money bigint comment 'åŸè·¯é€€è´¹é‡‘é¢',
-   origin_refound_time  timestamp comment 'åŸè·¯é€€è´¹æ—¶é—´',
-   man_made_refound_time timestamp comment 'äººå·¥é€€è´¹æ—¶é—´',
-   man_made_refound_type varchar(3) comment 'äººå·¥é€€è´¹æ–¹å¼ï¼ˆæ”¯ä»˜å®ï¼šALPï¼Œå¾®ä¿¡WCPï¼Œé€šè®¯è´¦æˆ·ï¼šCTPï¼Œå…¶ä»–ï¼šOTPï¼‰',
-   account_day          timestamp comment 'è´¦æœŸ',
-   pre_pay_id           varchar(128) comment 'é¢„æ”¯ä»˜ID',
-   third_pay_id         varchar(128) comment 'ç¬¬ä¸‰æ–¹æ”¯ä»˜ID',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   create_time          timestamp comment 'æ”¯ä»˜æ—¶é—´',
-   copy_time            timestamp comment 'ç§»å…¥æ—¶é—´',
+   origin_refound_money bigint comment 'Ô­Â·ÍË·Ñ½ğ¶î',
+   origin_refound_time  timestamp comment 'Ô­Â·ÍË·ÑÊ±¼ä',
+   man_made_refound_time timestamp comment 'ÈË¹¤ÍË·ÑÊ±¼ä',
+   man_made_refound_type varchar(3) comment 'ÈË¹¤ÍË·Ñ·½Ê½£¨Ö§¸¶±¦£ºALP£¬Î¢ĞÅWCP£¬Í¨Ñ¶ÕË»§£ºCTP£¬ÆäËû£ºOTP£©',
+   account_day          timestamp comment 'ÕËÆÚ',
+   pre_pay_id           varchar(128) comment 'Ô¤Ö§¸¶ID',
+   third_pay_id         varchar(128) comment 'µÚÈı·½Ö§¸¶ID',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   create_time          timestamp comment 'Ö§¸¶Ê±¼ä',
+   copy_time            timestamp comment 'ÒÆÈëÊ±¼ä',
    copy_remark          varchar(100),
    primary key (pay_id)
 );
 
-alter table t_s_his_payorder comment 'æ”¯ä»˜å†å²è®¢å•è¡¨ï¼ˆæŒ‰æœˆè¿ç§»ï¼‰';
+alter table t_s_his_payorder comment 'Ö§¸¶ÀúÊ·¶©µ¥±í£¨°´ÔÂÇ¨ÒÆ£©';
 
 /*==============================================================*/
 /* Table: t_s_order                                             */
@@ -215,35 +219,35 @@ alter table t_s_his_payorder comment 'æ”¯ä»˜å†å²è®¢å•è¡¨ï¼ˆæŒ‰æœˆè¿ç§»ï¼‰';
 create table t_s_order
 (
    order_id             varchar(22) not null,
-   wo_order_id          varchar(36) comment 'æ²ƒå®¶æ€»ç®¡è¿”å›çš„ID',
-   partner_code         varchar(12) comment 'åˆä½œæ–¹ç¼–ç ',
-   app_key              varchar(36) comment 'åˆä½œä¼™ä¼´äº§å“ID',
-   partner_order_id     varchar(36) comment 'åˆä½œä¼™ä¼´è®¢å•ID',
+   wo_order_id          varchar(36) comment 'ÎÖ¼Ò×Ü¹Ü·µ»ØµÄID',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   app_key              varchar(36) comment 'ºÏ×÷»ï°é²úÆ·ID',
+   partner_order_id     varchar(36) comment 'ºÏ×÷»ï°é¶©µ¥ID',
    product_code         varchar(6),
-   oper_type            tinyint default 0 comment 'è®¢è´­ï¼š1ï¼Œé€€è®¢ï¼š2',
-   refund_order_id      varchar(22) comment 'oper_typeæœª1æ—¶ï¼Œå¿…é¡»æœ‰',
-   is_real_request_woplat tinyint comment 'æ˜¯å¦çœŸå®è¯·æ±‚æ²ƒå®¶æ€»ç®¡ï¼ˆ0ï¼šçœŸå®è¯·æ±‚ 1ï¼šæœªè¯·æ±‚ï¼‰
-            å¦‚æœæˆ‘æ–¹åŒä¸€æ‰‹æœºå·ç ï¼Œåœ¨å¤šä¸ªappä¸‹è®¢è´­äº†åŒä¸€æµé‡äº§å“ï¼Œ
-            åˆ™1ã€åªæœ‰ç¬¬ä¸€æ¬¡è®¢è´­ä¼šåƒæ²ƒå®¶æ€»ç®¡å‘èµ·è®¢è´­è¯·æ±‚ï¼›
-            2ã€åªæœ‰æœ€åä¸€ä¸ªé€€è®¢æ—¶ï¼Œæ‰èƒ½çœŸå®åƒæ²ƒå®¶æ€»ç®¡å‘èµ·é€€è®¢è¯·æ±‚ï¼›',
+   oper_type            tinyint default 0 comment '¶©¹º£º1£¬ÍË¶©£º2',
+   refund_order_id      varchar(22) comment 'oper_typeÎ´1Ê±£¬±ØĞëÓĞ',
+   is_real_request_woplat tinyint comment 'ÊÇ·ñÕæÊµÇëÇóÎÖ¼Ò×Ü¹Ü£¨0£ºÕæÊµÇëÇó 1£ºÎ´ÇëÇó£©
+            Èç¹ûÎÒ·½Í¬Ò»ÊÖ»úºÅÂë£¬ÔÚ¶à¸öappÏÂ¶©¹ºÁËÍ¬Ò»Á÷Á¿²úÆ·£¬
+            Ôò1¡¢Ö»ÓĞµÚÒ»´Î¶©¹º»áÏñÎÖ¼Ò×Ü¹Ü·¢Æğ¶©¹ºÇëÇó£»
+            2¡¢Ö»ÓĞ×îºóÒ»¸öÍË¶©Ê±£¬²ÅÄÜÕæÊµÏñÎÖ¼Ò×Ü¹Ü·¢ÆğÍË¶©ÇëÇó£»',
    state                varchar(2),
-   mobilephone          varchar(11) comment 'è®¢è´­æ‰‹æœºå·ç ',
-   order_channel        varchar(8) comment 'è®¢è´­æ¸ é“ï¼ˆAPPã€WEBã€FILEï¼šæ–‡ä»¶æ¥å£ã€Othersï¼šå…¶ä»–ï¼‰',
-   create_time          timestamp comment 'è®¢è´­æ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   valid_time           timestamp comment 'æœ‰æ•ˆæ—¶é—´',
-   invalid_time         timestamp comment 'å¤±æ•ˆæ—¶é—´',
-   price                int comment 'è®¢è´­äº§å“ä»·æ ¼',
-   count                int default 1 comment 'è®¢è´­æ•°é‡',
-   money                bigint comment 'è®¢å•ä»·æ ¼',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   allow_auto_pay       tinyint comment 'æ¯æœˆå›ºå®šæ—¶é—´ï¼š0ï¼Œä¸€æ¬¡æ€§ï¼š1',
-   redirect_url         varchar(100) comment 'æ”¯ä»˜æˆåŠŸè·³è½¬Url',
+   mobilephone          varchar(11) comment '¶©¹ºÊÖ»úºÅÂë',
+   order_channel        varchar(8) comment '¶©¹ºÇşµÀ£¨APP¡¢WEB¡¢FILE£ºÎÄ¼ş½Ó¿Ú¡¢Others£ºÆäËû£©',
+   create_time          timestamp comment '¶©¹ºÊ±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   valid_time           timestamp comment 'ÓĞĞ§Ê±¼ä',
+   invalid_time         timestamp comment 'Ê§Ğ§Ê±¼ä',
+   price                int comment '¶©¹º²úÆ·¼Û¸ñ',
+   count                int default 1 comment '¶©¹ºÊıÁ¿',
+   money                bigint comment '¶©µ¥¼Û¸ñ',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   allow_auto_pay       tinyint comment 'Ã¿ÔÂ¹Ì¶¨Ê±¼ä£º0£¬Ò»´ÎĞÔ£º1',
+   redirect_url         varchar(100) comment 'Ö§¸¶³É¹¦Ìø×ªUrl',
    remark               varchar(100),
    primary key (order_id)
 );
 
-alter table t_s_order comment 'æ‰§è¡Œæµç¨‹ä¸­çš„è®¢å•è®°å½•è¡¨';
+alter table t_s_order comment 'Ö´ĞĞÁ÷³ÌÖĞµÄ¶©µ¥¼ÇÂ¼±í';
 
 /*==============================================================*/
 /* Table: t_s_order_record                                      */
@@ -252,49 +256,49 @@ create table t_s_order_record
 (
    order_id             varchar(22) not null,
    wo_order_id          varchar(22),
-   parent_order_id      varchar(22) comment 'çˆ¶è®¢å•IDï¼Œå½“åŠå¹´åŒ…ï¼Œæˆ–è€…å¹´åŒ…æ‹†åˆ†æ—¶å‡ºç°æ­¤å­—æ®µï¼Œæ­¤æ—¶è¯¥è®°å½•æœªæœ¬ç³»ç»Ÿå†…ä¸ç”Ÿæˆï¼Œ
-            éç”¨æˆ·è¯·æ±‚ç”Ÿæˆ',
-   partner_code         varchar(12) comment 'åˆä½œæ–¹ç¼–ç ',
-   app_key              varchar(36) comment 'åˆä½œä¼™ä¼´äº§å“ID',
-   partner_order_id     varchar(36) comment 'åˆä½œä¼™ä¼´è®¢å•ID',
-   cycle_type           tinyint default 0 comment 'åŒ…æœˆï¼š0ï¼ŒåŒ…åŠå¹´ï¼š1ï¼ŒåŒ…å¹´ï¼š2',
-   product_code         varchar(6) comment 'å®šå‘æµé‡äº§å“ç¼–ç ',
+   parent_order_id      varchar(22) comment '¸¸¶©µ¥ID£¬µ±°ëÄê°ü£¬»òÕßÄê°ü²ğ·ÖÊ±³öÏÖ´Ë×Ö¶Î£¬´ËÊ±¸Ã¼ÇÂ¼Î´±¾ÏµÍ³ÄÚ²»Éú³É£¬
+            ·ÇÓÃ»§ÇëÇóÉú³É',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   app_key              varchar(36) comment 'ºÏ×÷»ï°é²úÆ·ID',
+   partner_order_id     varchar(36) comment 'ºÏ×÷»ï°é¶©µ¥ID',
+   cycle_type           tinyint default 0 comment '°üÔÂ£º0£¬°ü°ëÄê£º1£¬°üÄê£º2',
+   product_code         varchar(6) comment '¶¨ÏòÁ÷Á¿²úÆ·±àÂë',
    state                varchar(2),
-   mobilephone          varchar(11) comment 'è®¢è´­æ‰‹æœºå·ç ',
-   order_channel        varchar(8) comment 'è®¢è´­æ¸ é“ï¼ˆAPPã€WEBã€FILEï¼šæ–‡ä»¶æ¥å£ã€Othersï¼šå…¶ä»–ï¼‰',
-   price                int comment 'è®¢è´­äº§å“ä»·æ ¼',
-   count                int default 1 comment 'è®¢è´­æ•°é‡',
-   money                bigint comment 'è®¢å•ä»·æ ¼',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   oper_source          tinyint default 0 comment 'æ“ä½œæ¥æºï¼ˆ0ï¼šå®šå‘æµé‡å¹³å°å†… 1ï¼šæ²ƒå®¶æ€»ç®¡åŒæ­¥ ï¼‰',
-   allow_auto_pay       tinyint default 0 comment '0ï¼šå…è®¸ 1ï¼šä¸å…è®¸',
+   mobilephone          varchar(11) comment '¶©¹ºÊÖ»úºÅÂë',
+   order_channel        varchar(8) comment '¶©¹ºÇşµÀ£¨APP¡¢WEB¡¢FILE£ºÎÄ¼ş½Ó¿Ú¡¢Others£ºÆäËû£©',
+   price                int comment '¶©¹º²úÆ·¼Û¸ñ',
+   count                int default 1 comment '¶©¹ºÊıÁ¿',
+   money                bigint comment '¶©µ¥¼Û¸ñ',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   oper_source          tinyint default 0 comment '²Ù×÷À´Ô´£¨0£º¶¨ÏòÁ÷Á¿Æ½Ì¨ÄÚ 1£ºÎÖ¼Ò×Ü¹ÜÍ¬²½ £©',
+   allow_auto_pay       tinyint default 0 comment '0£ºÔÊĞí 1£º²»ÔÊĞí',
    redirect_url         varchar(100),
-   wo_order             tinyint default 0 comment '0ï¼šæˆ‘æ–¹åˆå§‹åŒ–è®¢è´­ 
-            1ï¼šå…¶ä»–ä»£ç†å•†è®¢è´­ 
-            2ï¼šå…¶ä»–ä»£ç†å•†è®¢è´­å¤±æ•ˆã€åˆ°æœŸæˆ–é€€è®¢ç”±æˆ‘æ–¹ç»­è®¢',
+   wo_order             tinyint default 0 comment '0£ºÎÒ·½³õÊ¼»¯¶©¹º 
+            1£ºÆäËû´úÀíÉÌ¶©¹º 
+            2£ºÆäËû´úÀíÉÌ¶©¹ºÊ§Ğ§¡¢µ½ÆÚ»òÍË¶©ÓÉÎÒ·½Ğø¶©',
    remark               varchar(100),
-   refund_valid_time    timestamp comment 'é€€è®¢ç”Ÿæ•ˆæ—¶é—´',
-   refund_time          timestamp comment 'é€€è®¢æ—¶é—´',
-   valid_time           timestamp comment 'æœ‰æ•ˆæ—¶é—´',
-   invalid_time         timestamp comment 'å¤±æ•ˆæ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   create_time          timestamp comment 'è®¢è´­æ—¶é—´',
+   refund_valid_time    timestamp comment 'ÍË¶©ÉúĞ§Ê±¼ä',
+   refund_time          timestamp comment 'ÍË¶©Ê±¼ä',
+   valid_time           timestamp comment 'ÓĞĞ§Ê±¼ä',
+   invalid_time         timestamp comment 'Ê§Ğ§Ê±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   create_time          timestamp comment '¶©¹ºÊ±¼ä',
    primary key (order_id)
 );
 
-alter table t_s_order_record comment 'æœ‰æ•ˆçš„äº§å“è®¢è´­å…³ç³»';
+alter table t_s_order_record comment 'ÓĞĞ§µÄ²úÆ·¶©¹º¹ØÏµ';
 
 /*==============================================================*/
 /* Table: t_s_param                                             */
 /*==============================================================*/
 create table t_s_param
 (
-   param_code           varchar(50) comment 'å‚æ•°ç¼–ç ',
-   param_value          varchar(50) comment 'å‚æ•°å€¼',
-   parent_code          varchar(50) comment 'çˆ¶å‚æ•°ç¼–ç ',
-   status               int(1) comment 'çŠ¶æ€ 1ï¼šå¯ç”¨',
-   create_time          timestamp comment 'åˆ›å»ºæ—¶é—´',
-   remark               varchar(100) comment 'å¤‡æ³¨'
+   param_code           varchar(50) comment '²ÎÊı±àÂë',
+   param_value          varchar(50) comment '²ÎÊıÖµ',
+   parent_code          varchar(50) comment '¸¸²ÎÊı±àÂë',
+   status               int(1) comment '×´Ì¬ 1£º¿ÉÓÃ',
+   create_time          timestamp comment '´´½¨Ê±¼ä',
+   remark               varchar(100) comment '±¸×¢'
 );
 
 /*==============================================================*/
@@ -302,40 +306,74 @@ create table t_s_param
 /*==============================================================*/
 create table t_s_partner
 (
-   partner_id           bigint not null comment 'åˆä½œæ–¹ID',
-   partner_code         varchar(12) not null comment 'åˆä½œæ–¹ç¼–ç ',
-   partner_name         varchar(100) comment 'åˆä½œæ–¹åç§°',
-   state                tinyint default 0 comment 'çŠ¶æ€ï¼ˆ0ï¼šæœ‰æ•ˆï¼Œ 1å¤±æ•ˆï¼‰',
-   contacts             varchar(20) comment 'è”ç³»äºº',
-   telephone            varchar(13) comment 'å›ºå®šç”µè¯',
-   mobilephone          varchar(11) comment 'ç§»åŠ¨ç”µè¯',
-   address              varchar(100) comment 'åœ°å€',
-   create_time          timestamp comment 'åˆ›å»ºæ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
+   partner_id           bigint not null comment 'ºÏ×÷·½ID',
+   partner_code         varchar(12) not null comment 'ºÏ×÷·½±àÂë',
+   partner_name         varchar(100) comment 'ºÏ×÷·½Ãû³Æ',
+   state                tinyint default 0 comment '×´Ì¬£¨0£ºÓĞĞ§£¬ 1Ê§Ğ§£©',
+   contacts             varchar(20) comment 'ÁªÏµÈË',
+   telephone            varchar(13) comment '¹Ì¶¨µç»°',
+   mobilephone          varchar(11) comment 'ÒÆ¶¯µç»°',
+   address              varchar(100) comment 'µØÖ·',
+   create_time          timestamp comment '´´½¨Ê±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
    primary key (partner_id)
 );
+
+/*==============================================================*/
+/* Table: t_s_partner_his_order_resources                       */
+/*==============================================================*/
+create table t_s_partner_his_order_resources
+(
+   batch_id             varchar(32) not null comment '×ÊÔ´Åú´ÎID',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   pre_count            tinyint default 0 comment 'Ô¤´æ¶©¹º´ÎÊı',
+   use_count            tinyint comment 'Ê§Ğ§ºó£¬Ê¹ÓÃÁËµÄ´ÎÊı',
+   create_user          varchar(50) comment '´´½¨Õß',
+   create_time          timestamp comment '´´½¨Ê±¼ä',
+   end_time             timestamp comment '½áÊøÊ±¼ä',
+   primary key (batch_id)
+);
+
+alter table t_s_partner_his_order_resources comment 'ºÏ×÷·½¶©¹º×ÊÔ´Åú´ÎÀúÊ·¼ÇÂ¼±í';
+
+/*==============================================================*/
+/* Table: t_s_partner_order_resources                           */
+/*==============================================================*/
+create table t_s_partner_order_resources
+(
+   batch_id             varchar(32) not null comment '×ÊÔ´Åú´ÎID',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   pre_count            tinyint default 0 comment 'Ô¤´æ¶©¹º´ÎÊı',
+   use_count            tinyint comment 'Ê§Ğ§ºó£¬Ê¹ÓÃÁËµÄ´ÎÊı',
+   create_user          varchar(50) comment '´´½¨Õß',
+   create_time          timestamp comment '´´½¨Ê±¼ä',
+   end_time             timestamp comment '½áÊøÊ±¼ä',
+   primary key (batch_id)
+);
+
+alter table t_s_partner_order_resources comment 'ºÏ×÷·½¶©¹º×ÊÔ´Åú´Î¼ÇÂ¼±í';
 
 /*==============================================================*/
 /* Table: t_s_payorder                                          */
 /*==============================================================*/
 create table t_s_payorder
 (
-   pay_id               varchar(22) not null comment 'æ”¯ä»˜ID',
-   order_id             varchar(22) comment 'è®¢å•ID',
-   pay_account          varchar(32) comment 'æ”¯ä»˜è´¦æˆ·ID',
-   pay_money            bigint comment 'æ”¯ä»˜é’±æ•°',
-   pay_type             varchar(3) comment 'å¾®ä¿¡æ”¯ä»˜ï¼šWCPï¼Œæ”¯ä»˜å®æ”¯ä»˜ï¼šALP',
-   oper_type            tinyint comment 'æ”¯ä»˜ï¼š1  ï¼Œé€€æ¬¾ï¼š2',
+   pay_id               varchar(22) not null comment 'Ö§¸¶ID',
+   order_id             varchar(22) comment '¶©µ¥ID',
+   pay_account          varchar(32) comment 'Ö§¸¶ÕË»§ID',
+   pay_money            bigint comment 'Ö§¸¶Ç®Êı',
+   pay_type             varchar(3) comment 'Î¢ĞÅÖ§¸¶£ºWCP£¬Ö§¸¶±¦Ö§¸¶£ºALP',
+   oper_type            tinyint comment 'Ö§¸¶£º1  £¬ÍË¿î£º2',
    state                varchar(2),
-   origin_refound_money bigint comment 'åŸè·¯é€€è´¹é‡‘é¢',
-   origin_refound_time  timestamp comment 'åŸè·¯é€€è´¹æ—¶é—´',
-   man_made_refound_time timestamp comment 'äººå·¥é€€è´¹æ—¶é—´',
-   man_made_refound_type varchar(3) comment 'äººå·¥é€€è´¹æ–¹å¼ï¼ˆæ”¯ä»˜å®ï¼šALPï¼Œå¾®ä¿¡WCPï¼Œé€šè®¯è´¦æˆ·ï¼šCTPï¼Œå…¶ä»–ï¼šOTPï¼‰',
-   account_day          timestamp comment 'è´¦æœŸ',
-   pre_pay_id           varchar(128) comment 'é¢„æ”¯ä»˜ID',
-   third_pay_id         varchar(128) comment 'ç¬¬ä¸‰æ–¹æ”¯ä»˜ID',
+   origin_refound_money bigint comment 'Ô­Â·ÍË·Ñ½ğ¶î',
+   origin_refound_time  timestamp comment 'Ô­Â·ÍË·ÑÊ±¼ä',
+   man_made_refound_time timestamp comment 'ÈË¹¤ÍË·ÑÊ±¼ä',
+   man_made_refound_type varchar(3) comment 'ÈË¹¤ÍË·Ñ·½Ê½£¨Ö§¸¶±¦£ºALP£¬Î¢ĞÅWCP£¬Í¨Ñ¶ÕË»§£ºCTP£¬ÆäËû£ºOTP£©',
+   account_day          timestamp comment 'ÕËÆÚ',
+   pre_pay_id           varchar(128) comment 'Ô¤Ö§¸¶ID',
+   third_pay_id         varchar(128) comment 'µÚÈı·½Ö§¸¶ID',
    update_time          timestamp,
-   create_time          timestamp comment 'æ”¯ä»˜æ—¶é—´',
+   create_time          timestamp comment 'Ö§¸¶Ê±¼ä',
    primary key (pay_id)
 );
 
@@ -350,18 +388,18 @@ create table t_s_product
    product_name         varchar(100),
    price                int default 0,
    wo_product_price     int,
-   state                tinyint default 0 comment 'æœ‰æ•ˆï¼š0ï¼Œå¤±æ•ˆï¼š1',
-   cycle_type           tinyint default 0 comment 'åŒ…æœˆï¼š0ï¼ŒåŒ…åŠå¹´ï¼š1ï¼ŒåŒ…å¹´ï¼š2',
-   type                 tinyint default 0 comment 'å‘å‰æ”¶è´¹ï¼š0ï¼Œ å‘åæ”¶è´¹ï¼š1',
-   can_unsubscribe      tinyint default 0 comment 'å…è®¸ï¼š0ï¼Œä¸å…è®¸ï¼š 1',
-   area_code            varchar(6) comment 'åœ°åŒºç¼–ç ',
-   area_name            varchar(100) comment 'åœ°åŒºåç§°',
+   state                tinyint default 0 comment 'ÓĞĞ§£º0£¬Ê§Ğ§£º1',
+   cycle_type           tinyint default 0 comment '°üÔÂ£º0£¬°ü°ëÄê£º1£¬°üÄê£º2',
+   type                 tinyint default 0 comment 'ÏòÇ°ÊÕ·Ñ£º0£¬ ÏòºóÊÕ·Ñ£º1',
+   can_unsubscribe      tinyint default 0 comment 'ÔÊĞí£º0£¬²»ÔÊĞí£º 1',
+   area_code            varchar(6) comment 'µØÇø±àÂë',
+   area_name            varchar(100) comment 'µØÇøÃû³Æ',
    create_time          timestamp,
    update_time          timestamp,
    primary key (ID)
 );
 
-alter table t_s_product comment 'æµé‡äº§å“å®šä¹‰è¡¨';
+alter table t_s_product comment 'Á÷Á¿²úÆ·¶¨Òå±í';
 
 /*==============================================================*/
 /* Table: t_s_product_price                                     */
@@ -369,20 +407,20 @@ alter table t_s_product comment 'æµé‡äº§å“å®šä¹‰è¡¨';
 create table t_s_product_price
 (
    ID                   bigint not null,
-   product_id           bigint not null comment 'äº§å“ID',
-   partner_id           bigint comment 'åˆä½œæ–¹ID',
-   app_id               bigint comment 'åº”ç”¨ID',
-   partner_price        int default 0 comment 'äº§å“é’ˆå¯¹åˆä½œæ–¹çš„ä»·æ ¼',
-   app_price            int comment 'äº§å“é’ˆå¯¹åº”ç”¨çš„ä»·æ ¼',
-   state                tinyint default 0 comment 'æœ‰æ•ˆï¼š0ï¼Œå¤±æ•ˆï¼š1',
+   product_id           bigint not null comment '²úÆ·ID',
+   partner_id           bigint comment 'ºÏ×÷·½ID',
+   app_id               bigint comment 'Ó¦ÓÃID',
+   partner_price        int default 0 comment '²úÆ·Õë¶ÔºÏ×÷·½µÄ¼Û¸ñ',
+   app_price            int comment '²úÆ·Õë¶ÔÓ¦ÓÃµÄ¼Û¸ñ',
+   state                tinyint default 0 comment 'ÓĞĞ§£º0£¬Ê§Ğ§£º1',
    create_time          timestamp,
    update_time          timestamp,
-   area_code            varchar(6) comment 'åœ°åŒºç¼–ç ',
-   area_name            varchar(100) comment 'åœ°åŒºåç§°',
+   area_code            varchar(6) comment 'µØÇø±àÂë',
+   area_name            varchar(100) comment 'µØÇøÃû³Æ',
    primary key (ID)
 );
 
-alter table t_s_product_price comment 'æµé‡äº§å“ä»·æ ¼å®šä¹‰è¡¨';
+alter table t_s_product_price comment 'Á÷Á¿²úÆ·¼Û¸ñ¶¨Òå±í';
 
 /*==============================================================*/
 /* Table: t_s_vcode                                             */
@@ -390,16 +428,16 @@ alter table t_s_product_price comment 'æµé‡äº§å“ä»·æ ¼å®šä¹‰è¡¨';
 create table t_s_vcode
 (
    ID                   bigint not null,
-   order_id             varchar(22) comment 'è®¢å•ID',
-   vcode_send_time      varchar(14) comment 'æœ€åä¸€æ¬¡éªŒè¯ç ä¸‹å‘æ—¶é—´',
-   lvcode               varchar(6) comment 'ä¸‹å‘çš„éªŒè¯ç ',
-   user_input_vcode     varchar(6) comment 'ç”¨æˆ·è¾“å…¥éªŒè¯ç å†…å®¹',
-   user_input_time      varchar(14) comment 'éªŒè¯ç å¡«å†™æ—¶é—´ ',
-   vcode_valid_resut    varchar(4) default 'æˆåŠŸ' comment 'æ ¡éªŒç»“æœ',
+   order_id             varchar(22) comment '¶©µ¥ID',
+   vcode_send_time      varchar(14) comment '×îºóÒ»´ÎÑéÖ¤ÂëÏÂ·¢Ê±¼ä',
+   lvcode               varchar(6) comment 'ÏÂ·¢µÄÑéÖ¤Âë',
+   user_input_vcode     varchar(6) comment 'ÓÃ»§ÊäÈëÑéÖ¤ÂëÄÚÈİ',
+   user_input_time      varchar(14) comment 'ÑéÖ¤ÂëÌîĞ´Ê±¼ä ',
+   vcode_valid_resut    varchar(4) default '³É¹¦' comment 'Ğ£Ñé½á¹û',
    primary key (ID)
 );
 
-alter table t_s_vcode comment 'ç”¨æˆ·æœ€åä¸€æ¬¡éªŒè¯æ³•ä¿¡æ¯ï¼ŒæŒ‰æœˆè¿ç§»';
+alter table t_s_vcode comment 'ÓÃ»§×îºóÒ»´ÎÑéÖ¤·¨ĞÅÏ¢£¬°´ÔÂÇ¨ÒÆ';
 
 /*==============================================================*/
 /* Table: t_s_woplat_order                                      */
@@ -407,28 +445,28 @@ alter table t_s_vcode comment 'ç”¨æˆ·æœ€åä¸€æ¬¡éªŒè¯æ³•ä¿¡æ¯ï¼ŒæŒ‰æœˆè¿ç§»'
 create table t_s_woplat_order
 (
    order_id             varchar(22) not null,
-   wo_order_id          varchar(36) comment 'æ²ƒå®¶æ€»ç®¡è¿”å›çš„ID',
-   partner_code         varchar(12) comment 'åˆä½œæ–¹ç¼–ç ',
-   app_key              varchar(36) comment 'åˆä½œä¼™ä¼´äº§å“ID',
-   partner_order_id     varchar(36) comment 'åˆä½œä¼™ä¼´è®¢å•ID',
+   wo_order_id          varchar(36) comment 'ÎÖ¼Ò×Ü¹Ü·µ»ØµÄID',
+   partner_code         varchar(12) comment 'ºÏ×÷·½±àÂë',
+   app_key              varchar(36) comment 'ºÏ×÷»ï°é²úÆ·ID',
+   partner_order_id     varchar(36) comment 'ºÏ×÷»ï°é¶©µ¥ID',
    product_code         varchar(6),
    state                varchar(2),
-   mobilephone          varchar(11) comment 'è®¢è´­æ‰‹æœºå·ç ',
-   order_channel        varchar(8) comment 'è®¢è´­æ¸ é“ï¼ˆAPPã€WEBã€FILEï¼šæ–‡ä»¶æ¥å£ã€Othersï¼šå…¶ä»–ï¼‰',
-   create_time          timestamp comment 'è®¢è´­æ—¶é—´',
-   update_time          timestamp comment 'æ›´æ–°æ—¶é—´',
-   valid_time           timestamp comment 'æœ‰æ•ˆæ—¶é—´',
-   invalid_time         timestamp comment 'å¤±æ•ˆæ—¶é—´',
-   price                int comment 'è®¢è´­äº§å“ä»·æ ¼',
-   count                int default 1 comment 'è®¢è´­æ•°é‡',
-   money                bigint comment 'è®¢å•ä»·æ ¼',
-   is_need_charge       tinyint comment 'æ˜¯å¦éœ€è¦è¿”å……è¯è´¹ï¼ˆ0ï¼šéœ€è¦ 1ï¼šä¸éœ€è¦ï¼‰',
-   charge_type          tinyint comment 'æ¯æœˆå›ºå®šæ—¶é—´ï¼š0ï¼Œä¸€æ¬¡æ€§ï¼š1',
+   mobilephone          varchar(11) comment '¶©¹ºÊÖ»úºÅÂë',
+   order_channel        varchar(8) comment '¶©¹ºÇşµÀ£¨APP¡¢WEB¡¢FILE£ºÎÄ¼ş½Ó¿Ú¡¢Others£ºÆäËû£©',
+   create_time          timestamp comment '¶©¹ºÊ±¼ä',
+   update_time          timestamp comment '¸üĞÂÊ±¼ä',
+   valid_time           timestamp comment 'ÓĞĞ§Ê±¼ä',
+   invalid_time         timestamp comment 'Ê§Ğ§Ê±¼ä',
+   price                int comment '¶©¹º²úÆ·¼Û¸ñ',
+   count                int default 1 comment '¶©¹ºÊıÁ¿',
+   money                bigint comment '¶©µ¥¼Û¸ñ',
+   is_need_charge       tinyint comment 'ÊÇ·ñĞèÒª·µ³ä»°·Ñ£¨0£ºĞèÒª 1£º²»ĞèÒª£©',
+   charge_type          tinyint comment 'Ã¿ÔÂ¹Ì¶¨Ê±¼ä£º0£¬Ò»´ÎĞÔ£º1',
    remark               varchar(100),
    primary key (order_id)
 );
 
-alter table t_s_woplat_order comment 'æ²ƒå®¶æ€»ç®¡åŒæ­¥è¿‡æ¥çš„å‡ºè‡ªå·±ä»¥å¤–çš„è®¢è´­å…³ç³»';
+alter table t_s_woplat_order comment 'ÎÖ¼Ò×Ü¹ÜÍ¬²½¹ıÀ´µÄ³ö×Ô¼ºÒÔÍâµÄ¶©¹º¹ØÏµ';
 
 alter table t_s_app add constraint FK_Reference_1 foreign key (partner_id)
       references t_s_partner (partner_id) on delete restrict on update restrict;
