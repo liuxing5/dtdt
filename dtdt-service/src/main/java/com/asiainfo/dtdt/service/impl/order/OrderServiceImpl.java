@@ -225,6 +225,92 @@ public class OrderServiceImpl implements IOrderService{
 		/**组装支付订单信息返回给接入商 end**/
 		return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
 	}
+	
+	/**
+	 * 后向流量单个订购
+	 */
+	@Override
+	public String postfixOrder(String jsonStr) {
+		//参数校验
+		log.info("OrderServiceImpl postfixOrder() jsonStr:" + jsonStr);
+		JSONObject jsonObject = null;
+		/**获取接口中传递的参数  start*/
+		try {
+			jsonObject =JSONObject.parseObject(jsonStr);
+		} catch (Exception e) {
+			log.error("orderService postfixOrder check param is json error；"+e.getMessage(),e);
+			e.printStackTrace();
+			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		}
+		String seq = null;
+		String partnerCode = null;
+		String appKey = null;
+		String phone = null;
+		String productCode = null;
+		String orderMethod = null;
+		String partnerOrderId = null;
+		
+		try {
+			seq = jsonObject.getString("seq");
+//			partnerCode = jsonObject.getString("partnerCode").toString();
+//			appKey = jsonObject.getString("appKey").toString();
+			partnerCode = "1234543245";
+			appKey = "fwerh4356ytrt54";
+			phone = jsonObject.getString("phone").toString();
+			productCode = jsonObject.getString("productCode").toString();
+			orderMethod = jsonObject.get("orderMethod").toString();
+			partnerOrderId = jsonObject.get("partnerOrderId").toString();
+		} catch (NullPointerException e) {
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}
+		/**获取接口中传递的参数  end*/
+		/**校验接口中传递的参数是否合法  start*/
+		if (StringUtils.isBlank(seq)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(partnerCode)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(appKey)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(phone)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (!IsMobileNo.isMobile(phone)) {
+			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+		}
+		if (StringUtils.isBlank(productCode)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(orderMethod)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
+		}
+		if(StringUtils.isBlank(partnerOrderId)){
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
+		}
+		/**校验验证码是否正确 start*/
+		//是否可以订购
+//		if(true){//如果不能订购返回原因
+//			return null;
+//		}
+		
+		//订购后向流量
+		/**处理业务开始*/
+		
+		/**查询产品价格信息 start**/
+		String strProduct = productService.queryProduct(productCode);
+		if(StringUtils.isBlank(strProduct)){
+			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+		}
+		Product product = JSONObject.parseObject(strProduct, Product.class);
+		/**查询产品价格信息 end**/
+		
+		
+//		return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
+		return null ;
+	}
 
 	/**
 	* @Title: OrderServiceImpl 

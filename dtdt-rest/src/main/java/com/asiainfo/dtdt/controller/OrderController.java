@@ -82,7 +82,23 @@ public class OrderController extends BaseController{
         String orderJson = sb.toString(); //接收到通知信息。
         logger.info("pre-order param data:"+orderJson);
         String result = orderService.forwardOrder(orderJson, headers.getString("appkey"), headers.getString("partnerCode"));
-        logger.info("pre-order return data:"+result);
+		logger.info("pre-order return data:"+result);
+		return result;
+	}
+	
+	@RequestMapping(value="/postfix-order",produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String postfixOrder(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		InputStream ins = request.getInputStream();
+		BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+		StringBuilder sb = new StringBuilder();
+		String line = "";
+		while ((line = in.readLine()) != null) {
+			sb.append(line);
+		}
+		String orderJson = sb.toString(); //接收到通知信息。
+		logger.info("pre-order param data:"+orderJson);
+		String result = orderService.postfixOrder(orderJson);
 		return result;
 	}
 	
