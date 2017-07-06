@@ -52,7 +52,7 @@ public class HisOrder implements Serializable {
 
 	private String remark;
 
-	private Date copyTime2;
+	private Date copyTime;
 
 	private Byte copyType;
 
