@@ -9,8 +9,8 @@ package com.asiainfo.dtdt.common;
 */
 public class Constant {
 
-	public static final String APPID = "209b6980-d0d5-4b64-a8e0-1eb384ad9de7";
-	public static final String  APPKEY = "38d3e80a-e1e7-4b50-b50d-158c51b5bb0f";
+	public static final String APPID = "b3ab31fd-8074-46da-9086-f3fb6184b334";
+	public static final String  APPKEY = "d4584789-4423-4884-80cd-5447b6aa19df";
 	
 	public static final String CHARGESYSUSERNAME = "wojia";
 	
@@ -93,6 +93,11 @@ public class Constant {
 	public static final String NO_PRODUCT_CODE	=	"40002";
 	/**产品不存在编码描述**/
 	public static final String NO_PRODUCT_MSG	=	"无可订购产品";
+	
+	/**订购失败编码**/
+	public static final String ORDER_ERROR_CODE	=	"40003";
+	/**订购失败编码描述**/
+	public static final String ORDER_ERROR_MSG	=	"订购失败：";
 	
 	/**订单不存在编码**/
 	public static final String NO_ORDER_CODE	=	"40010";

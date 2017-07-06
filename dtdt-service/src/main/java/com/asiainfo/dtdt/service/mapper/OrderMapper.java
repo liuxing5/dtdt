@@ -29,6 +29,8 @@ public interface OrderMapper {
 	 */
     String queryOrder(String orderId);
     
+    Order queryOrderByWoOrderId(@Param("woOrderId")String woOrderId);
+    
     /**
      * @Title: OrderMapper 
      * @Description: (将在途订购信息存放到备份表中) 

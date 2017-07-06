@@ -14,20 +14,14 @@ import lombok.Data;
 * @since 
 * @return 
 */
-@ConfigurationProperties(prefix = "woplat")
+@ConfigurationProperties(prefix = "recharge.return_code")
 @Data
 @Configuration
-public class WoplatConfig {
+public class RechargeConfig {
 	
-	private String woAppId;
+	private String recharge_fail_code;
 	
-	private String woAppKey;
+	private String recharge_success_code;
 	
-	private String orderUrl;
-	
-	private String queryOrder;
-	
-	private String woplat_success_code;
-	
-	private String woplat_error_code;
+	private String recharge_timeout_code;
 }
