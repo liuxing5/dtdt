@@ -59,18 +59,18 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		try {
-			JSONObject data = new JSONObject();
+//			JSONObject data = new JSONObject();
 			
 			List<OrderRecord> orderRecordList = orderRecordMapper.queryOrderRecord(phone, appkey);
 			log.info("OrderServiceImpl queryOrderState() orderRecordList=" + orderRecordList);
-			data.put("successOrders", orderRecordList);
+//			data.put("successOrders", orderRecordList);
 			
 			//订购失败信息在历史订购关系表
-			List<HisOrderRecord> hisOrderRecordlist = hisOrderRecordMapper.queryOrderRecord(phone, appkey);
-			log.info("OrderServiceImpl queryOrderState() hisOrderRecordlist=" + hisOrderRecordlist);
-			data.put("failOrders", hisOrderRecordlist);
+//			List<HisOrderRecord> hisOrderRecordlist = hisOrderRecordMapper.queryOrderRecord(phone, appkey);
+//			log.info("OrderServiceImpl queryOrderState() hisOrderRecordlist=" + hisOrderRecordlist);
+//			data.put("failOrders", hisOrderRecordlist);
 			
-			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
+			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, orderRecordList);
 		} catch (Exception e) {
 			log.error("OrderServiceImpl queryOrderRecord() Exception e=" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
