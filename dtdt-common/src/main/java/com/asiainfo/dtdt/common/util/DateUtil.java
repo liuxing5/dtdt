@@ -325,9 +325,7 @@ public class DateUtil {
         
     }
 	public static void main(String[] args) {
-		System.out.println(getDateTime(getCurrentMonthEndTime(new Date())));
-		System.out.println(getDateTime(getCurrentMonthEndTime(getCurrentNextYear(new Date(),6))));
-		System.out.println(getDateTime(getCurrentMonthEndTime(getCurrentNextYear(new Date(),12))));
-
+		System.out.println(new Date().getTime());
+		System.out.println(getDateTime(new Date()));
 	}
 }

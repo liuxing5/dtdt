@@ -38,6 +38,12 @@
     from t_s_order
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
+  <select id="queryOrderByWoOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_order
+    where wo_order_id = #{woOrderId,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from t_s_order
     where order_id = #{orderId,jdbcType=VARCHAR}
@@ -263,7 +269,7 @@
       (   order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
     update_time, valid_time, invalid_time, price, count, money, is_need_charge,
-    remark, allow_auto_pay,redirect_url,copy_time2, copy_type, copy_remark 
+    remark, allow_auto_pay,redirect_url,copy_time, copy_type, copy_remark 
       )
       (SELECT order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     	refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
@@ -271,15 +277,15 @@
     	remark, allow_auto_pay,redirect_url ,now() , #{copyType} ,#{copyRemark} 
       FROM t_s_order WHERE order_id = #{orderId,jdbcType=VARCHAR});
   </insert>
-  <insert id="insertFromOrderRecordById" parameterType="java.lang.String">
+  <insert id="insertFromOrderRecordById" parameterType="java.util.Map">
       INSERT INTO t_s_order_record 
       (   order_id,wo_order_id, partner_code, app_key, partner_order_id, product_code,oper_source,
        state, mobilephone, order_channel, price, count, money, is_need_charge, 
-     allow_auto_pay, remark,  valid_time, invalid_time, update_time, create_time,redirect_url,cycle_type2,wo_order
+     allow_auto_pay, remark,  valid_time, invalid_time, update_time, create_time,redirect_url,cycle_type,wo_order
       )
       (SELECT order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
     	state, mobilephone, order_channel, price, count, money, is_need_charge,
-    	allow_auto_pay,remark, valid_time, invalid_time,  update_time,  create_time, redirect_url , #{cycleType} ,#{woOrder} 
+    	allow_auto_pay,remark, valid_time, invalid_time,  update_time,  create_time, redirect_url , #{cycleType,jdbcType=TINYINT} ,#{woOrder} 
       FROM t_s_order WHERE order_id = #{orderId,jdbcType=VARCHAR});
   </insert>
 </mapper>

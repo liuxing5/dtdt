@@ -1,15 +1,13 @@
 package com.asiainfo.dtdt.interfaces;
 
-import java.util.Date;
-
+/**
+* @ClassName: ICodeService 
+* @Description: (记录短信接口) 
+* @author xiangpeng 
+* @date 2017年7月6日 上午11:17:56 
+*
+ */
 public interface ICodeService {
-	/**
-	 * @param partnerCode
-	 * @param appKey
-	 * @param phone
-	 * @return
-	 */
-	String getCode(String partnerCode, String appKey, String phone);
 	
 	/**
 	* @Title: ICodeService 

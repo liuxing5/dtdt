@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+import javax.annotation.Resources;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +26,7 @@ import com.asiainfo.dtdt.common.RestClient;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.common.request.HttpClientUtil;
 import com.asiainfo.dtdt.common.util.BaseSeq;
+import com.asiainfo.dtdt.config.woplat.RechargeConfig;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.Charge;
 import com.asiainfo.dtdt.interfaces.order.IChargeService;
@@ -44,6 +48,9 @@ public class ChargeServiceImpl implements IChargeService {
 
 	@Autowired
 	private ChargeMapper chargeMapper;
+	
+	@Resource
+	private RechargeConfig rechargeConfig ;
 	
 	/**
 	 * (非 Javadoc) 
@@ -221,8 +228,6 @@ public class ChargeServiceImpl implements IChargeService {
 		return ReturnUtil.returnJsonError(Constant.RECHARGE_ERROR_CODE, Constant.RECHARGE_ERROR_MSG, "phonebillCode=" + resultJson.getString("phonebillCode"));
 	}
 	
-	private static WoplatConfig woplatConfig = new WoplatConfig();
-	
 	/**
 	 * 验证充值是否成功
 	 * @author liuxp5
@@ -230,9 +235,9 @@ public class ChargeServiceImpl implements IChargeService {
 	 * @param rspresult
 	 * @return
 	 */
-	public static boolean checkSuccessCode(String rspresult) {
-		System.out.println("recharge_success_code:"+woplatConfig.getRecharge_success_code());
-		if (woplatConfig.getRecharge_success_code().equals(rspresult)
+	public boolean checkSuccessCode(String rspresult) {
+		System.out.println("recharge_success_code:"+rechargeConfig.getRecharge_success_code());
+		if (rechargeConfig.getRecharge_success_code().equals(rspresult)
 				|| null == rspresult
 				|| "null".equals(rspresult)
 				|| ("recharge_success_code").indexOf(rspresult) != -1) {
@@ -248,9 +253,9 @@ public class ChargeServiceImpl implements IChargeService {
 	 * @param rspresult
 	 * @return
 	 */
-	public static boolean checkFailCode(String rspresult) {
-		System.out.println("recharge_fail_code:"+woplatConfig.getRecharge_fail_code());
-		if (woplatConfig.getRecharge_fail_code().equals(rspresult)
+	public boolean checkFailCode(String rspresult) {
+		System.out.println("recharge_fail_code:"+rechargeConfig.getRecharge_fail_code());
+		if (rechargeConfig.getRecharge_fail_code().equals(rspresult)
 				|| null == rspresult
 				|| "null".equals(rspresult)
 				|| ("recharge_fail_code").indexOf(rspresult) != -1) {
@@ -266,9 +271,9 @@ public class ChargeServiceImpl implements IChargeService {
 	 * @param rspresult
 	 * @return
 	 */
-	public static boolean checkTimeoutCode(String rspresult) {
-		System.out.println("recharge_timeout_code:"+woplatConfig.getRecharge_timeout_code());
-		if (woplatConfig.getRecharge_timeout_code().equals(rspresult)
+	public boolean checkTimeoutCode(String rspresult) {
+		System.out.println("recharge_timeout_code:"+rechargeConfig.getRecharge_timeout_code());
+		if (rechargeConfig.getRecharge_timeout_code().equals(rspresult)
 				|| null == rspresult
 				|| "null".equals(rspresult)
 				|| ("recharge_timeout_code").indexOf(rspresult) != -1) {

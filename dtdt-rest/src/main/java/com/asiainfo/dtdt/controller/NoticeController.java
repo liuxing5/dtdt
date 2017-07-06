@@ -60,7 +60,7 @@ public class NoticeController {
         	sb.append(line);
         }
         String notifyJson = sb.toString(); //接收到通知信息。
-        log.info("notice data:"+notifyJson);
+        log.info("woplat notice data:"+notifyJson);
 		/**处理业务开始*/
 		String result = noticeService.optNoticeOrder(notifyJson);
 		/**处理业务结束*/

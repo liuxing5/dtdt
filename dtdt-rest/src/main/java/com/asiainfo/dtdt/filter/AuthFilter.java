@@ -41,7 +41,7 @@ import com.asiainfo.dtdt.interfaces.IAuthoService;
 public class AuthFilter implements Filter{
 
 
-	private static final String[] IGNORE_URI = {"/test/getSign" };
+	private static final String[] IGNORE_URI = {"/test/getSign","/notice" };
 	
 	private IAuthoService authoService;
 	

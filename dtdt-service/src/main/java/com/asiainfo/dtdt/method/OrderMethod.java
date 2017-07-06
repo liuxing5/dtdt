@@ -1,7 +1,11 @@
 package com.asiainfo.dtdt.method;
 
 
-import lombok.extern.log4j.Log4j2;
+import java.util.Date;
+
+import javax.annotation.Resource;
+
+import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
@@ -11,6 +15,8 @@ import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
 import com.asiainfo.dtdt.common.util.UuidUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
+
+import lombok.extern.log4j.Log4j2;
 
 
 /** 
@@ -24,7 +30,8 @@ import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 @Log4j2
 public class OrderMethod {
 	
-	public static WoplatConfig woplatConfig = new WoplatConfig();
+	@Resource
+	public static WoplatConfig woplatConfig;
 	
 	/**
 	 * @throws Exception 
@@ -38,7 +45,7 @@ public class OrderMethod {
 	* @return    订购ID    
 	* @throws
 	 */
-	public static String order(String msisdn,String productCode,String subscriptionTime,String orderChannel){
+	public static  String order(String msisdn,String productCode,String subscriptionTime,String orderChannel){
 		log.info("**********请求沃家总管进行定向流量订购开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
@@ -81,7 +88,7 @@ public class OrderMethod {
 	* @return        
 	* @throws
 	 */
-	public static String closeOrder(String msisdn,String productId,String orderId,String subscriptionTime,String orderMethod){
+	public  String closeOrder(String msisdn,String productId,String orderId,String subscriptionTime,String orderMethod){
 		log.info("**********请求沃家总管进行定向流量退订开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
@@ -124,21 +131,21 @@ public class OrderMethod {
 	* @return        
 	* @throws
 	 */
-	public static String queryOrder(String msisdn,String orderId){
+	public static  String queryOrder(String msisdn,String orderId){
 		log.info("**********请求沃家总管进行定向流量查询订购信息开始***********");
 		JSONObject jsonObject = new JSONObject();
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", woplatConfig.getWoAppId());
+			jsonObject.put("appId", Constant.APPID);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("orderId", orderId);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
+			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("wojia post queryOrder param:"+jsonObject.toString());
-			result = HttpClientUtil.httpPost(woplatConfig.getQueryOrder(), jsonObject);
+			result = RestClient.doRest(Constant.QUERYORDER_URL, "POST", jsonObject.toString());
 			log.info("wojia queryOrder return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia queryOrder error:"+e.getMessage(), e);
@@ -150,7 +157,8 @@ public class OrderMethod {
 	
 	public static void main(String[] args) {
 //		System.out.println(DateUtil.getSysdateYYYYMMDDHHMMSS());
-		System.out.println(order("18516222334", "cc0ad6fb167742e185d85f511e26c80d", "201706271303010201", "1"));
+//		System.out.println(order("18516222334", "fd3cd79e20c14728-984f32dbfa56713c", DateUtil.getSysdateYYYYMMDDHHMMSS(), "1"));
 //		System.out.println(closeOrder( "18516222334", "1000", "3453445467665434567", "201706271303010201", "1"));
+		System.out.println(queryOrder("18516222334", "231846ff-a973-4705-ad01-026b9c6ebbf7"));
 	}
 }
