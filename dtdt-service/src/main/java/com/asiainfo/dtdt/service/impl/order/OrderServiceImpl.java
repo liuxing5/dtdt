@@ -1067,7 +1067,8 @@ public class OrderServiceImpl implements IOrderService{
 		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
 			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			json.put("orderId", order.getOrderId());
-			json.put("status", order.getState());
+			json.put("partnerOrderId", order.getPartnerOrderId());
+//			json.put("status", order.getState());
 			json.put("money", order.getMoney());
 			json.put("createTime", order.getCreateTime());
 			List list = new ArrayList();
@@ -1075,9 +1076,9 @@ public class OrderServiceImpl implements IOrderService{
 			listItem.put("productCode", order.getProductCode());
 			listItem.put("productName", product.getProductName());
 			listItem.put("productType", product.getCycleType());
-			listItem.put("status", order.getState());
+			listItem.put("state", order.getState());
 			listItem.put("price", order.getPrice());
-			listItem.put("count", order.getCount());
+//			listItem.put("count", order.getCount());
 			listItem.put("allowAutoPay", order.getAllowAutoPay());
 			listItem.put("validTime", order.getValidTime());
 			listItem.put("invalidTime", order.getInvalidTime());
