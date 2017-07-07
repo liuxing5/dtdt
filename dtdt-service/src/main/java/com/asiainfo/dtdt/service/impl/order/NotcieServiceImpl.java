@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.dubbo.common.json.JSON;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
@@ -118,6 +119,7 @@ public class NotcieServiceImpl implements INoticeService {
 		log.info("begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
 		try {
 			Order order = orderMapper.queryOrderByWoOrderId(orderId);
+			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
 			if(resultCode.equals("2")){//订购成功
 				log.info("NoticeService optNoticeOrder wojia return resultCode 2-订购成功");
 				//沃家总管异步回调返回订购成功，我们需要生成订购关系，并且反冲话费
@@ -146,16 +148,16 @@ public class NotcieServiceImpl implements INoticeService {
 			}else if(resultCode.equals("5")){//退订成功（可再订购）
 				log.info("NoticeService optNoticeOrder wojia return resultCode 5-退订成功（可再订购）");
 				//退订成功将订单关系数据转移到备份表中
-				orderService.updateOrder(order.getOrderId(), null, "19", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
-				
+//				orderService.updateOrder(order.getOrderId(), null, "19", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+//				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
+				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "19");
 			}else if(resultCode.equals("6")){//订购失败
 				log.info("NoticeService optNoticeOrder wojia return resultCode 6-订购失败");
 				//订购失败更新在途表状态5-订购失败待原路退款
 				orderService.updateOrder(order.getOrderId(), null, "5", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			}else if(resultCode.equals("7")){//退订失败
 				log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
-				//一般情况下不会出现退订失败，退订失败不更新任何信息
+				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
 			}
 		} catch (Exception e) {
 			log.error("NoticeService optNoticeOrder fail:"+e.getMessage(),e);

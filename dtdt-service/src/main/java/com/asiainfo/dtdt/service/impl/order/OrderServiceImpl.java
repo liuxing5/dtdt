@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.RestClient;
@@ -19,9 +18,7 @@ import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.common.util.BaseSeq;
 import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
-import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.UuidUtil;
-import com.asiainfo.dtdt.config.redis.RedisUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
@@ -36,7 +33,6 @@ import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
-import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
@@ -60,8 +56,8 @@ public class OrderServiceImpl implements IOrderService{
 	@Resource
 	private WoplatConfig woplatConfig ;
 	
-	@Resource
-	private RedisAssistant redisAssistant;
+//	@Resource
+//	private RedisAssistant redisAssistant;
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -748,14 +744,14 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
 		}
 		/**校验验证码是否正确 start*/
-		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
-		String redisVcode = redisAssistant.getStringValue(vcodeKey);
-		if(StringUtils.isBlank(redisVcode)){//判断验证码是否存在
-			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
-		}
-		if(!StringUtils.equals(vcode, redisVcode)){
-			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
-		}
+//		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
+//		String redisVcode = redisAssistant.getStringValue(vcodeKey);
+//		if(StringUtils.isBlank(redisVcode)){//判断验证码是否存在
+//			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
+//		}
+//		if(!StringUtils.equals(vcode, redisVcode)){
+//			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
+//		}
 		/**校验验证码是否正确 end*/
 		/**校验接口中传递的参数是否合法  end*/
 		/**处理业务开始*/
@@ -775,9 +771,9 @@ public class OrderServiceImpl implements IOrderService{
 		//记录订购在途表
 		order = order(appkey, partnerCode, partnerOrderId, phone, product, orderMethod, null,null,"4");//待订购
 		//记录验证码信息
-		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
-		//清除redis中的验证码
-		redisAssistant.clear(vcodeKey);
+//		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
+//		//清除redis中的验证码
+//		redisAssistant.clear(vcodeKey);
 		//发沃家起订购请求
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)1, (byte)0);
 		String woResult = null;
@@ -882,8 +878,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	/**
 	* @Title: closeOrder 
-	* @Description:定向流量退订接口
+	* @Description: 定向流量退订接口
 	* @param orderStr
+	* @param appkey
 	* @return
 	* @throws
 	 */
@@ -954,17 +951,17 @@ public class OrderServiceImpl implements IOrderService{
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
 				data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
-				updateTable(newOrderId, orderRecord, "19");
+//				updateTable(newOrderId, orderRecord, "19");
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
-				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder updateTable Exception e" + e);
+//				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder updateTable Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder fail ecode=" + ecode);
 			data.put("failMsg", emsg);
-			updateTable(newOrderId, orderRecord, "23");//退订失败
+//			updateTable(newOrderId, orderRecord, "23");//退订失败
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 		} 
 	}
@@ -1044,48 +1041,18 @@ public class OrderServiceImpl implements IOrderService{
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
 				data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
-				updateTable(newOrderId, orderRecord, "19");
+//				updateTable(newOrderId, orderRecord, "19");
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
-				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder updateTable Exception e" + e);
+//				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder updateTable Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode);
 			data.put("failMsg", emsg);
-			updateTable(newOrderId, orderRecord, "23");//退订失败
+//			updateTable(newOrderId, orderRecord, "23");//退订失败
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
-		}
-	}
-	
-	/**
-	* @Title: updateTable 
-	* @Description: 调用wojia退订接口成功后，更新 order和orderRecord表为已退订	状态并迁移到历史表，返回接口成功信息
-	* @param newOrderId
-	* @param orderRecord
-	* @param state
-	* @return String
-	* @throws
-	 */
-	private void updateTable(String newOrderId, OrderRecord orderRecord, String state) {
-		log.info("OrderServiceImpl updateTable() orderRecord =" + orderRecord);
-
-		try {
-			//t_s_order 表到 t_s_his_order 表
-			insertFromHisOrderById(newOrderId, "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
-			orderMapper.deleteByPrimaryKey(newOrderId);
-			
-			//t_s_order_record 表到 t_s_his_order_record 表
-			orderRecord.setState(state);//设置状态：19-退订成功 23-退订失败
-			orderRecordMapper.updateOrderRecord(orderRecord);
-			if ("19".equals(state)) {
-				orderRecord.setRemark("退订成功");
-				insertHisOrderRecord(orderRecord);
-				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
-			}
-		} catch (Exception e) {
-			log.info("OrderServiceImpl updateTable() Exception e=" + e);
 		}
 	}
 	
@@ -1219,5 +1186,37 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		log.info("**********请求沃家总管进行定向流量退订结束***********");
 		return result;
+	}
+	
+	/**
+	* @Title: closeOrderUpdateTable 
+	* @Description: 沃家退订接口回调后，更新 order和orderRecord表状态并迁移到历史表
+	* @param newOrderId
+	* @param orderRecord
+	* @param state
+	* @return String
+	* @throws
+	 */
+	public void closeOrderUpdateTable(String orderId, String orderRecordJson, String state) {
+		log.info("OrderServiceImpl updateTable() orderRecordJson =" + orderRecordJson);
+		
+		OrderRecord orderRecord = JSONObject.parseObject(orderRecordJson, OrderRecord.class);
+		try {
+			//t_s_order 表到 t_s_his_order 表
+			insertFromHisOrderById(orderId, "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+			orderMapper.deleteByPrimaryKey(orderId);
+			
+			//t_s_order_record 表到 t_s_his_order_record 表
+			orderRecord.setState(state);//设置状态：19-退订成功 23-退订失败
+			orderRecord.setRemark("退订失败");
+			orderRecordMapper.updateOrderRecord(orderRecord);
+			if ("19".equals(state)) {
+				orderRecord.setRemark("退订成功");
+				insertHisOrderRecord(orderRecord);
+				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
+			}
+		} catch (Exception e) {
+			log.info("OrderServiceImpl updateTable() Exception e=" + e);
+		}
 	}
 }

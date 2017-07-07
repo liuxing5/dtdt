@@ -1,6 +1,5 @@
 package com.asiainfo.dtdt.interfaces.order;
 
-
 /** 
 * @author 作者 : xiangpeng
 * @date 创建时间：2017年6月29日 上午11:39:11 
@@ -140,4 +139,14 @@ public interface IOrderService {
     * @version 0.0.5
      */
     String forwardOrder(String jsonStr);
+    
+    /**
+    * @Title: closeOrderUpdateTable 
+    * @Description: 沃家退订接口回调后，更新 order和orderRecord表状态并迁移到历史表
+    * @param orderId
+    * @param orderRecord
+    * @param state void
+    * @throws
+     */
+    void closeOrderUpdateTable(String orderId, String orderRecordJson, String state);
 }
