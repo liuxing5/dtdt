@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.service.mapper.PartnerSmsConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.PartnerSmsConfig" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
+    <result column="threshold" property="threshold" jdbcType="BIGINT" />
+    <result column="mail" property="mail" jdbcType="VARCHAR" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, partner_code, contacts, mobilephone, threshold, mail, create_user, create_time, 
+    end_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_partner_sms_config
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByStatement" resultMap="BaseResultMap" parameterType="com.asiainfo.dtdt.entity.PartnerSmsConfig" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_partner_sms_config
+    <where >
+      <if test="partnerCode != null" >
+         and partner_code = #{partnerCode,jdbcType=VARCHAR}
+      </if>
+      <if test="contacts != null" >
+         and contacts = #{contacts,jdbcType=VARCHAR}
+      </if>
+      <if test="mobilephone != null" >
+         and mobilephone = #{mobilephone,jdbcType=VARCHAR}
+      </if>
+      <if test="threshold != null" >
+         and threshold = #{threshold,jdbcType=BIGINT}
+      </if>
+      <if test="mail != null" >
+         and mail = #{mail,jdbcType=VARCHAR}
+      </if>
+      <if test="createUser != null" >
+         and create_user = #{createUser,jdbcType=VARCHAR}
+      </if>
+      <if test="createTime != null" >
+         and create_time = #{createTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endTime != null" >
+         and end_time = #{endTime,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_s_partner_sms_config
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.PartnerSmsConfig" >
+    insert into t_s_partner_sms_config (id, partner_code, contacts, 
+      mobilephone, threshold, mail, 
+      create_user, create_time, end_time
+      )
+    values (#{id,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, #{contacts,jdbcType=VARCHAR}, 
+      #{mobilephone,jdbcType=VARCHAR}, #{threshold,jdbcType=BIGINT}, #{mail,jdbcType=VARCHAR}, 
+      #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.PartnerSmsConfig" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_s_partner_sms_config
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="partnerCode != null" >
+        partner_code,
+      </if>
+      <if test="contacts != null" >
+        contacts,
+      </if>
+      <if test="mobilephone != null" >
+        mobilephone,
+      </if>
+      <if test="threshold != null" >
+        threshold,
+      </if>
+      <if test="mail != null" >
+        mail,
+      </if>
+      <if test="createUser != null" >
+        create_user,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerCode != null" >
+        #{partnerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="mobilephone != null" >
+        #{mobilephone,jdbcType=VARCHAR},
+      </if>
+      <if test="threshold != null" >
+        #{threshold,jdbcType=BIGINT},
+      </if>
+      <if test="mail != null" >
+        #{mail,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.PartnerSmsConfig" >
+    update t_s_partner_sms_config
+    <set >
+      <if test="partnerCode != null" >
+        partner_code = #{partnerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        contacts = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="mobilephone != null" >
+        mobilephone = #{mobilephone,jdbcType=VARCHAR},
+      </if>
+      <if test="threshold != null" >
+        threshold = #{threshold,jdbcType=BIGINT},
+      </if>
+      <if test="mail != null" >
+        mail = #{mail,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null" >
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

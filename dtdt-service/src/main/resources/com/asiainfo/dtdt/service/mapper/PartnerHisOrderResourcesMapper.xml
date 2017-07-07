@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.service.mapper.PartnerHisOrderResourcesMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.PartnerHisOrderResources" >
+    <id column="batch_id" property="batchId" jdbcType="VARCHAR" />
+    <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
+    <result column="pre_count" property="preCount" jdbcType="TINYINT" />
+    <result column="use_count" property="useCount" jdbcType="TINYINT" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    batch_id, partner_code, pre_count, use_count, create_user, create_time, end_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_partner_his_order_resources
+    where batch_id = #{batchId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByStatement" resultMap="BaseResultMap" parameterType="com.asiainfo.dtdt.entity.PartnerHisOrderResources" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_partner_his_order_resources
+    <where >
+      <if test="partnerCode != null" >
+         and partner_code = #{partnerCode,jdbcType=VARCHAR}
+      </if>
+      <if test="preCount != null" >
+         and pre_count = #{preCount,jdbcType=TINYINT}
+      </if>
+      <if test="useCount != null" >
+         and use_count = #{useCount,jdbcType=TINYINT}
+      </if>
+      <if test="createUser != null" >
+         and create_user = #{createUser,jdbcType=VARCHAR}
+      </if>
+      <if test="createTime != null" >
+         and create_time = #{createTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endTime != null" >
+         and end_time = #{endTime,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_s_partner_his_order_resources
+    where batch_id = #{batchId,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" parameterType="com.asiainfo.dtdt.entity.PartnerHisOrderResources" >
+    insert into t_s_partner_his_order_resources (batch_id, partner_code, pre_count, 
+      use_count, create_user, create_time, 
+      end_time)
+    values (#{batchId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, #{preCount,jdbcType=TINYINT}, 
+      #{useCount,jdbcType=TINYINT}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.PartnerHisOrderResources" useGeneratedKeys="true" keyProperty="id" >
+    insert into t_s_partner_his_order_resources
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="batchId != null" >
+        batch_id,
+      </if>
+      <if test="partnerCode != null" >
+        partner_code,
+      </if>
+      <if test="preCount != null" >
+        pre_count,
+      </if>
+      <if test="useCount != null" >
+        use_count,
+      </if>
+      <if test="createUser != null" >
+        create_user,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="batchId != null" >
+        #{batchId,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerCode != null" >
+        #{partnerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="preCount != null" >
+        #{preCount,jdbcType=TINYINT},
+      </if>
+      <if test="useCount != null" >
+        #{useCount,jdbcType=TINYINT},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.entity.PartnerHisOrderResources" >
+    update t_s_partner_his_order_resources
+    <set >
+      <if test="partnerCode != null" >
+        partner_code = #{partnerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="preCount != null" >
+        pre_count = #{preCount,jdbcType=TINYINT},
+      </if>
+      <if test="useCount != null" >
+        use_count = #{useCount,jdbcType=TINYINT},
+      </if>
+      <if test="createUser != null" >
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where batch_id = #{batchId,jdbcType=VARCHAR}
+  </update>
+
+</mapper>
