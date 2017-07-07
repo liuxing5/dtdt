@@ -61,6 +61,10 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
 		}
 		
+		if (phone.length() != 11) {
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "phone" + Constant.PARAM_LENGTH_MSG, null);
+		}
+		
 		if (!IsMobileNo.isMobile(phone)) {
 			return ReturnUtil.returnJsonList(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
 		}
@@ -111,6 +115,10 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		
 		if (StringUtils.isEmpty(orderId)) {
 			return ReturnUtil.returnJsonList(Constant.PARAM_NULL_CODE, Constant.PARAM_NULL_MSG, null);
+		}
+		
+		if (orderId.length() != 32) {
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
 		}
 		
 		try {

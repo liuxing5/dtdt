@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.common.json.JSON;
@@ -16,9 +17,11 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
+import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
+import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
@@ -26,6 +29,7 @@ import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
+import com.asiainfo.dtdt.service.mapper.ProductMapper;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -61,6 +65,9 @@ public class NotcieServiceImpl implements INoticeService {
 	
 	@Autowired
 	private AppMapper appMapper;
+	
+	@Autowired
+	private ProductMapper productMapper;
 	
 	/**
 	 * (非 Javadoc) 
@@ -142,7 +149,7 @@ public class NotcieServiceImpl implements INoticeService {
 					cycleType = 2;
 				}
 				orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
-				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费成功");
+				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
 				/**订购成功回调通知**/
 				noticeService.dtdtNoticeOrder(order.getOrderId());
 			}else if(resultCode.equals("5")){//退订成功（可再订购）
@@ -152,9 +159,10 @@ public class NotcieServiceImpl implements INoticeService {
 //				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
 				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "19");
 			}else if(resultCode.equals("6")){//订购失败
-				log.info("NoticeService optNoticeOrder wojia return resultCode 6-订购失败");
+				log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
 				//订购失败更新在途表状态5-订购失败待原路退款
-				orderService.updateOrder(order.getOrderId(), null, "5", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+				orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
 			}else if(resultCode.equals("7")){//退订失败
 				log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
 				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
@@ -178,18 +186,32 @@ public class NotcieServiceImpl implements INoticeService {
 		try {
 			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
 			App app = appMapper.queryAppInfo(orderRecord.getAppKey());
+			Product product = productMapper.queryProduct(orderRecord.getProductCode());
 			String state = orderRecord.getState();
 			log.info("NoticeServiceImpl dtdtNoticeOrder() state=" + state);
 			JSONObject json = new JSONObject();
+			json.put("orderId", orderRecord.getOrderId());
+			json.put("partnerOrderId", orderRecord.getPartnerOrderId());
+			json.put("productCode", orderRecord.getProductCode());
+			json.put("productName", product.getProductName());
+			json.put("price", orderRecord.getPrice());
+			json.put("allowAutoPay", orderRecord.getAllowAutoPay());
+			json.put("createTime", orderRecord.getCreateTime());
+			json.put("validTime", orderRecord.getValidTime());
+			json.put("invalidTime", orderRecord.getInvalidTime());
 			switch (Integer.valueOf(state)) {
-			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:
-				json.put("orderId", orderRecord.getOrderId());
-				json.put("productCode", orderRecord.getProductCode());
-				json.put("stateName", "订购成功");
-				RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
-				break;
-			default:break;
+			case 4:json.put("state", "1");break;
+			case 5:case 6:case 7:case 8:case 15:case 16:case 17:case 18:json.put("state", "4");break;
+			case 9:json.put("state", "2");break;
+			case 10:case 11:case 12:case 13:case 14:json.put("state", "3");break;
+			case 19:json.put("state", "6");break;
+			case 20:json.put("state", "5");break;
+			//case 21:json.put("stateMsg", "订购作废");break;
+			case 22:json.put("state", "7");break;
+			default:json.put("state", "");break;
 			}
+			String  result = RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
+			log.info("合作方返回当前订单（"+orderId+"）回调内容："+result);
 		} catch (Exception e) {
 			log.error("noticeService dtdtNoticeOrder fail by orderId="+orderId);
 		}
