@@ -41,10 +41,12 @@ public class Constant {
 	/**参数错误描述**/
 	public static final String PARAM_ERROR_MSG		= "参数错误";
 	
+	
 	/**参数错误码**/
 	public static final String PARAM_ILLEGAL_CODE		= "20001";
 	/**参数错误描述**/
 	public static final String PARAM_ILLEGAL_MSG		= "消息体不是合法的json字符串";
+	public static final String PARAM_WRONG_SIGN		= "20002";
 	
 	/**签名错误码**/
 	public static final String SIGN_ERROR_CODE		= "99998";
