@@ -306,10 +306,68 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
 		/**查询产品价格信息 end**/
+		/**检查是否存在互斥产品并存储在途数据**/
+		Order order = null;
+		//记录订购在途表
+		order = order(appKey, partnerCode, partnerOrderId, phone, product, orderMethod,"0",null,"4");//待订购
+		//发沃家起订购请求
+		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
+		String woResult = null;
+		if(num > 0){
+			woResult = postWoplatOrder(phone, product.getWoProductCode(), DateUtil.getDateTime(new Date()), order.getOrderChannel());
+		}
+		/**组装支付订单信息返回给接入商 start**/
+		JSONObject json = new JSONObject();
+		JSONObject woJson = JSONObject.parseObject(woResult);
+		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
+			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+			json.put("orderId", order.getOrderId());
+			json.put("status", order.getState());
+			json.put("money", order.getMoney());
+			json.put("createTime", order.getCreateTime());
+			List list = new ArrayList();
+			JSONObject listItem = new JSONObject();
+			listItem.put("productCode", order.getProductCode());
+			listItem.put("productName", product.getProductName());
+			listItem.put("productType", product.getCycleType());
+			listItem.put("status", order.getState());
+			listItem.put("price", order.getPrice());
+			listItem.put("count", order.getCount());
+			listItem.put("allowAutoPay", order.getAllowAutoPay());
+			listItem.put("validTime", order.getValidTime());
+			listItem.put("invalidTime", order.getInvalidTime());
+			list.add(listItem);
+			json.put("item", listItem);
+			/**组装支付订单信息返回给接入商 end**/
+			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
+		}
+		if(woJson.getString("ecode").equals(Constant.ERROR_CODE) || StringUtils.isBlank(woResult)){//请求沃家总管超时或者异常
+			//更新在途订购订单状态7-订购失败
+			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+			//将在途表信息存放在备份表中
+			insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
+			json.put("orderId", order.getOrderId());
+			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, json.toString());
+		}
+		//更新在途订购订单状态7-订购失败
+		updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+		//将在途表信息存放在备份表中
+		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
+		json.put("orderId", order.getOrderId());
+		String msg = null;
+		if(woJson.getString("ecode").equals("1405")){
+			msg = "用户 "+phone+" 不存在";
+		}else if(woJson.getString("ecode").equals("4000")){
+			msg = "产品 "+product.getProductName()+" 不存在或已失效";
+		}else if(woJson.getString("ecode").equals("4001")){
+			msg = "产品重复订购";
+		}else if(woJson.getString("ecode").equals("4002")){
+			msg = "产品无法订购";
+		}else if(woJson.getString("ecode").equals("4005")){
+			msg = "不能同时订购互斥产品";
+		}
+		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, json.toString());
 		
-		
-//		return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
-		return null ;
 	}
 
 	/**
@@ -336,7 +394,7 @@ public class OrderServiceImpl implements IOrderService{
 		}else{
 			order.setAllowAutoPay((byte)1);
 		}
-		if(product.getType().equals("1")){//包月后向流量
+		if(product.getType().equals((byte)1)){//包月后向流量
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月失效时间
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
