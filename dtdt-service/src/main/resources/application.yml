@@ -2,8 +2,9 @@ dubbo:
   provider:
     appname: dtdt-service
     filternames: simpleproviderfilter
-    group: elf
-    
+    #group: elf
+    #group: test
+    ip: 192.168.1.10
 app:
   config:
     export-properties:

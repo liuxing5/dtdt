@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
+import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.config.RedisUtil;
 import com.asiainfo.dtdt.entity.ResponseCode;
 import com.asiainfo.dtdt.entity.ResponseData;
@@ -45,7 +47,7 @@ public class AuthFilter implements Filter{
 	
 	private IAuthoService authoService;
 	
-	private RedisUtil redisUtil;  
+	private RedisAssistant redis;
 	/**
 	 * Description:
 	 * 
@@ -58,7 +60,7 @@ public class AuthFilter implements Filter{
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
 	     authoService = SpringContextHolder.getBean(IAuthoService.class);
-	     redisUtil = SpringContextHolder.getBean(RedisUtil.class);
+	     redis = SpringContextHolder.getBean(RedisAssistant.class);
 	}
 	/**
 	 * Description:
@@ -180,11 +182,11 @@ public class AuthFilter implements Filter{
 			}
 			
 			// 校验timestamp(配置已秒为单位)
-			String validTimeStr = redisUtil.get("ser_v_t");
+			String validTimeStr = redis.getStringValue("ser_v_t");
 			if(StringUtils.isEmpty(validTimeStr))
 			{
 				validTimeStr = "60";
-				redisUtil.set("ser_v_t", validTimeStr);
+				redis.setForever("ser_v_t", validTimeStr);
 			}
 			long timestamp = Long.valueOf(requestJson.getString("timestamp"));
 			long validTime = Long.valueOf(validTimeStr) * 1000l;

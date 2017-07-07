@@ -3,6 +3,8 @@ package com.asiainfo.dtdt.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.File;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +20,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.dtdt.common.constants.RedisKey;
+import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.util.PhoneUtil;
+import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.SignUtil;
 import com.asiainfo.dtdt.config.RedisUtil;
 import com.asiainfo.dtdt.config.SMSContentConfig;
@@ -45,11 +49,11 @@ public class AuthoController extends BaseController{
 	@Resource
 	private IAuthoService authoService;
 	
-	@Resource//(name="redisObject")
-	private RedisTemplate<String, Object> redisTemplate;
+	@Resource(name="redisObject")
+	private RedisTemplate<String, String> redisTemplate;
 	
 	@Resource
-	private RedisUtil redisUtil; 
+	private RedisAssistant redis;
 	
 	@Resource
 	private SMSContentConfig smsContentConfig;
@@ -59,7 +63,7 @@ public class AuthoController extends BaseController{
 	public ResponseData<?> getSMSCode(HttpServletRequest request)
 	{
 		log.debug("directional data traffic!");
-
+		
 		getHeaderCommonData(request);
 		JSONObject result = new JSONObject();
 		String phone = request.getParameter("phone");
@@ -92,14 +96,21 @@ public class AuthoController extends BaseController{
 			 */
 
 			// 短信有效时间(单位分钟)
-			String smsvalidStr = redisUtil.get("smsc_v_t");
+			/*String smsvalidStr = redisUtil.get("smsc_v_t");
 			if (StringUtils.isEmpty(smsvalidStr))
 			{
 				smsvalidStr = "5";
 				redisUtil.set("smsc_v_t", "5");
 			}
 			redisUtil.set(sb.toString(), String.valueOf(code),
-					Integer.valueOf(smsvalidStr) * 60);
+					Integer.valueOf(smsvalidStr) * 60);*/
+			String smsvalidStr = redis.getStringValue("smsc_v_t");
+			if (StringUtils.isEmpty(smsvalidStr))
+			{
+				smsvalidStr = "5";
+				redis.setForever("smsc_v_t", "5");
+			}
+			redis.setValue(sb.toString(), String.valueOf(code), Long.valueOf(smsvalidStr), TimeUnit.MINUTES);
 
 			String path = "";
 			if (System.getProperty("os.name").startsWith("win") || System.getProperty("os.name").startsWith("Win")){

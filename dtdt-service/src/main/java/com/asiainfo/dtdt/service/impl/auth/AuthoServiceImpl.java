@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.impl.auth;
 
+import javax.annotation.Resource;
+
 import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 public class AuthoServiceImpl implements IAuthoService
 {
 
-	//@Resource(name="redisObject")
+	@Resource(name="redisObject")
 	private RedisTemplate<?, ?> redisTemplate;
 	
 	@Autowired
