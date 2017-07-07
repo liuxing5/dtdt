@@ -1,10 +1,12 @@
 package com.asiainfo.dtdt.common;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 
 /**
@@ -18,6 +20,7 @@ public class ReturnUtil {
 	
 	private static String dateFormat;  
 	
+	//返回参数data类型 时间统一格式化为："yyyy-MM-dd HH:mm:ss"
 	static {  
 	    dateFormat = "yyyy-MM-dd HH:mm:ss";  
 	    mapping.put(Date.class, new SimpleDateFormatSerializer(dateFormat));
@@ -97,7 +100,8 @@ public class ReturnUtil {
 		{
 			json.put("data", null);
 		}else{
-			json.put("data", json.parse(json.toJSONString(list, mapping)));
+			//返回list：禁止fastjson循环引用:SerializerFeature.DisableCircularReferenceDetect
+			json.put("data", json.parse(json.toJSONString(list, mapping, SerializerFeature.DisableCircularReferenceDetect)));
 		}
 		return json.toString();
 	}
@@ -131,4 +135,29 @@ public class ReturnUtil {
 		return json.toString();
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void main(String[] args) {
+		String code = "0000";
+		String msg = "ok";
+		List list = new ArrayList<>();
+		
+		//这里两个list不是循环，就不会有引用
+		JSONObject jsonObject1 = new JSONObject();
+		jsonObject1.put("cycleType", "0");
+		jsonObject1.put("productCode", "100105");
+		jsonObject1.put("validTime", "2017-07-05 14:45:42");
+		jsonObject1.put("invalidTime", "2017-07-05 14:45:42");
+		jsonObject1.put("type", "1");
+		
+		JSONObject jsonObject2 = new JSONObject();
+		jsonObject2.put("cycleType", "0");
+		jsonObject2.put("productCode", "100105");
+		jsonObject2.put("validTime", "2017-07-05 14:45:42");
+		jsonObject2.put("invalidTime", "2017-07-05 14:45:42");
+		jsonObject2.put("type", "1");
+		
+		list.add(jsonObject1);
+		list.add(jsonObject2);
+		System.out.println(returnJsonList(code, msg, list));
+	}
 }
