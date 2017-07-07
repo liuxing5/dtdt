@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.common.json.JSON;
@@ -16,9 +17,11 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
+import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
+import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
@@ -26,6 +29,7 @@ import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
+import com.asiainfo.dtdt.service.mapper.ProductMapper;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -61,6 +65,9 @@ public class NotcieServiceImpl implements INoticeService {
 	
 	@Autowired
 	private AppMapper appMapper;
+	
+	@Autowired
+	private ProductMapper productMapper;
 	
 	/**
 	 * (非 Javadoc) 
@@ -178,18 +185,32 @@ public class NotcieServiceImpl implements INoticeService {
 		try {
 			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
 			App app = appMapper.queryAppInfo(orderRecord.getAppKey());
+			Product product = productMapper.queryProduct(orderRecord.getProductCode());
 			String state = orderRecord.getState();
 			log.info("NoticeServiceImpl dtdtNoticeOrder() state=" + state);
 			JSONObject json = new JSONObject();
+			json.put("orderId", orderRecord.getOrderId());
+			json.put("partnerOrderId", orderRecord.getPartnerOrderId());
+			json.put("productCode", orderRecord.getProductCode());
+			json.put("productName", product.getProductName());
+			json.put("price", orderRecord.getPrice());
+			json.put("allowAutoPay", orderRecord.getAllowAutoPay());
+			json.put("createTime", orderRecord.getCreateTime());
+			json.put("validTime", orderRecord.getValidTime());
+			json.put("invalidTime", orderRecord.getInvalidTime());
 			switch (Integer.valueOf(state)) {
-			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:
-				json.put("orderId", orderRecord.getOrderId());
-				json.put("productCode", orderRecord.getProductCode());
-				json.put("stateName", "订购成功");
-				RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
-				break;
-			default:break;
+			case 4:json.put("state", "1");break;
+			case 5:case 6:case 7:case 8:case 15:case 16:case 17:case 18:json.put("state", "4");break;
+			case 9:json.put("state", "2");break;
+			case 10:case 11:case 12:case 13:case 14:json.put("state", "3");break;
+			case 19:json.put("state", "6");break;
+			case 20:json.put("state", "5");break;
+			//case 21:json.put("stateMsg", "订购作废");break;
+			case 22:json.put("state", "7");break;
+			default:json.put("state", "");break;
 			}
+			String  result = RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
+			log.info("合作方返回当前订单（"+orderId+"）回调内容："+result);
 		} catch (Exception e) {
 			log.error("noticeService dtdtNoticeOrder fail by orderId="+orderId);
 		}
