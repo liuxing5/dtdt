@@ -1,9 +1,0 @@
-.settings/
-dtdt-interface/target/
-dtdt-rest/target/
-dtdt-service/target/
-dtdt-rest/log/
-dtdt-service/log/
-dtdt-task/.factorypath
-dtdt-service/.factorypath
-dtdt-rest/.factorypath
