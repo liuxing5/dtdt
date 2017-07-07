@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/7/7 11:43:02                            */
+/* Created on:     2017/7/7 12:25:39                            */
 /*==============================================================*/
 
 
@@ -10,7 +10,7 @@ use directionaldt;
 
 drop table if exists t_s_app;
 
-drop table if exists t_s_batcn_order;
+drop table if exists t_s_batch_order;
 
 drop table if exists t_s_charge;
 
@@ -64,9 +64,9 @@ create table t_s_app
 );
 
 /*==============================================================*/
-/* Table: t_s_batcn_order                                       */
+/* Table: t_s_batch_order                                       */
 /*==============================================================*/
-create table t_s_batcn_order
+create table t_s_batch_order
 (
    batch_id             varchar(22) not null comment '批量订单ID',
    partner_code         varchar(12) comment '合作方编码',
@@ -79,11 +79,13 @@ create table t_s_batcn_order
    update_time          timestamp comment '更新时间',
    price                int comment '订购产品价格',
    redirect_url         varchar(100) comment '支付成功跳转Url',
+   mobilephones         varchar(1000) comment '批量开的手机号码',
+   mobilephones_count   tinyint comment '手机号码个数',
    remark               varchar(100),
    primary key (batch_id)
 );
 
-alter table t_s_batcn_order comment '批量订单表';
+alter table t_s_batch_order comment '批量订单表';
 
 /*==============================================================*/
 /* Table: t_s_charge                                            */
@@ -387,7 +389,9 @@ create table t_s_partner_sms_config
    id                   varchar(32) not null,
    partner_code         varchar(12) comment '合作方编码',
    contacts             varchar(20) default '0' comment '预存订购次数',
-   mobilephone          varchar(11) comment '手机号码',
+   mobilephone          varchar(200) comment '手机号码',
+   threshold            bigint comment '告警阈值',
+   mail                 varchar(500) comment '邮箱',
    create_user          varchar(50) comment '创建者',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',

@@ -3,6 +3,7 @@ package com.asiainfo.dtdt.common.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,25 +88,30 @@ public class SignUtil {
 	public static void main(String[] args)
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("pertnerCode", 123);
+		map.put("partnerCode", 123);
 		map.put("appkey", 12345);
 		map.put("appsecret", 33333);
 		System.out.println(createSign(map, "utf-8"));
 		
 		JSONObject parameters = new JSONObject();
 		
-		parameters.put("pertnerCode", "1234543245");
+		parameters.put("partnerCode", "1234543245");
 		parameters.put("appkey", "fwerh4356ytrt54");
-		parameters.put("timestamp", "1234567890");
+		parameters.put("timestamp", "1499235630342");
 		parameters.put("secret", "ewer5retyt");
+		//parameters.put("phone", "18710728340");
+		parameters.put("phone", "18516222335");
 		System.out.println(createSign(parameters, "utf-8"));
 		
-		parameters.put("pertnerCode", "1234543245");
+		parameters.put("partnerCode", "1234543245");
 		parameters.put("appkey", "fwerh4356ytrt54");
-		parameters.put("timestamp", "1234567890");
+		parameters.put("timestamp", "1499235630342");
 		parameters.put("secret", "ewer5retyt");
+		parameters.put("phone", "18600000000");
 		parameters.put("appSignature", "956B6123531BA8269DD067271BA1E360");
+		
 		System.out.println(createSign(parameters, "utf-8"));
+		System.out.println(new Date().getTime());
 		
 	}
 }

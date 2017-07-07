@@ -213,7 +213,7 @@ public class AuthFilter implements Filter{
 		{
 			log.error("参数校验错误！", e);
 			checkResult.put("code", "99999");
-			checkResult.put("99999", "系统错误！");
+			checkResult.put("msg", "系统错误！");
 		}
 		
 		return checkResult;
