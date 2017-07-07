@@ -697,7 +697,7 @@ public class OrderServiceImpl implements IOrderService{
 			e.printStackTrace();
 			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
 		}
-		String seq = null;
+//		String seq = null;
 		String phone = null;
 		String appkey = null;
 		String partnerCode = null;
@@ -707,7 +707,7 @@ public class OrderServiceImpl implements IOrderService{
 		String vcode = null;
 		String partnerOrderId = null;
 		try {
-			seq = jsonObject.getString("seq");
+//			seq = jsonObject.getString("seq");
 			phone = jsonObject.getString("phone");
 			appkey = jsonObject.getString("appkey");
 			partnerCode = jsonObject.getString("partnerCode");
@@ -722,9 +722,9 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
-		if (CheckParam.checkParamIsNull(seq)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
-		}
+//		if (CheckParam.checkParamIsNull(seq)) {
+//			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+//		}
 		if (CheckParam.checkParamIsNull(phone)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -793,23 +793,23 @@ public class OrderServiceImpl implements IOrderService{
 		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
 			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			json.put("orderId", order.getOrderId());
-			json.put("partnerOrderId", order.getPartnerOrderId());
-//			json.put("status", order.getState());
-			json.put("money", order.getMoney());
-			json.put("createTime", order.getCreateTime());
-			List list = new ArrayList();
-			JSONObject listItem = new JSONObject();
-			listItem.put("productCode", order.getProductCode());
-			listItem.put("productName", product.getProductName());
-			listItem.put("productType", product.getCycleType());
-			listItem.put("state", order.getState());
-			listItem.put("price", order.getPrice());
-//			listItem.put("count", order.getCount());
-			listItem.put("allowAutoPay", order.getAllowAutoPay());
-			listItem.put("validTime", order.getValidTime());
-			listItem.put("invalidTime", order.getInvalidTime());
-			list.add(listItem);
-			json.put("item", listItem);
+//			json.put("partnerOrderId", order.getPartnerOrderId());
+////			json.put("status", order.getState());
+//			json.put("money", order.getMoney());
+//			json.put("createTime", order.getCreateTime());
+//			List list = new ArrayList();
+//			JSONObject listItem = new JSONObject();
+//			listItem.put("productCode", order.getProductCode());
+//			listItem.put("productName", product.getProductName());
+//			listItem.put("productType", product.getCycleType());
+//			listItem.put("state", order.getState());
+//			listItem.put("price", order.getPrice());
+////			listItem.put("count", order.getCount());
+//			listItem.put("allowAutoPay", order.getAllowAutoPay());
+//			listItem.put("validTime", order.getValidTime());
+//			listItem.put("invalidTime", order.getInvalidTime());
+//			list.add(listItem);
+//			json.put("item", listItem);
 			/**组装支付订单信息返回给接入商 end**/
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
 		}
