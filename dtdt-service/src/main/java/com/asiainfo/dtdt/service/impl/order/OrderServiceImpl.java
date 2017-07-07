@@ -902,6 +902,9 @@ public class OrderServiceImpl implements IOrderService{
 		if (StringUtils.isBlank(orderId)) {
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
+		if (orderId.length() != 32) {
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+		}
 		
 		//查询订购关系表：校验包月类订购为成功，只限包月类产产品
 		OrderRecord orderRecord = null;
