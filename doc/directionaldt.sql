@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/7/6 19:33:17                            */
+/* Created on:     2017/7/7 11:43:02                            */
 /*==============================================================*/
 
 
@@ -9,6 +9,8 @@ CREATE DATABASE IF NOT EXISTS directionaldt DEFAULT CHARSET utf8 COLLATE utf8_ge
 use directionaldt;
 
 drop table if exists t_s_app;
+
+drop table if exists t_s_batcn_order;
 
 drop table if exists t_s_charge;
 
@@ -31,6 +33,8 @@ drop table if exists t_s_partner;
 drop table if exists t_s_partner_his_order_resources;
 
 drop table if exists t_s_partner_order_resources;
+
+drop table if exists t_s_partner_sms_config;
 
 drop table if exists t_s_payorder;
 
@@ -58,6 +62,28 @@ create table t_s_app
    notice_url           varchar(100) comment '通知回调地址',
    primary key (app_id)
 );
+
+/*==============================================================*/
+/* Table: t_s_batcn_order                                       */
+/*==============================================================*/
+create table t_s_batcn_order
+(
+   batch_id             varchar(22) not null comment '批量订单ID',
+   partner_code         varchar(12) comment '合作方编码',
+   app_key              varchar(36) comment '合作伙伴产品',
+   partner_order_id     varchar(36) comment '合作伙伴订单ID',
+   product_code         varchar(6),
+   oper_type            tinyint default 0 comment '订购：1，退订：2',
+   state                varchar(2),
+   create_time          timestamp comment '订购时间',
+   update_time          timestamp comment '更新时间',
+   price                int comment '订购产品价格',
+   redirect_url         varchar(100) comment '支付成功跳转Url',
+   remark               varchar(100),
+   primary key (batch_id)
+);
+
+alter table t_s_batcn_order comment '批量订单表';
 
 /*==============================================================*/
 /* Table: t_s_charge                                            */
@@ -352,6 +378,23 @@ create table t_s_partner_order_resources
 );
 
 alter table t_s_partner_order_resources comment '合作方订购资源批次记录表';
+
+/*==============================================================*/
+/* Table: t_s_partner_sms_config                                */
+/*==============================================================*/
+create table t_s_partner_sms_config
+(
+   id                   varchar(32) not null,
+   partner_code         varchar(12) comment '合作方编码',
+   contacts             varchar(20) default '0' comment '预存订购次数',
+   mobilephone          varchar(11) comment '手机号码',
+   create_user          varchar(50) comment '创建者',
+   create_time          timestamp comment '创建时间',
+   end_time             timestamp comment '结束时间',
+   primary key (id)
+);
+
+alter table t_s_partner_sms_config comment '合作方短信通知配置表';
 
 /*==============================================================*/
 /* Table: t_s_payorder                                          */
