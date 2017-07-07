@@ -911,7 +911,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			orderRecord = orderRecordMapper.selectMonthProduct(orderId, appkey);
 			if (null == orderRecord)
-				return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, "包月类" + Constant.PRODUCT_EXISTENCE_MSG, null);
+				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrder() selectMonthProduct() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -961,17 +961,15 @@ public class OrderServiceImpl implements IOrderService{
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
 				data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
-//				updateTable(newOrderId, orderRecord, "19");
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
-//				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder updateTable Exception e" + e);
+				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder fail ecode=" + ecode);
 			data.put("failMsg", emsg);
-//			updateTable(newOrderId, orderRecord, "23");//退订失败
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 		} 
 	}
@@ -987,7 +985,7 @@ public class OrderServiceImpl implements IOrderService{
 	public String closeOrderNew(String orderStr, String appkey) {
 		log.info("OrderServiceImpl closeOrderNew() orderStr:" + orderStr + " appkey=" + appkey);
 		
-		//获取参数：合作方请求orderId（我方平台的orderId,对应订购的时候wijia返回的woorderId）
+		//获取参数：合作方请求orderId（我方平台的orderId）
 		JSONObject jsonObject = JSONObject.parseObject(orderStr);
 		String orderId = jsonObject.getString("orderId");
 		
@@ -1001,7 +999,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
 			if (null == orderRecord)
-				return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrderNew() selectByPrimaryKey() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -1051,17 +1049,15 @@ public class OrderServiceImpl implements IOrderService{
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
 				data.put("refundValidTime", DateUtil.getDateTime(orderRecord.getRefundValidTime()));	
-//				updateTable(newOrderId, orderRecord, "19");
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
-//				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder updateTable Exception e" + e);
+				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode);
 			data.put("failMsg", emsg);
-//			updateTable(newOrderId, orderRecord, "23");//退订失败
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 		}
 	}
@@ -1074,7 +1070,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	private void insertOrder(String newOrderId, OrderRecord orderRecord) {
-		log.info("OrderServiceImpl closeOrderParams() orderRecord:" + orderRecord);
+		log.info("OrderServiceImpl insertOrder() newOrderId:" + newOrderId + " orderRecord=" + orderRecord);
 		Order order = new Order();
 		Date now = new Date();
 		
@@ -1085,7 +1081,7 @@ public class OrderServiceImpl implements IOrderService{
 		order.setPartnerOrderId(orderRecord.getPartnerOrderId());
 		order.setProductCode(orderRecord.getProductCode());
 		order.setOperType((byte)2);
-		order.setRefundOrderId("");
+		order.setRefundOrderId(orderRecord.getOrderId());
 		/**
 		 * 是否真实请求沃家总管（0：真实请求 1：未请求）
             	如果我方同一手机号码，在多个app下订购了同一流量产品，
@@ -1099,7 +1095,7 @@ public class OrderServiceImpl implements IOrderService{
 		order.setCreateTime(now);
 		order.setUpdateTime(now);
 		order.setValidTime(now);
-		order.setInvalidTime(now);
+		order.setInvalidTime(DateUtil.getCurrentMonthEndTime(now));//月底
 		order.setPrice(orderRecord.getPrice());
 		order.setCount(orderRecord.getCount());
 		order.setMoney(orderRecord.getMoney());
@@ -1108,7 +1104,12 @@ public class OrderServiceImpl implements IOrderService{
 		order.setRedirectUrl(orderRecord.getRedirectUrl());
 		order.setIsRealRequestWoplat((byte)1);
 		order.setRemark("退订");
-		orderMapper.insertOrder(order);
+		try {
+			orderMapper.insertOrder(order);
+		} catch (Exception e) {
+			log.info("OrderServiceImpl insertOrder() Exception: e=" + e);
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -1119,7 +1120,6 @@ public class OrderServiceImpl implements IOrderService{
 	 */
 	private void insertHisOrderRecord(OrderRecord orderRecord) {
 		log.info("OrderServiceImpl insertHisOrderRecord() orderRecord:" + orderRecord);
-		Date date = new Date();
 		
 		HisOrderRecord hisOrderRecord = new HisOrderRecord();
 		hisOrderRecord.setOrderId(orderRecord.getOrderId());
@@ -1143,8 +1143,8 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrderRecord.setRefundTime(orderRecord.getRefundTime());
 		hisOrderRecord.setValidTime(orderRecord.getValidTime());
 		hisOrderRecord.setInvalidTime(orderRecord.getInvalidTime());
-		hisOrderRecord.setCreateTime(date);
-		hisOrderRecord.setUpdateTime(date);
+		hisOrderRecord.setCreateTime(orderRecord.getCreateTime());
+		hisOrderRecord.setUpdateTime(orderRecord.getUpdateTime());
 		hisOrderRecord.setRedirectUrl(orderRecord.getRedirectUrl());
 		hisOrderRecord.setWoOrderId(orderRecord.getWoOrderId());
 		hisOrderRecord.setRemark("退订移历史表");
@@ -1187,7 +1187,6 @@ public class OrderServiceImpl implements IOrderService{
 			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia closeOrder param:" + jsonObject.toString());
-//			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
 			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
 			log.info("wojia closeOrder return result:"+result);
 		} catch (Exception e) {
@@ -1208,9 +1207,10 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public void closeOrderUpdateTable(String orderId, String orderRecordJson, String state) {
-		log.info("OrderServiceImpl updateTable() orderRecordJson =" + orderRecordJson);
+		log.info("OrderServiceImpl closeOrderUpdateTable() orderRecordJson =" + orderRecordJson);
 		
 		OrderRecord orderRecord = JSONObject.parseObject(orderRecordJson, OrderRecord.class);
+		Date date = new Date();
 		try {
 			//t_s_order 表到 t_s_his_order 表
 			insertFromHisOrderById(orderId, "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
@@ -1219,14 +1219,19 @@ public class OrderServiceImpl implements IOrderService{
 			//t_s_order_record 表到 t_s_his_order_record 表
 			orderRecord.setState(state);//设置状态：19-退订成功 23-退订失败
 			orderRecord.setRemark("退订失败");
+			orderRecord.setUpdateTime(date);
+			orderRecord.setRefundTime(date);
 			orderRecordMapper.updateOrderRecord(orderRecord);
+			
 			if ("19".equals(state)) {
 				orderRecord.setRemark("退订成功");
+				orderRecord.setRefundValidTime(DateUtil.getCurrentMonthEndTime(date));//月底
 				insertHisOrderRecord(orderRecord);
 				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
 			}
 		} catch (Exception e) {
-			log.info("OrderServiceImpl updateTable() Exception e=" + e);
+			log.info("OrderServiceImpl closeOrderUpdateTable() Exception e=" + e);
+			e.printStackTrace();
 		}
 	}
 }
