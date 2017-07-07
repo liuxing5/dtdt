@@ -1,4 +1,4 @@
-package com.asiainfo.dtdt.common.constants;
+package com.asiainfo.dtdt.common.util;
 
 
 public class RedisKey {

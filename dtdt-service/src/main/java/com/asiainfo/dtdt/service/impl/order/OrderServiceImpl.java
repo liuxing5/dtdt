@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.RestClient;
@@ -18,6 +19,7 @@ import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.common.util.BaseSeq;
 import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
+import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.UuidUtil;
 import com.asiainfo.dtdt.config.redis.RedisUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
@@ -59,8 +61,8 @@ public class OrderServiceImpl implements IOrderService{
 	private WoplatConfig woplatConfig ;
 	
 	@Resource
-	private RedisUtil redisUtil;
-
+	private RedisAssistant redisAssistant;
+	
 	@Autowired
 	private OrderMapper orderMapper;
 	
@@ -1026,11 +1028,11 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
 		}
 		/**校验验证码是否正确 start*/
-		String vcodeKey = "SmsC_"+partnerCode+"_"+appkey+"_"+phone;
-		if(!redisUtil.exist(vcodeKey)){//判断验证码是否存在
+		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
+		String redisVcode = redisAssistant.getStringValue(vcodeKey);
+		if(StringUtils.isBlank(redisVcode)){//判断验证码是否存在
 			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
 		}
-		String redisVcode = redisUtil.get(vcodeKey);
 		if(!StringUtils.equals(vcode, redisVcode)){
 			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
 		}
@@ -1052,7 +1054,7 @@ public class OrderServiceImpl implements IOrderService{
 		//记录验证码信息
 		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
 		//清除redis中的验证码
-		redisUtil.delKey(vcodeKey);
+		redisAssistant.clear(vcodeKey);
 		//发沃家起订购请求
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
 		String woResult = null;
