@@ -126,8 +126,20 @@ public class NotcieServiceImpl implements INoticeService {
 					chargeService.backChargeBill(orderId,Integer.parseInt(String.valueOf(order.getMoney())) , order.getMobilephone());
 				}*/
 				/**调用反冲话费 end**/
-				orderService.updateOrder(order.getOrderId(), null, "11", Constant.IS_NEED_CHARGE_0,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-				orderService.insertFromOrderRecordById(order.getOrderId(),(byte) 0, "0");
+				orderService.updateOrder(order.getOrderId(), null, "11", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+				String pcStr = order.getProductCode().substring(2, 4);//当前订购流量包
+				byte cycleType = 0;
+				if(Constant.CYCLE_TYPE_01.equals(pcStr)){//包月
+					//判断wojia总管订购流量包为包月并且当前也为包月流量包
+					cycleType = 0;
+				}else if(Constant.CYCLE_TYPE_02.equals(pcStr)){//包半年
+					//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
+					cycleType = 1;
+				}else if(Constant.CYCLE_TYPE_03.equals(pcStr)){//包年
+					//判断wojia总管订购流量包为包年并且当前也为包年流量包
+					cycleType = 2;
+				}
+				orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
 				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&返充话费成功");
 				/**订购成功回调通知**/
 				noticeService.dtdtNoticeOrder(order.getOrderId());

@@ -139,5 +139,5 @@ public interface IOrderService {
     * @throws
     * @version 0.0.5
      */
-    String forwardOrder(String jsonStr,String appkey,String partnerCode);
+    String forwardOrder(String jsonStr);
 }

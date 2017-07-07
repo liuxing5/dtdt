@@ -90,8 +90,8 @@ public class OrderServiceImpl implements IOrderService{
 	@Autowired
 	private IAppService appService;
 	
-	@Autowired
-	private IPayOrderService payOrderService;
+//	@Autowired
+//	private IPayOrderService payOrderService;
 	
 	@Autowired
 	private INoticeService noticeService;
@@ -391,17 +391,15 @@ public class OrderServiceImpl implements IOrderService{
 		order.setCreateTime(new Date());//订购时间
 		order.setValidTime(new Date());//有效时间
 		order.setRedirectUrl(redirectUrl);//支付成功跳转URL
-		if(StringUtils.contains("0", allowAutoPay)){//是否自动续订
-			order.setAllowAutoPay((byte)0);
-		}else{
-			order.setAllowAutoPay((byte)1);
-		}
 		if(product.getType().equals((byte)1)){//包月后向流量
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月失效时间
+			order.setAllowAutoPay((byte)1);
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
+			order.setAllowAutoPay((byte)1);
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_03)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),12)));//包年失效时间
+			order.setAllowAutoPay((byte)1);
 		}
 		order.setPrice(product.getPrice());//产品价格
 		order.setCount(1);//订购数量
@@ -971,7 +969,7 @@ public class OrderServiceImpl implements IOrderService{
 	* @see com.asiainfo.dtdt.interfaces.order.IOrderService#forwardOrder(java.lang.String)
 	 */
 	@Override
-	public String forwardOrder(String jsonStr,String appkey,String partnerCode) {
+	public String forwardOrder(String jsonStr) {
 		log.info("OrderServiceImpl preOrder() jsonStr:" + jsonStr);
 		JSONObject jsonObject = null;
 		/**获取接口中传递的参数  start*/
@@ -984,22 +982,26 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		String seq = null;
 		String phone = null;
+		String appkey = null;
+		String partnerCode = null;
 		String productCode = null;
 		String orderMethod = null;
-		String allowAutoPay = null;
+//		String allowAutoPay = null;
 		String vcode = null;
 		String partnerOrderId = null;
 		try {
 			seq = jsonObject.getString("seq");
-			phone = jsonObject.getString("phone").toString();
-			productCode = jsonObject.getString("productCode").toString();
-			orderMethod = jsonObject.get("orderMethod").toString();
-			allowAutoPay = jsonObject.get("allowAutoPay").toString();
-			vcode = jsonObject.get("vcode").toString();
-			partnerOrderId = jsonObject.get("partnerOrderId").toString();
+			phone = jsonObject.getString("phone");
+			appkey = jsonObject.getString("appkey");
+			partnerCode = jsonObject.getString("partnerCode");
+			productCode = jsonObject.getString("productCode");
+			orderMethod = jsonObject.getString("orderMethod");
+//			allowAutoPay = jsonObject.get("allowAutoPay").toString();
+			vcode = jsonObject.getString("vcode");
+			partnerOrderId = jsonObject.getString("partnerOrderId");
 		} catch (NullPointerException e) {
 			log.error("get param error is null");
-			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, "seq,phone,productCode,orderMethod,vcode,partnerOrderId"+Constant.PARAM_ERROR_MSG, null);
 		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
@@ -1018,9 +1020,9 @@ public class OrderServiceImpl implements IOrderService{
 		if (StringUtils.isBlank(orderMethod)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
 		}
-		if(StringUtils.isBlank(allowAutoPay)){
+	/*	if(StringUtils.isBlank(allowAutoPay)){
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "allowAutoPay"+Constant.PARAM_NULL_MSG, null);
-		}
+		}*/
 		if (StringUtils.isBlank(vcode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -1045,18 +1047,21 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
+		if(product.getType() == 1){
+			return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
+		}
 		/**查询产品价格信息 end**/
 		
 		/**检查是否存在互斥产品并存储在途数据**/
 		Order order = null;
 		//记录订购在途表
-		order = order(appkey, partnerCode, partnerOrderId, phone, product, orderMethod, allowAutoPay,null,"4");//待订购
+		order = order(appkey, partnerCode, partnerOrderId, phone, product, orderMethod, null,null,"4");//待订购
 		//记录验证码信息
 		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
 		//清除redis中的验证码
 		redisAssistant.clear(vcodeKey);
 		//发沃家起订购请求
-		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
+		int num = updateOrder(order.getOrderId(), null, "9", (byte)1, (byte)0);
 		String woResult = null;
 		if(num > 0){
 			woResult = postWoplatOrder(phone, product.getWoProductCode(), DateUtil.getDateTime(new Date()), order.getOrderChannel());
@@ -1092,14 +1097,14 @@ public class OrderServiceImpl implements IOrderService{
 			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 			//将在途表信息存放在备份表中
 			insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
-			json.put("orderId", order.getOrderId());
-			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, json.toString());
+//			json.put("orderId", order.getOrderId());
+			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, null);
 		}
 		//更新在途订购订单状态7-订购失败
-		updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+		updateOrder(order.getOrderId(),null, "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 		//将在途表信息存放在备份表中
 		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
-		json.put("orderId", order.getOrderId());
+//		json.put("orderId", order.getOrderId());
 		String msg = null;
 		if(woJson.getString("ecode").equals("1405")){
 			msg = "用户 "+phone+" 不存在";
@@ -1112,7 +1117,7 @@ public class OrderServiceImpl implements IOrderService{
 		}else if(woJson.getString("ecode").equals("4005")){
 			msg = "不能同时订购互斥产品";
 		}
-		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, json.toString());
+		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, null);
 	}
 	
 	/**

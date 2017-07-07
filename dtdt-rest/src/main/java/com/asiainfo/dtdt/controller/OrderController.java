@@ -81,7 +81,7 @@ public class OrderController extends BaseController{
         }
         String orderJson = sb.toString(); //接收到通知信息。
         logger.info("pre-order param data:"+orderJson);
-        String result = orderService.forwardOrder(orderJson, headers.getString("appkey"), headers.getString("partnerCode"));
+        String result = orderService.forwardOrder(orderJson);
 		logger.info("pre-order return data:"+result);
 		return result;
 	}

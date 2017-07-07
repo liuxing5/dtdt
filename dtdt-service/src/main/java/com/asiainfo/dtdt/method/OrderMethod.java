@@ -33,6 +33,14 @@ public class OrderMethod {
 	@Resource
 	public static WoplatConfig woplatConfig;
 	
+	public static final String APPID = "b3ab31fd-8074-46da-9086-f3fb6184b334";
+	public static final String  APPKEY = "d4584789-4423-4884-80cd-5447b6aa19df";
+	
+	/**沃家总管订购退订接口**/
+	public static final String ORDER_URL  			= "http://120.52.120.106:9008/order";
+	/**沃家总管查询订购信息接口**/
+	public static final String QUERYORDER_URL  		= "http://120.52.120.106:9008/queryorder";
+	
 	/**
 	 * @throws Exception 
 	* @Title: OrderMethod 
@@ -52,7 +60,7 @@ public class OrderMethod {
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
 //			jsonObject.put("appId", woplatConfig.getWoAppId());
-			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("appId", APPID);
 			jsonObject.put("operType", 1);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("productId", productCode);
@@ -61,11 +69,11 @@ public class OrderMethod {
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
 //			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
-			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			String signStr = APPID+msisdn+timeStamp+APPKEY;
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia order param:"+jsonObject.toString());
 //			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
-			result = RestClient.doRest(Constant.ORDER_URL, "POST", jsonObject.toString());
+			result = RestClient.doRest(ORDER_URL, "POST", jsonObject.toString());
 			log.info("wojia order return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia order error:"+e.getMessage(), e);
@@ -137,15 +145,15 @@ public class OrderMethod {
 		String result = null;
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
-			jsonObject.put("appId", Constant.APPID);
+			jsonObject.put("appId", APPID);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("orderId", orderId);
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
-			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
+			String signStr = APPID+msisdn+timeStamp+APPKEY;
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("wojia post queryOrder param:"+jsonObject.toString());
-			result = RestClient.doRest(Constant.QUERYORDER_URL, "POST", jsonObject.toString());
+			result = RestClient.doRest(QUERYORDER_URL, "POST", jsonObject.toString());
 			log.info("wojia queryOrder return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia queryOrder error:"+e.getMessage(), e);

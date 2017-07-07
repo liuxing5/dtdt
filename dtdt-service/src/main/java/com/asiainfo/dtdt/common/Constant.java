@@ -9,8 +9,8 @@ package com.asiainfo.dtdt.common;
 */
 public class Constant {
 
-	public static final String APPID = "b3ab31fd-8074-46da-9086-f3fb6184b334";
-	public static final String  APPKEY = "d4584789-4423-4884-80cd-5447b6aa19df";
+//	public static final String APPID = "b3ab31fd-8074-46da-9086-f3fb6184b334";
+//	public static final String  APPKEY = "d4584789-4423-4884-80cd-5447b6aa19df";
 	
 	public static final String CHARGESYSUSERNAME = "wojia";
 	
@@ -22,7 +22,7 @@ public class Constant {
 	
 	public static final String RECHARGE_URL	= "http://120.52.21.138:11186/RechargeApi/rest/activity/recharge.n";
 	
-	public static final String WJZG_RETURN_SUCCESS_CODE	= "0";
+//	public static final String WJZG_RETURN_SUCCESS_CODE	= "0";
 	
 	/**处理成功码**/
 	public static final String SUCCESS_CODE			= "00000";
@@ -55,9 +55,9 @@ public class Constant {
 	public static final String ERROR_MSG			= "异常";
 	
 	/**沃家总管订购退订接口**/
-	public static final String ORDER_URL  			= "http://120.52.120.106:9008/order";
+//	public static final String ORDER_URL  			= "http://120.52.120.106:9008/order";
 	/**沃家总管查询订购信息接口**/
-	public static final String QUERYORDER_URL  		= "http://120.52.120.106:9008/queryorder";
+//	public static final String QUERYORDER_URL  		= "http://120.52.120.106:9008/queryorder";
 	
 	/**非联通号码**/
 	public static final String NOT_UNICOM_CODE 		= "20001";
@@ -98,6 +98,11 @@ public class Constant {
 	public static final String ORDER_ERROR_CODE	=	"40003";
 	/**订购失败编码描述**/
 	public static final String ORDER_ERROR_MSG	=	"订购失败：";
+	
+	/**非前向订购产品编码**/
+	public static final String ORDER_TYPE_NOTFORWARD_CODE	=	"40004";
+	/**非前向订购产品描述**/
+	public static final String ORDER_TYPE_NOTFORWARD_MSG	=	"非前向订购产品：";
 	
 	/**订单不存在编码**/
 	public static final String NO_ORDER_CODE	=	"40010";
