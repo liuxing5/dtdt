@@ -11,13 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.RestClient;
 import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.common.util.BaseSeq;
+import com.asiainfo.dtdt.common.util.CheckParam;
 import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
+import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.UuidUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.App;
@@ -56,8 +59,8 @@ public class OrderServiceImpl implements IOrderService{
 	@Resource
 	private WoplatConfig woplatConfig ;
 	
-//	@Resource
-//	private RedisAssistant redisAssistant;
+	@Resource
+	private RedisAssistant redisAssistant;
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -719,39 +722,43 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
-		if (StringUtils.isBlank(seq)) {
+		if (CheckParam.checkParamIsNull(seq)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
 		}
-		if (StringUtils.isBlank(phone)) {
+		if (CheckParam.checkParamIsNull(phone)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
 		}
 		if (!IsMobileNo.isMobile(phone)) {
 			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
 		}
-		if (StringUtils.isBlank(productCode)) {
+		if (CheckParam.checkParamIsNull(productCode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
 		}
-		if (StringUtils.isBlank(orderMethod)) {
+		if (CheckParam.checkParamIsNull(orderMethod)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
 		}
 	/*	if(StringUtils.isBlank(allowAutoPay)){
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "allowAutoPay"+Constant.PARAM_NULL_MSG, null);
 		}*/
-		if (StringUtils.isBlank(vcode)) {
+		if (CheckParam.checkParamIsNull(vcode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
 		}
-		if (StringUtils.isBlank(partnerOrderId)) {
+		if (CheckParam.checkParamIsNull(partnerOrderId)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
 		}
+		String paramErr =  CheckParam.checkParam(Constant.lengthParam, jsonStr);
+		if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
+		}
 		/**校验验证码是否正确 start*/
-//		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
-//		String redisVcode = redisAssistant.getStringValue(vcodeKey);
-//		if(StringUtils.isBlank(redisVcode)){//判断验证码是否存在
-//			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
-//		}
-//		if(!StringUtils.equals(vcode, redisVcode)){
-//			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
-//		}
+		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
+		String redisVcode = redisAssistant.getStringValue(vcodeKey);
+		if(StringUtils.isBlank(redisVcode)){//判断验证码是否存在
+			return ReturnUtil.returnJsonError(Constant.SENDSMS_EXPIRED_CODE, Constant.SENDSMS_EXPIRED_MSG, null);//验证码过期不存在
+		}
+		if(!StringUtils.equals(vcode, redisVcode)){
+			return ReturnUtil.returnJsonError(Constant.SENDSMS_VALIDATE_CODE, Constant.SENDSMS_VALIDATE_MSG, null);//验证码错误
+		}
 		/**校验验证码是否正确 end*/
 		/**校验接口中传递的参数是否合法  end*/
 		/**处理业务开始*/
@@ -771,9 +778,9 @@ public class OrderServiceImpl implements IOrderService{
 		//记录订购在途表
 		order = order(appkey, partnerCode, partnerOrderId, phone, product, orderMethod, null,null,"4");//待订购
 		//记录验证码信息
-//		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
-//		//清除redis中的验证码
-//		redisAssistant.clear(vcodeKey);
+		codeService.insertVcode(redisVcode,DateUtil.getDateTime(new Date()),order.getOrderId(),vcode,DateUtil.getDateTime(new Date()),"0");//0-验证通过
+		//清除redis中的验证码
+		redisAssistant.clear(vcodeKey);
 		//发沃家起订购请求
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)1, (byte)0);
 		String woResult = null;

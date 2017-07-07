@@ -12,6 +12,8 @@ public class Constant {
 //	public static final String APPID = "b3ab31fd-8074-46da-9086-f3fb6184b334";
 //	public static final String  APPKEY = "d4584789-4423-4884-80cd-5447b6aa19df";
 	
+	public static final String lengthParam = "{\"orderId\":36,\"appkey\":36,\"pertnerCode\":12,\"phone\":11,\"productCode\":6,\"orderMethod\":1,\"vcode\":6,\"partnerOrderId\":36}";
+	
 	public static final String CHARGESYSUSERNAME = "wojia";
 	
 	public static final String CHARGESYSPASSWORD = "123qwe";
