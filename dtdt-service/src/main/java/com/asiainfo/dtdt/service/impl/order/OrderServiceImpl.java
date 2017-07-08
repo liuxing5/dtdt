@@ -1394,6 +1394,10 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		
+		if (orderId.length() != 32) {
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+		}
+		
 		//查询订购关系表：不校验包月类
 		OrderRecord orderRecord = null;
 		try {
