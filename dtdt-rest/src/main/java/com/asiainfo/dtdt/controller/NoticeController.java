@@ -100,4 +100,38 @@ public class NoticeController {
 		}
 		return resultJson.toString();
 	}
+	
+	
+	/**
+	* @Title: NoticeController 
+	* @Description: (测试合作方接收通知) 
+	* @param request
+	* @param response
+	* @return        
+	* @throws
+	 */
+	@RequestMapping("/test/partnerNotice")
+	public synchronized String partnerNotice(HttpServletRequest request, HttpServletResponse response){
+		log.info("**********合作方接收通知开始**********");
+		JSONObject resultJson = new JSONObject();
+		try {
+			InputStream ins = request.getInputStream();
+	        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+	        StringBuilder sb = new StringBuilder();
+	        String line = "";
+	        while ((line = in.readLine()) != null) {
+	        	sb.append(line);
+	        }
+	        String notifyJson = sb.toString(); //接收到第三方支付插件通知信息。
+	        log.info("partnerNotice data:"+notifyJson);
+	        resultJson.put("code", "00000");
+	        resultJson.put("msg", "成功");
+		} catch (Exception e) {
+			log.error("合作方接收通知失败："+e.getMessage(),e);
+			resultJson.put("code", "FAIL");
+			return resultJson.toString();
+		}
+		log.info("**********合作方接收通知结束**********");
+		return resultJson.toString();
+	}
 }
