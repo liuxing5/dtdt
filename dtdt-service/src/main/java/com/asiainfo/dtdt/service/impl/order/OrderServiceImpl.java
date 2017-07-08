@@ -508,7 +508,37 @@ public class OrderServiceImpl implements IOrderService{
 			JSONObject woJson)
 	{
 		String msg = "";
-		if (woJson.getString("ecode").equals("1405"))
+		if (woJson.getString("ecode").equals("-1"))
+		{
+			msg = "系统繁忙";
+		} else if (woJson.getString("ecode").equals("-3"))
+		{
+			msg = "接口调用次数超过限制";
+		} else if (woJson.getString("ecode").equals("100"))
+		{
+			msg = "缺少参数  " + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("110"))
+		{
+			msg = "操作超时，超时时间 " + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("1450"))
+		{
+			msg = "appid不存在" + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("1451"))
+		{
+			msg = "appid或appkey错误";
+		} else if (woJson.getString("ecode").equals("1452"))
+		{
+			msg = "当前合作伙伴没有定购产品的权限" + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("1453"))
+		{
+			msg = "当前合作伙伴没有定购产品的额度" + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("4003"))
+		{
+			msg = "订购关系不存在" + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("4004"))
+		{
+			msg = "产品无法退订" + woJson.getString("emsg");
+		} else if (woJson.getString("ecode").equals("1405"))
 		{
 			msg = "用户 " + phone + " 不存在";
 		} else if (woJson.getString("ecode").equals("4000"))
@@ -1370,7 +1400,7 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, null);
+			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
 		} 
 	}
 	
@@ -1471,7 +1501,7 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, null);
+			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
 		}
 	}
 	
