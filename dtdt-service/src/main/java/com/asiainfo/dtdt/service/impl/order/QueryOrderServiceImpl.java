@@ -94,8 +94,8 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 				data.put("productCode", orderRecord.getProductCode());
 				data.put("cycleType", orderRecord.getCycleType());
 				data.put("type", product.getType());
-				data.put("validTime", DateUtil.getDateTime(orderRecord.getValidTime()));
-				data.put("invalidTime", DateUtil.getDateTime(orderRecord.getInvalidTime()));
+				data.put("validTime", orderRecord.getValidTime());
+				data.put("invalidTime", orderRecord.getInvalidTime());
 				returnList.add(data);
 			}
 			
@@ -158,7 +158,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			switch (Integer.valueOf(state)) {
 			
 			/**
-			 *  state
+			 *  wojia 返回 state
 			* 	状态1：未付款，此时邮箱侧合作方查询该笔订购状态为：未付款；
 			*	状态2：付款中，此时邮箱侧合作方查询该笔订购状态为：付款中；
 			*	状态3：付款失败，此时邮箱侧合作方查询该笔订购状态为：付款失败；
@@ -181,6 +181,15 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			*	状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
 			*	状态21：邮箱侧已作废（订购状态在X小时内一直为“未支付”，X小时后将该订单状态设置为“已作废”），此时邮箱侧合作方查询该笔订购状态为：订购作废；
 			*	状态22：服务到期（半年包、年包产品自然达到有效期截止日），此时邮箱侧合作方查询该笔订购状态为：服务到期；
+			*
+			*	我方返回给合作方state（无 1,2,3,21状态）
+			*	      状态1：待订购；--4
+			*	      状态2：订购中；--9
+			*	      状态3：订购成功--10,11,12,13,14
+			*	      状态4：订购失败；--5,6,7,8,15,16,17,18
+			*	      状态5：退订中；--20
+			*	      状态6：退订成功；--19
+			*	      状态7：服务到期；--22
 			 */
 //			case 1:json.put("stateMsg", "未付款");break;
 //			case 2:json.put("stateMsg", "付款中");break;

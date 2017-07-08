@@ -94,7 +94,7 @@ public interface IOrderService {
 	* @return        
 	* @throws
 	 */
-	String closeOrder(String orderStr, String appkey);
+	String closeOrder(String orderStr, String appkey, String partnerCode);
 	
 	/**
 	* @Title: closeOrderNew
@@ -104,7 +104,7 @@ public interface IOrderService {
 	* @return        
 	* @throws
 	 */
-	String closeOrderNew(String orderStr, String appkey);
+	String closeOrderNew(String orderStr, String appkey, String partnerCode);
 	
 	/**
 	* @Title: OrderServiceImpl 

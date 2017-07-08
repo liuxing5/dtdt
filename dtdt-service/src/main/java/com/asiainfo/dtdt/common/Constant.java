@@ -131,7 +131,7 @@ public class Constant {
 	/**退订失败编码**/
 	public static final String CLOSE_ORDER_FAIL_CODE	=	"40005";
 	/**退订失败编码描述**/
-	public static final String CLOSE_ORDER_FAIL_MSG		=	"产品无法退订";
+	public static final String CLOSE_ORDER_FAIL_MSG		=	"产品退订失败";
 	
 	/**非前向订购产品编码**/
 	public static final String ORDER_TYPE_NOTFORWARD_CODE	=	"40004";
