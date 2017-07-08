@@ -45,6 +45,7 @@ public class PartnerSMSConfImp implements IPartnerSMSConfService {
 
 					redis.hset(hkey, RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE,
 							psc.getMobilephone());
+					
 					redis.hset(hkey, RedisKey.PARTNER_OR_WARN_KEY_MAIL,
 							psc.getMail());
 					redis.hset(hkey,
@@ -53,10 +54,11 @@ public class PartnerSMSConfImp implements IPartnerSMSConfService {
 					
 					log.info("hkey:{}|{}:{}|{}:{}|{}:{}", hkey,
 							RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE,
-							psc.getMobilephone(),
-							RedisKey.PARTNER_OR_WARN_KEY_MAIL, psc.getMail(),
+							redis.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE),
+							RedisKey.PARTNER_OR_WARN_KEY_MAIL,
+							redis.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_MAIL),
 							RedisKey.PARTNER_OR_WARN_KEY_WARNTHRESHOLD,
-							psc.getWarnThreshold());
+							redis.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_WARNTHRESHOLD));
 				});
 			}
 		}

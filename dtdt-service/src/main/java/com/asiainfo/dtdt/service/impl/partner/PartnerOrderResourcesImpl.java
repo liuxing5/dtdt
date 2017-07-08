@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.util.RedisKey;
-import com.asiainfo.dtdt.config.redis.RedisUtil;
 import com.asiainfo.dtdt.entity.PartnerOrderResources;
 import com.asiainfo.dtdt.service.IPartnerOrderResourcesService;
 import com.asiainfo.dtdt.service.mapper.PartnerHisOrderResourcesMapper;
@@ -41,8 +40,8 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 	@Resource
 	private RedisAssistant redis;
 	
-	@Resource
-	private RedisUtil redisSingle;
+	/*@Resource
+	private RedisUtil redisSingle;*/
 	
 	@Override
 	public void refreshTask()
@@ -126,31 +125,39 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 					{
 						if (!StringUtils.isEmpty(redis.getStringValue(key)))
 						{
-							log.info("{}到期，移除，预存次数{}，剩余次数{}", key,
-									por.getPreCount(), redis.getStringValue(key));
+							log.info("{}到期，移除，预存次数{}，告警阈值{}，剩余次数{}", key,
+									por.getPreCount(), por.getWarnThreshold(),
+									redis.getStringValue(key));
 							por.setUseCount(por.getPreCount()
 									- Long.valueOf(redis.getStringValue(key)));
 						}
 						outDate.add(por);
 					} else if (StringUtils.isEmpty(redis.getStringValue(key)))
 					{
-						log.info("{}不存在，增加，预存次数{}", key, por.getPreCount(),
-								redis.getStringValue(key));
-						redis.setForever(key, por.getPreCount().toString());
+						log.info("{}不存在，增加，预存次数{},告警阈值{}", key,
+								por.getPreCount(), redis.getStringValue(key),
+								por.getWarnThreshold());
+						Long canUseCount = por.getPreCount()
+								- por.getWarnThreshold();
+						redis.setForever(key, canUseCount.toString());
 					} else
 					{
 						por.setUseCount(por.getPreCount()
+								- por.getWarnThreshold()
 								- Long.valueOf(redis.getStringValue(key)));
 						Long newCount = Long.valueOf(redis.getStringValue(key))
 								+ por.getChargeCount();
-						log.info("{}存在未过期，刷新，预存次数{}，剩余次数{}，充值次数{}，刷新后次数{}", key,
-								por.getPreCount(), redis.getStringValue(key),
+						log.info(
+								"{}存在未过期，刷新，预存次数{}，告警阈值{}，剩余次数{}，充值次数{}，刷新后次数{}",
+								key, por.getPreCount(), por.getWarnThreshold(),
+								redis.getStringValue(key),
 								por.getChargeCount(), newCount);
 						redis.setForever(key, String.valueOf(newCount));
 
-						por.setPreCount(por.getPreCount() + por.getChargeCount());
+						por.setPreCount(por.getPreCount()
+								+ por.getChargeCount());
 						por.setChargeCount(0l);
-						
+
 						charge.add(por);
 					}
 				});
@@ -165,7 +172,6 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 				charge.forEach(c -> {
 					partnerORMapper.updateByPrimaryKeySelective(c);
 				});
-
 			}
 		
 		
@@ -190,7 +196,7 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 					String key = RedisKey.PARTNER_OR_KEY_PREFIX
 							+ por.getPartnerCode();
 					log.info("key:{}|exist:{}|value:{}", key,
-							redisSingle.exist(key), redisSingle.get(key));
+							 redis.getStringValue(key));
 				});
 			}
 		} catch (Exception e)
@@ -216,5 +222,11 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 		}
 
 		return null;
+	}
+	
+	
+	public static void main(String[] ag)
+	{
+		System.out.println(11l - 10l - Long.valueOf(-69));
 	}
 }

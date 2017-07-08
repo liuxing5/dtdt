@@ -14,7 +14,7 @@
   </resultMap>
 
   <sql id="Base_Column_List" >
-    batch_id, partner_code, pre_count, use_count, charge_count, create_user, create_time, end_time
+    batch_id, partner_code, pre_count, use_count, charge_count, create_user, warn_threshold, create_time, end_time
   </sql>
   
   <select id="getAll" resultMap="BaseResultMap">
