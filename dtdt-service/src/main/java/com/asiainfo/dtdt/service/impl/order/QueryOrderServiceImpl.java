@@ -73,6 +73,9 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			//需求：只返回订购成功的，只查询orderRecord表
 			List<OrderRecord> orderRecordList = orderRecordMapper.queryOrderRecord(phone, appkey);
 			log.info("OrderServiceImpl queryOrderState() orderRecordList=" + orderRecordList);
+			if (orderRecordList.size() == 0) {
+				return ReturnUtil.returnJsonInfo(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+			}
 //			data.put("successOrders", orderRecordList);
 			
 			//订购失败信息在历史订购关系表
