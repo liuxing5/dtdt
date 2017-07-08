@@ -127,11 +127,11 @@ public class NotcieServiceImpl implements INoticeService {
 		try {
 			Order order = orderMapper.queryOrderByWoOrderId(orderId);
 			if(order == null){
-				log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat option;");
+				log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat orderState="+resultCode);
 			}else{
 				OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
 				if(orderRecord == null){
-					log.info("NoticeService optNoticeOrder queryOrderRecord is null by orderId="+orderId+" woPlat option;");
+					log.info("NoticeService optNoticeOrder queryOrderRecord is null by orderId="+orderId+";");
 				}else{
 					if(resultCode.equals("2")){//订购成功
 						log.info("NoticeService optNoticeOrder wojia return resultCode 2-订购成功");
