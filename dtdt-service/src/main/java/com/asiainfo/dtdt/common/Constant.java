@@ -36,6 +36,11 @@ public class Constant {
 	/**参数为空错误描述**/
 	public static final String PARAM_NULL_MSG		= "参数为空";
 	
+	/**合作方信息错误码**/
+	public static final String PARTNER_ERROR_CODE		= "10001";
+	/**合作方信息错误描述**/
+	public static final String PARTNER_ERROR_MSG		= "合作伙伴信息错误";
+	
 	/**参数长度错误码**/
 	public static final String PARAM_LENGTH_CODE	= "10100";
 	/**参数长度错误描述**/

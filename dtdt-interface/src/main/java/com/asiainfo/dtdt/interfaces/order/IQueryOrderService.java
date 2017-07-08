@@ -16,7 +16,7 @@ public interface IQueryOrderService {
 	* @return String
 	* @throws
 	 */
-	String queryOrderRecord(String phone, String appkey);
+	String queryOrderRecord(String phone, String appkey, String partnerCode);
 	
 	/**
 	* @Title: queryOrderState 
@@ -25,5 +25,5 @@ public interface IQueryOrderService {
 	* @return String
 	* @throws
 	 */
-	String queryOrderState(String orderId);
+	String queryOrderState(String orderId, String appkey, String partnerCode);
 }

@@ -36,6 +36,7 @@ import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
+import com.asiainfo.dtdt.entity.Partner;
 import com.asiainfo.dtdt.entity.PartnerOrderResources;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.WoplatOrder;
@@ -48,11 +49,13 @@ import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
 import com.asiainfo.dtdt.service.IPartnerOrderResourcesService;
+import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.BatchOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
+import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
 import com.huawei.insa2.util.SGIPSendMSGUtil;
@@ -122,6 +125,13 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Resource
 	private SMSContentConfig smsContentConfig;
+	
+	
+	@Autowired
+	private AppMapper appMapper;
+	
+	@Autowired
+	private PartnerMapper partnerMapper;
 	
 	/**
 	 * (非 Javadoc) 
@@ -1336,6 +1346,11 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
 		}
 		
+		//校验合作方信息
+		if (checkPartner(appkey, partnerCode)) {
+			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
+		}
+		
 		//查询订购关系表：校验包月类订购为成功，只限包月类产产品
 		OrderRecord orderRecord = null;
 		try {
@@ -1457,6 +1472,11 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
 		}
 		
+		//校验合作方信息
+		if (checkPartner(appkey, partnerCode)) {
+			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
+		}
+		
 		//查询订购关系表：不校验包月类
 		OrderRecord orderRecord = null;
 		try {
@@ -1551,6 +1571,23 @@ public class OrderServiceImpl implements IOrderService{
 			}
 		}
 		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG + ":" + msg, null);
+	}
+	
+	/**
+	* @Title: checkPartner 
+	* @Description: 校验合作方信息
+	* @param appkey
+	* @param partnerCode
+	* @return boolean
+	* @throws
+	 */
+	private boolean checkPartner(String appkey, String partnerCode) {
+		App app = appMapper.queryAppInfo(appkey);
+		Partner partner = partnerMapper.selectByPrimaryKey(app.getPartnerId());
+		if (!partner.getPartnerCode().equals(partnerCode)) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**

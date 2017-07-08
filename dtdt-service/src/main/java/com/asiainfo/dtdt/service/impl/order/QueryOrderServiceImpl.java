@@ -11,17 +11,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
-import com.asiainfo.dtdt.common.util.DateUtil;
+import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
+import com.asiainfo.dtdt.entity.Partner;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
+import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
+import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 
 import lombok.extern.log4j.Log4j2;
@@ -45,6 +48,12 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	@Autowired
 	private ProductMapper productMapper;
 	
+	@Autowired
+	private AppMapper appMapper;
+	
+	@Autowired
+	private PartnerMapper partnerMapper;
+	
 	/**
 	* @Title: queryOrderRecord 
 	* @Description: 查询订购信息服务
@@ -53,7 +62,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	* @throws
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public String queryOrderRecord(String phone, String appkey) {
+	public String queryOrderRecord(String phone, String appkey, String partnerCode) {
 		
 		log.info("OrderServiceImpl queryOrderRecord() phone=" + phone + " appkey=" + appkey);
 		
@@ -67,6 +76,11 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		
 		if (!IsMobileNo.isMobile(phone)) {
 			return ReturnUtil.returnJsonList(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+		}
+		
+		//校验合作方信息
+		if (checkPartner(appkey, partnerCode)) {
+			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
 		try {
@@ -113,7 +127,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	* @return String
 	* @throws
 	 */
-	public String queryOrderState(String orderId) {
+	public String queryOrderState(String orderId, String appkey, String partnerCode) {
 		log.info("OrderServiceImpl queryOrderState() orderId=" + orderId);
 		
 		if (StringUtils.isEmpty(orderId)) {
@@ -122,6 +136,11 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		
 		if (orderId.length() != 32) {
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+		}
+		
+		//校验合作方信息
+		if (checkPartner(appkey, partnerCode)) {
+			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
 		try {
@@ -226,7 +245,23 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		} catch (Exception e) {
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-		
+	}
+	
+	/**
+	* @Title: checkPartner 
+	* @Description: 校验合作方信息
+	* @param appkey
+	* @param partnerCode
+	* @return boolean
+	* @throws
+	 */
+	private boolean checkPartner(String appkey, String partnerCode) {
+		App app = appMapper.queryAppInfo(appkey);
+		Partner partner = partnerMapper.selectByPrimaryKey(app.getPartnerId());
+		if (!partner.getPartnerCode().equals(partnerCode)) {
+			return false;
+		}
+		return true;
 	}
 
 }
