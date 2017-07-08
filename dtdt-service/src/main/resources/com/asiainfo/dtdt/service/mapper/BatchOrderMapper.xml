@@ -30,6 +30,20 @@
     from t_s_batch_order
     where batch_id = #{batchId,jdbcType=VARCHAR}
   </select>
+  
+  <select id="getBatchOrder" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+     <include refid="Base_Column_List" />
+    FROM t_s_batch_order bo
+    WHERE bo.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getBatchOrderCountByPOID" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    SELECT 
+     COUNT(1)
+    FROM t_s_batch_order bo
+    WHERE bo.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR}
+  </select>
 
   <select id="selectByStatement" resultMap="BaseResultMap" parameterType="com.asiainfo.dtdt.entity.BatchOrder" >
     select 
@@ -234,7 +248,11 @@
     where batch_id = #{batchId,jdbcType=VARCHAR}
   </update>
   <update id="updateBatchOrderState" parameterType="java.lang.String" >
-  
+	UPDATE t_s_batch_order bo,(SELECT COUNT(1) num 
+	FROM t_s_his_order ho 
+	    WHERE ho.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR}) h
+	SET bo.`state` = IF(h.num = bo.`mobilephones_count`,1,bo.`state`)
+	WHERE bo.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR}
   </update>
 
 </mapper>

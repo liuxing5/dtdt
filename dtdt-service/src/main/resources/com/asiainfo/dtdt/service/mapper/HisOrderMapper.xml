@@ -41,6 +41,13 @@
     from t_s_his_order
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
+  
+  <select id="getListByPartnerOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    FROM t_s_his_order ho
+    WHERE ho.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR}
+  </select>
   <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.HisOrder" >
     insert into t_s_his_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
