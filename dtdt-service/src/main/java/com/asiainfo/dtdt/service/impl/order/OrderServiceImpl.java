@@ -954,6 +954,14 @@ public class OrderServiceImpl implements IOrderService{
 		if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
 			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
 		}
+		/**校验接口中传递的参数是否合法  start*/
+		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
+		}else{
+			if(1 == existPartnerOrderId(partnerOrderId)){
+				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
+			}
+		}
 		/**校验验证码是否正确 start*/
 		String vcodeKey = RedisKey.SMSC+"_"+partnerCode+"_"+appkey+"_"+phone;
 		String redisVcode = redisAssistant.getStringValue(vcodeKey);
