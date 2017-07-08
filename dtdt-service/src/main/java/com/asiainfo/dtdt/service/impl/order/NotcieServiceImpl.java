@@ -58,9 +58,6 @@ public class NotcieServiceImpl implements INoticeService {
 	@Autowired
 	private OrderRecordMapper orderRecordMapper;
 	
-	@Autowired
-	private HisOrderMapper hisOrderMapper;
-	
 	@Autowired 
 	private IChargeService chargeService;
 	
@@ -75,7 +72,10 @@ public class NotcieServiceImpl implements INoticeService {
 	
 	@Autowired
 	private ProductMapper productMapper;
-
+	
+	@Autowired
+	private HisOrderMapper hisOrderMapper;
+	
 	@Autowired
 	private BatchOrderMapper batchOrderMapper;
 	
@@ -136,59 +136,79 @@ public class NotcieServiceImpl implements INoticeService {
 		log.info("begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
 		try {
 			Order order = orderMapper.queryOrderByWoOrderId(orderId);
-			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
-			if(resultCode.equals("2")){//订购成功
-				log.info("NoticeService optNoticeOrder wojia return resultCode 2-订购成功");
-				//沃家总管异步回调返回订购成功，我们需要生成订购关系，并且反冲话费
-				/**调用反冲话费 start**/
-				/*if(Constant.IS_NEED_CHARGE_0 == order.getIsNeedCharge()){
-					chargeService.backChargeBill(orderId,Integer.parseInt(String.valueOf(order.getMoney())) , order.getMobilephone());
-				}*/
-				/**调用反冲话费 end**/
-				orderService.updateOrder(order.getOrderId(), null, "11", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-				String pcStr = order.getProductCode().substring(2, 4);//当前订购流量包
-				byte cycleType = 0;
-				if(Constant.CYCLE_TYPE_01.equals(pcStr)){//包月
-					//判断wojia总管订购流量包为包月并且当前也为包月流量包
-					cycleType = 0;
-				}else if(Constant.CYCLE_TYPE_02.equals(pcStr)){//包半年
-					//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
-					cycleType = 1;
-				}else if(Constant.CYCLE_TYPE_03.equals(pcStr)){//包年
-					//判断wojia总管订购流量包为包年并且当前也为包年流量包
-					cycleType = 2;
-				}
-				orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
-				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
-				/**订购成功回调通知**/
-				if(isBatchOrder(order.getPartnerOrderId())){//批量订单和单个分开通知
-					BatchOrder batchOrder = null;
-					if(StringUtils.isNotBlank(order.getPartnerOrderId())){
-						orderService.updateBatchOrderState(order.getPartnerOrderId());
-						batchOrder = getBatchOrder(order.getPartnerOrderId());
-						if(BatchOrder.STATE_END.equals(batchOrder.getState())){
-							dtdtNoticeBatchOrder(batchOrder);
+			if(order == null){
+				log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat orderState="+resultCode);
+			}else{
+				if(order.getOperType() == 1){
+					if(resultCode.equals("2")){//订购成功
+						log.info("NoticeService optNoticeOrder wojia return resultCode 2-订购成功");
+						//沃家总管异步回调返回订购成功，我们需要生成订购关系，并且反冲话费
+						/**调用反冲话费 start**/
+						/*if(Constant.IS_NEED_CHARGE_0 == order.getIsNeedCharge()){
+							chargeService.backChargeBill(orderId,Integer.parseInt(String.valueOf(order.getMoney())) , order.getMobilephone());
+						}*/
+						/**调用反冲话费 end**/
+						orderService.updateOrder(order.getOrderId(), null, "11", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+						String pcStr = order.getProductCode().substring(2, 4);//当前订购流量包
+						byte cycleType = 0;
+						if(Constant.CYCLE_TYPE_01.equals(pcStr)){//包月
+							//判断wojia总管订购流量包为包月并且当前也为包月流量包
+							cycleType = 0;
+						}else if(Constant.CYCLE_TYPE_02.equals(pcStr)){//包半年
+							//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
+							cycleType = 1;
+						}else if(Constant.CYCLE_TYPE_03.equals(pcStr)){//包年
+							//判断wojia总管订购流量包为包年并且当前也为包年流量包
+							cycleType = 2;
 						}
+						orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
+						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
+
+						/**订购成功回调通知**/
+						if(isBatchOrder(order.getPartnerOrderId())){//批量订单和单个分开通知
+							BatchOrder batchOrder = null;
+							if(StringUtils.isNotBlank(order.getPartnerOrderId())){
+								orderService.updateBatchOrderState(order.getPartnerOrderId());
+								batchOrder = getBatchOrder(order.getPartnerOrderId());
+								if(BatchOrder.STATE_END.equals(batchOrder.getState())){
+									dtdtNoticeBatchOrder(batchOrder);
+								}
+							}else{
+								log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
+							}
+						}else{					
+							noticeService.dtdtNoticeOrder(order.getOrderId());
+						}
+						
+					}else if(resultCode.equals("6")){//订购失败
+						log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
+						//订购失败更新在途表状态5-订购失败待原路退款
+						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
+						/**订购失败回调通知**/
+						noticeService.dtdtNoticeOrder(order.getOrderId());
 					}else{
-						log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
+						log.info("NoticeService optNoticeOrder return code is notSuccess and noError orderState="+resultCode +" orderId="+orderId);
 					}
-				}else{					
-					noticeService.dtdtNoticeOrder(order.getOrderId());
+				}else{//处理退订的业务
+					OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
+					if(orderRecord == null){
+						log.info("NoticeService optNoticeOrder closeOrder queryOrderRecord is null by orderId="+order.getOrderId());
+					}else{
+						if(resultCode.equals("5")){//退订成功（可再订购）
+							log.info("NoticeService optNoticeOrder wojia return resultCode 5-退订成功（可再订购）");
+							//退订成功将订单关系数据转移到备份表中
+//								orderService.updateOrder(order.getOrderId(), null, "19", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+//								orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
+							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "19");
+						}else if(resultCode.equals("7")){//退订失败
+							log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
+							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
+						}
+						/**退订处理完成回调通知**/
+						noticeService.dtdtNoticeOrder(order.getOrderId());
+					}
 				}
-			}else if(resultCode.equals("5")){//退订成功（可再订购）
-				log.info("NoticeService optNoticeOrder wojia return resultCode 5-退订成功（可再订购）");
-				//退订成功将订单关系数据转移到备份表中
-//				orderService.updateOrder(order.getOrderId(), null, "19", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-//				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
-				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "19");
-			}else if(resultCode.equals("6")){//订购失败
-				log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
-				//订购失败更新在途表状态5-订购失败待原路退款
-				orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-				orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
-			}else if(resultCode.equals("7")){//退订失败
-				log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
-				orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
 			}
 		} catch (Exception e) {
 			log.error("NoticeService optNoticeOrder fail:"+e.getMessage(),e);
@@ -240,7 +260,35 @@ public class NotcieServiceImpl implements INoticeService {
 		}
 		
 	}
-	
+
+	/**
+	 * (非 Javadoc) 
+	* <p>Title: thirdPayNotice</p> 
+	* <p>Description: </p> 
+	* @param params
+	* @return 
+	* @see com.asiainfo.dtdt.interfaces.order.INoticeService#thirdPayNotice(java.lang.String)
+	 */
+	@Override
+	public boolean thirdPayNotice(String params) {
+		try {
+			JSONObject jsonParam = JSONObject.parseObject(params);
+			String orderId = jsonParam.getString("orderId");
+			String resultCode = jsonParam.getString("resultCode");
+			String thirdOrderId = jsonParam.getString("thirdOrderId");
+			/**更新充值状态 start**/
+			payOrderService.updatePayOrderStatusAfterPayNotify(resultCode, orderId,thirdOrderId);
+			/**更新充值状态 end**/
+			//订购数据沉淀
+			orderService.paySuccessOrderDeposition("SUCCESS", orderId);
+			//订购数据沉淀
+			return true;
+		} catch (Exception e) {
+			log.error("noticeService thirdPayNotice Exception:"+e.getMessage(),e);
+		}
+		return false;
+	}
+
 	public void dtdtNoticeBatchOrder(BatchOrder batchOrder) {
 		try {
 			App app = appMapper.queryAppInfo(batchOrder.getAppKey());
@@ -278,8 +326,19 @@ public class NotcieServiceImpl implements INoticeService {
 		}
 		
 	}
-	
-	public String noticeStateFormat(String state){
+
+	/**
+	 * 判断是否为批量订单
+	 */
+	public BatchOrder getBatchOrder(String partnerOrderId){
+		return batchOrderMapper.getBatchOrder(partnerOrderId);
+	}
+
+	public Boolean isBatchOrder(String partnerOrderId){
+		return batchOrderMapper.getBatchOrderCountByPOID(partnerOrderId) > 0;
+	}
+
+public String noticeStateFormat(String state){
 		switch (Integer.valueOf(state)) {
 		case 4: return "1";
 		case 5:case 6:case 7:case 8:case 15:case 16:case 17:case 18:return "4";
@@ -292,44 +351,5 @@ public class NotcieServiceImpl implements INoticeService {
 		case 99:return "8";
 		default:return "";
 		}
-	}
-
-	/**
-	 * (非 Javadoc) 
-	* <p>Title: thirdPayNotice</p> 
-	* <p>Description: </p> 
-	* @param params
-	* @return 
-	* @see com.asiainfo.dtdt.interfaces.order.INoticeService#thirdPayNotice(java.lang.String)
-	 */
-	@Override
-	public boolean thirdPayNotice(String params) {
-		try {
-			JSONObject jsonParam = JSONObject.parseObject(params);
-			String orderId = jsonParam.getString("orderId");
-			String resultCode = jsonParam.getString("resultCode");
-			String thirdOrderId = jsonParam.getString("thirdOrderId");
-			/**更新充值状态 start**/
-			payOrderService.updatePayOrderStatusAfterPayNotify(resultCode, orderId,thirdOrderId);
-			/**更新充值状态 end**/
-			//订购数据沉淀
-			orderService.paySuccessOrderDeposition("SUCCESS", orderId);
-			//订购数据沉淀
-			return true;
-		} catch (Exception e) {
-			log.error("noticeService thirdPayNotice Exception:"+e.getMessage(),e);
-		}
-		return false;
-	}
-	
-	/**
-	 * 判断是否为批量订单
-	 */
-	public BatchOrder getBatchOrder(String partnerOrderId){
-		return batchOrderMapper.getBatchOrder(partnerOrderId);
-	}
-
-	public Boolean isBatchOrder(String partnerOrderId){
-		return batchOrderMapper.getBatchOrderCountByPOID(partnerOrderId) > 0;
 	}
 }

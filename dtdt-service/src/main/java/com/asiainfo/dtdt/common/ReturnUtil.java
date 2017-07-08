@@ -49,7 +49,7 @@ public class ReturnUtil {
 		{
 			json.put("data", null);
 		}else{
-			json.put("data", json.parse(json.toJSONString(data, mapping)));
+			json.put("data", json.parse(json.toJSONString(data, mapping, SerializerFeature.DisableCircularReferenceDetect)));
 		}
 		return json.toString();
 	}
@@ -77,7 +77,7 @@ public class ReturnUtil {
 		{
 			json.put("data", null);
 		}else{
-			json.put("data", json.parse(json.toJSONString(data, mapping)));
+			json.put("data", json.parse(json.toJSONString(data, mapping, SerializerFeature.DisableCircularReferenceDetect)));
 		}
 		return json.toString();
 	}
@@ -130,7 +130,7 @@ public class ReturnUtil {
 		{
 			json.put("data", null);
 		}else{
-			json.put("data", json.parse(json.toJSONString(obj, mapping)));
+			json.put("data", json.parse(json.toJSONString(obj, mapping, SerializerFeature.DisableCircularReferenceDetect)));
 		}
 		return json.toString();
 	}

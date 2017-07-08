@@ -64,5 +64,16 @@ public interface OrderRecordMapper {
  	* @return OrderRecord
  	* @throws
  	 */
- 	OrderRecord selectMonthProduct(@Param("orderId")String orderId, @Param("appkey")String appkey);
+ 	OrderRecord selectMonthProduct(@Param("orderId")String orderId, @Param("appkey")String appkey, @Param("partnerCode")String partnerCode);
+ 	
+ 	/**
+ 	* @Title: selectMonthProduct 
+ 	* @Description: 校验订购
+ 	* @param orderId
+ 	* @param appkey
+ 	* @return OrderRecord
+ 	* @throws
+ 	 */
+ 	OrderRecord selectOrderRecord(@Param("orderId")String orderId, @Param("appkey")String appkey, @Param("partnerCode")String partnerCode);
+ 	
 }
