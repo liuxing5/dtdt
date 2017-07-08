@@ -1,10 +1,14 @@
 package com.asiainfo.dtdt.service.impl.order;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+
+import lombok.extern.log4j.Log4j2;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +26,14 @@ import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.common.util.MD5Util;
 import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.UuidUtil;
+import com.asiainfo.dtdt.config.redis.RedisUtil;
+import com.asiainfo.dtdt.config.sms.SMSContentConfig;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
+import com.asiainfo.dtdt.entity.PartnerOrderResources;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
@@ -37,12 +44,12 @@ import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
+import com.asiainfo.dtdt.service.IPartnerOrderResourcesService;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
-
-import lombok.extern.log4j.Log4j2;
+import com.huawei.insa2.util.SGIPSendMSGUtil;
 
 /** 
 * @author 作者 : xiangpeng
@@ -61,6 +68,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Resource
 	private RedisAssistant redisAssistant;
+	
+	@Resource
+	private RedisUtil redisSingle;
 	
 	@Autowired
 	private OrderMapper orderMapper;
@@ -94,6 +104,12 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private INoticeService noticeService;
+	
+	@Resource
+	private IPartnerOrderResourcesService pORService;
+	
+	@Resource
+	private SMSContentConfig smsContentConfig;
 	
 	/**
 	 * (非 Javadoc) 
@@ -231,18 +247,23 @@ public class OrderServiceImpl implements IOrderService{
 	 * 后向流量单个订购
 	 */
 	@Override
-	public String postfixOrder(String jsonStr) {
+	public String postfixOrder(String jsonStr)
+	{
 		//参数校验
 		log.info("OrderServiceImpl postfixOrder() jsonStr:" + jsonStr);
 		JSONObject jsonObject = null;
-		/**获取接口中传递的参数  start*/
-		try {
-			jsonObject =JSONObject.parseObject(jsonStr);
-		} catch (Exception e) {
-			log.error("orderService postfixOrder check param is json error；"+e.getMessage(),e);
-			e.printStackTrace();
-			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		/** 获取接口中传递的参数 start */
+		try
+		{
+			jsonObject = JSONObject.parseObject(jsonStr);
+		} catch (Exception e)
+		{
+			log.error("orderService postfixOrder check param is json error；"
+					+ e.getMessage(), e);
+			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE,
+					Constant.PARAM_ILLEGAL_MSG, null);
 		}
+		
 		String seq = null;
 		String partnerCode = null;
 		String appKey = null;
@@ -250,125 +271,314 @@ public class OrderServiceImpl implements IOrderService{
 		String productCode = null;
 		String orderMethod = null;
 		String partnerOrderId = null;
-		
-		try {
+
+		try
+		{
 			seq = jsonObject.getString("seq");
-//			partnerCode = jsonObject.getString("partnerCode").toString();
-//			appKey = jsonObject.getString("appKey").toString();
-			partnerCode = "1234543245";
-			appKey = "fwerh4356ytrt54";
-			phone = jsonObject.getString("phone").toString();
-			productCode = jsonObject.getString("productCode").toString();
+			partnerCode = jsonObject.getString("partnerCode");
+			appKey = jsonObject.getString("appkey");
+			phone = jsonObject.getString("phone");
+			productCode = jsonObject.getString("productCode");
 			orderMethod = jsonObject.get("orderMethod").toString();
 			partnerOrderId = jsonObject.get("partnerOrderId").toString();
-		} catch (NullPointerException e) {
-			log.error("get param error is null");
-			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
-		}
-		/**获取接口中传递的参数  end*/
-		/**校验接口中传递的参数是否合法  start*/
-		if (StringUtils.isBlank(seq)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (StringUtils.isBlank(partnerCode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (StringUtils.isBlank(appKey)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (StringUtils.isBlank(phone)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (!IsMobileNo.isMobile(phone)) {
-			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-		}
-		if (StringUtils.isBlank(productCode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (StringUtils.isBlank(orderMethod)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
-		}
-		if(StringUtils.isBlank(partnerOrderId)){
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
-		}
-		/**校验验证码是否正确 start*/
-		//是否可以订购
-//		if(true){//如果不能订购返回原因
-//			return null;
-//		}
-		
-		//订购后向流量
-		/**处理业务开始*/
-		
-		/**查询产品价格信息 start**/
-		String strProduct = productService.queryProduct(productCode);
-		if(StringUtils.isBlank(strProduct)){
-			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
-		}
-		Product product = JSONObject.parseObject(strProduct, Product.class);
-		/**查询产品价格信息 end**/
-		/**检查是否存在互斥产品并存储在途数据**/
-		Order order = null;
-		//记录订购在途表
-		order = order(appKey, partnerCode, partnerOrderId, phone, product, orderMethod,"0",null,"4");//待订购
-		//发沃家起订购请求
-		int num = updateOrder(order.getOrderId(), null, "9", (byte)0, (byte)0);
-		String woResult = null;
-		if(num > 0){
-			woResult = postWoplatOrder(phone, product.getWoProductCode(), DateUtil.getDateTime(new Date()), order.getOrderChannel());
-		}
-		/**组装支付订单信息返回给接入商 start**/
-		JSONObject json = new JSONObject();
-		JSONObject woJson = JSONObject.parseObject(woResult);
-		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
-			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-			json.put("orderId", order.getOrderId());
-			json.put("status", order.getState());
-			json.put("money", order.getMoney());
-			json.put("createTime", order.getCreateTime());
-			List list = new ArrayList();
-			JSONObject listItem = new JSONObject();
-			listItem.put("productCode", order.getProductCode());
-			listItem.put("productName", product.getProductName());
-			listItem.put("productType", product.getCycleType());
-			listItem.put("status", order.getState());
-			listItem.put("price", order.getPrice());
-			listItem.put("count", order.getCount());
-			listItem.put("allowAutoPay", order.getAllowAutoPay());
-			listItem.put("validTime", order.getValidTime());
-			listItem.put("invalidTime", order.getInvalidTime());
-			list.add(listItem);
-			json.put("item", listItem);
-			/**组装支付订单信息返回给接入商 end**/
-			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
-		}
-		if(woJson.getString("ecode").equals(Constant.ERROR_CODE) || StringUtils.isBlank(woResult)){//请求沃家总管超时或者异常
+
+			String checkCR = checkCounts(partnerCode);
+			if(null != checkCR)
+			{
+				return checkCR;
+			}
+			
+			/** 获取接口中传递的参数 end */
+			/** 校验接口中传递的参数是否合法 start */
+			String checkpR = checkParam(seq, partnerCode, appKey, phone, productCode,
+					orderMethod, partnerOrderId);
+			if(null != checkpR)
+			{
+				return checkpR;
+			}
+			
+			/** 查询产品价格信息 start **/
+			String strProduct = productService.queryProduct(productCode);
+			if (StringUtils.isBlank(strProduct))
+			{
+				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE,
+						Constant.PRODUCT_EXISTENCE_MSG, null);
+			}
+			Product product = JSONObject.parseObject(strProduct, Product.class);
+			/** 查询产品价格信息 end **/
+			/** 检查是否存在互斥产品并存储在途数据 **/
+			Order order = null;
+			//记录订购在途表
+			order = order(appKey, partnerCode, partnerOrderId, phone, product,
+					orderMethod, "0", null, "4");//待订购
+			//发沃家起订购请求
+			int num = updateOrder(order.getOrderId(), null, "9", (byte) 0, (byte) 0);
+			String woResult = null;
+			if (num > 0)
+			{
+				woResult = postWoplatOrder(phone, product.getWoProductCode(),
+						DateUtil.getDateTime(new Date()), order.getOrderChannel());
+			}
+			/** 组装支付订单信息返回给接入商 start **/
+			JSONObject json = new JSONObject();
+			JSONObject woJson = JSONObject.parseObject(woResult);
+			if (woplatConfig.getWoplat_success_code().equals(
+					woJson.getString("ecode")))
+			{
+				updateOrder(order.getOrderId(), woJson.getString("orderId"), null,
+						Constant.IS_NEED_CHARGE_1,
+						Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+				
+				buildReturnJson(product, order, json);
+				
+				/** 组装支付订单信息返回给接入商 end **/
+				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE,
+						Constant.SUCCESS_MSG, json);
+			}
+			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
+					|| StringUtils.isBlank(woResult))
+			{//请求沃家总管超时或者异常
+				//更新在途订购订单状态7-订购失败
+				updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
+						Constant.IS_NEED_CHARGE_1,
+						Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+				//将在途表信息存放在备份表中
+				insertOrderBakAndDelOrder(order.getOrderId(), "0",
+						woJson.getString("emsg") + "),订购处理失败");
+				json.put("orderId", order.getOrderId());
+				return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
+						Constant.ORDER_ERROR_MSG, json.toString());
+			}
 			//更新在途订购订单状态7-订购失败
-			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+			updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
+					Constant.IS_NEED_CHARGE_1,
+					Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 			//将在途表信息存放在备份表中
-			insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
+			insertOrderBakAndDelOrder(order.getOrderId(), "0",
+					woJson.getString("emsg") + ",订购处理失败");
 			json.put("orderId", order.getOrderId());
-			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, json.toString());
+			String msg = buildMsgFromWoReturn(phone, product, woJson);
+			
+			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
+					Constant.ORDER_ERROR_MSG + msg, json.toString());
+			
+		} catch (NullPointerException e)
+		{
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE,
+					Constant.PARAM_ERROR_MSG, null);
 		}
-		//更新在途订购订单状态7-订购失败
-		updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-		//将在途表信息存放在备份表中
-		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
-		json.put("orderId", order.getOrderId());
-		String msg = null;
-		if(woJson.getString("ecode").equals("1405")){
-			msg = "用户 "+phone+" 不存在";
-		}else if(woJson.getString("ecode").equals("4000")){
-			msg = "产品 "+product.getProductName()+" 不存在或已失效";
-		}else if(woJson.getString("ecode").equals("4001")){
+		catch (Exception e)
+		{
+			log.error("get param error is null", e);
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE,
+					Constant.PARAM_ERROR_MSG, null);
+		}
+	}
+
+	private String checkCounts(String partnerCode)
+	{
+		String key = RedisKey.PARTNER_OR_KEY_PREFIX + partnerCode;
+
+		/*if (!redisSingle.exist(key))
+		{
+			
+			PartnerOrderResources por = pORService.loadByPartnerCode(partnerCode);
+			if(null != por)
+			{
+				redisSingle.set(key, por.getPreCount().toString());
+				log.info("无可用次数！key不存在，key:{},load成功，预存次数{}", key, por.getPreCount());
+			}
+			else
+			{
+				log.info("无可用次数！key不存在，key:{},load无记录", key);
+				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
+						Constant.NO_ORDER_RESOURCE_MSG, null);
+			}
+			
+		}
+		Long count = Long.valueOf(redisSingle.get(key));
+		if (count == 0l)
+		{
+			log.info("订购次数已用完，key：{}", key);
+			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
+					Constant.NO_ORDER_RESOURCE_MSG, null);
+		}
+		log.info("使用一次key:{}", key);
+		redisSingle.incrBy(key, -1);*/
+		
+		/*集群方式*/
+		if (org.springframework.util.StringUtils.isEmpty(redisAssistant
+				.getStringValue(key)))
+		{
+
+			PartnerOrderResources por = pORService
+					.loadByPartnerCode(partnerCode);
+			if (null != por)
+			{
+				Long canUsedCount = por.getPreCount() - por.getWarnThreshold() - por.getUseCount();
+				if(!canUsedCount.equals(0l))
+				{
+					redisAssistant.setForever(key, canUsedCount.toString());
+					log.info("无可用次数！key不存在，key:{},load成功，预存次数{},告警阈值{},可用次数{}",
+							key, por.getPreCount(), por.getWarnThreshold(),
+							canUsedCount);
+				}
+				else
+				{
+					log.info("无可用次数！key不存在，key:{},load成功，但是无可用次数", key);
+					return ReturnUtil.returnJsonInfo(
+							Constant.NO_ORDER_RESOURCE_CODE,
+							Constant.NO_ORDER_RESOURCE_MSG, null);
+				}
+				
+			} else
+			{
+				log.info("无可用次数！key不存在，key:{},load无记录", key);
+				return ReturnUtil.returnJsonInfo(
+						Constant.NO_ORDER_RESOURCE_CODE,
+						Constant.NO_ORDER_RESOURCE_MSG, null);
+			}
+
+		}
+		Long count = Long.valueOf(redisAssistant.getStringValue(key));
+		if (count == 0l)
+		{
+			log.info("订购次数已用完，key：{}", key);
+			
+			
+			sendWarnMsg(partnerCode);
+			
+			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
+					Constant.NO_ORDER_RESOURCE_MSG, null);
+		}
+		log.info("使用一次key:{}", key);
+		redisAssistant.increateValue(key, -1);
+		
+		return null;
+	}
+
+	private void sendWarnMsg(String partnerCode)
+	{
+		String path = "";
+		if (System.getProperty("os.name").startsWith("win")
+				|| System.getProperty("os.name").startsWith("Win"))
+		{
+			path = OrderServiceImpl.class.getResource("/").getPath();
+		} else
+		{
+			path = System.getProperty("user.dir");
+		}
+		
+		String content = smsContentConfig.getPorMonitorSmsContent();
+		if (StringUtils.isEmpty(content))
+		{
+			content = "";
+		}
+		content = content.replace("{0}", String.valueOf(partnerCode));
+		SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
+		log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
+		String hkey = RedisKey.PARTNER_OR_WARN_KEY_PREFIX + partnerCode;
+		String phones = redisAssistant.hgetString(hkey,
+				RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE);
+		if (!org.springframework.util.StringUtils.isEmpty(phones))
+		{
+			log.info("send warn msg {}", phones);
+			List<String> phoneList = Arrays.asList(phones.split(","));
+			SGIPSendMSGUtil.sendMsg(phoneList, content);
+		}
+	}
+
+	private String buildMsgFromWoReturn(String phone, Product product,
+			JSONObject woJson)
+	{
+		String msg = "";
+		if (woJson.getString("ecode").equals("1405"))
+		{
+			msg = "用户 " + phone + " 不存在";
+		} else if (woJson.getString("ecode").equals("4000"))
+		{
+			msg = "产品 " + product.getProductName() + " 不存在或已失效";
+		} else if (woJson.getString("ecode").equals("4001"))
+		{
 			msg = "产品重复订购";
-		}else if(woJson.getString("ecode").equals("4002")){
+		} else if (woJson.getString("ecode").equals("4002"))
+		{
 			msg = "产品无法订购";
-		}else if(woJson.getString("ecode").equals("4005")){
+		} else if (woJson.getString("ecode").equals("4005"))
+		{
 			msg = "不能同时订购互斥产品";
 		}
-		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, json.toString());
+		return msg;
+	}
+
+	private void buildReturnJson(Product product, Order order, JSONObject json)
+	{
+		json.put("orderId", order.getOrderId());
+		json.put("status", order.getState());
+		json.put("money", order.getMoney());
+		json.put("createTime", order.getCreateTime());
+		List list = new ArrayList();
+		JSONObject listItem = new JSONObject();
+		listItem.put("productCode", order.getProductCode());
+		listItem.put("productName", product.getProductName());
+		listItem.put("productType", product.getCycleType());
+		listItem.put("status", order.getState());
+		listItem.put("price", order.getPrice());
+		listItem.put("count", order.getCount());
+		listItem.put("allowAutoPay", order.getAllowAutoPay());
+		listItem.put("validTime", order.getValidTime());
+		listItem.put("invalidTime", order.getInvalidTime());
+		list.add(listItem);
+		json.put("item", listItem);
+	}
+
+	private String checkParam(String seq, String partnerCode, String appKey,
+			String phone, String productCode, String orderMethod,
+			String partnerOrderId)
+	{
+		if (StringUtils.isBlank(seq))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"
+					+ Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(partnerCode))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
+					"partnerCode" + Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(appKey))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
+					"appKey" + Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(phone))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"
+					+ Constant.PARAM_NULL_MSG, null);
+		}
+		if (!IsMobileNo.isMobile(phone))
+		{
+			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
+					Constant.NOT_UNICOM_MSG, null);
+		}
+		if (StringUtils.isBlank(productCode))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
+					"productCode" + Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(orderMethod))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
+					"orderMethod" + Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(partnerOrderId))
+		{
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
+					"partnerOrderId" + Constant.PARAM_NULL_MSG, null);
+		}
 		
+		return null;
 	}
 
 	/**
@@ -827,17 +1037,7 @@ public class OrderServiceImpl implements IOrderService{
 		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
 //		json.put("orderId", order.getOrderId());
 		String msg = null;
-		if(woJson.getString("ecode").equals("1405")){
-			msg = "用户 "+phone+" 不存在";
-		}else if(woJson.getString("ecode").equals("4000")){
-			msg = "产品 "+product.getProductName()+" 不存在或已失效";
-		}else if(woJson.getString("ecode").equals("4001")){
-			msg = "产品重复订购";
-		}else if(woJson.getString("ecode").equals("4002")){
-			msg = "产品无法订购";
-		}else if(woJson.getString("ecode").equals("4005")){
-			msg = "不能同时订购互斥产品";
-		}
+		msg = buildMsgFromWoReturn(phone, product, woJson);
 		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, null);
 	}
 	

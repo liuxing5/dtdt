@@ -118,6 +118,9 @@ public class Constant {
 	/**订单不存在编码描述**/
 	public static final String NO_ORDER_MSG	=	"订单不存在";
 	
+	public static final String NO_ORDER_RESOURCE_CODE	=	"40011";
+	public static final String NO_ORDER_RESOURCE_MSG	=	"没有订购资源";
+	
 	/**定向流量产品第二三位表示产品周期*/
 	/**包月**/
 	public static final String CYCLE_TYPE_01	=	"01";

@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,7 +23,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
 import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
-import com.asiainfo.dtdt.config.RedisUtil;
 import com.asiainfo.dtdt.entity.ResponseCode;
 import com.asiainfo.dtdt.entity.ResponseData;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
@@ -156,6 +154,7 @@ public class AuthFilter implements Filter{
 	@SuppressWarnings("rawtypes")
 	private JSONObject checkCommonParam(JSONObject requestJson)
 	{
+		
 		JSONObject checkResult = new JSONObject();
 		try
 		{
