@@ -1,4 +1,4 @@
-package com.asiainfo.dtdt.config;
+package com.asiainfo.dtdt.config.sms;
 
 import lombok.Data;
 
@@ -20,4 +20,6 @@ public class SMSContentConfig {
 
 	// 验证短信码内容
 	private String codeContent;
+	// 合作方订购资源监控告警内容
+	private String porMonitorSmsContent;
 }

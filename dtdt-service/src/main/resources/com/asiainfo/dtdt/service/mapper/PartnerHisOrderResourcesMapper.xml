@@ -4,15 +4,17 @@
   <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.entity.PartnerHisOrderResources" >
     <id column="batch_id" property="batchId" jdbcType="VARCHAR" />
     <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
-    <result column="pre_count" property="preCount" jdbcType="TINYINT" />
-    <result column="use_count" property="useCount" jdbcType="TINYINT" />
+    <result column="pre_count" property="preCount" jdbcType="BIGINT" />
+    <result column="use_count" property="useCount" jdbcType="BIGINT" />
+    <result column="charge_count" property="chargeCount" jdbcType="BIGINT" />
+    <result column="warn_threshold" property="warnThreshold" jdbcType="BIGINT" />
     <result column="create_user" property="createUser" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <sql id="Base_Column_List" >
-    batch_id, partner_code, pre_count, use_count, create_user, create_time, end_time
+    batch_id, partner_code, pre_count, use_count, charge_count, warn_threshold, create_user, create_time, end_time
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -31,10 +33,10 @@
          and partner_code = #{partnerCode,jdbcType=VARCHAR}
       </if>
       <if test="preCount != null" >
-         and pre_count = #{preCount,jdbcType=TINYINT}
+         and pre_count = #{preCount,jdbcType=BIGINT}
       </if>
       <if test="useCount != null" >
-         and use_count = #{useCount,jdbcType=TINYINT}
+         and use_count = #{useCount,jdbcType=BIGINT}
       </if>
       <if test="createUser != null" >
          and create_user = #{createUser,jdbcType=VARCHAR}
@@ -57,8 +59,8 @@
     insert into t_s_partner_his_order_resources (batch_id, partner_code, pre_count, 
       use_count, create_user, create_time, 
       end_time)
-    values (#{batchId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, #{preCount,jdbcType=TINYINT}, 
-      #{useCount,jdbcType=TINYINT}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{batchId,jdbcType=VARCHAR}, #{partnerCode,jdbcType=VARCHAR}, #{preCount,jdbcType=BIGINT}, 
+      #{useCount,jdbcType=BIGINT}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{endTime,jdbcType=TIMESTAMP})
   </insert>
 
@@ -95,10 +97,10 @@
         #{partnerCode,jdbcType=VARCHAR},
       </if>
       <if test="preCount != null" >
-        #{preCount,jdbcType=TINYINT},
+        #{preCount,jdbcType=BIGINT},
       </if>
       <if test="useCount != null" >
-        #{useCount,jdbcType=TINYINT},
+        #{useCount,jdbcType=BIGINT},
       </if>
       <if test="createUser != null" >
         #{createUser,jdbcType=VARCHAR},
@@ -119,10 +121,10 @@
         partner_code = #{partnerCode,jdbcType=VARCHAR},
       </if>
       <if test="preCount != null" >
-        pre_count = #{preCount,jdbcType=TINYINT},
+        pre_count = #{preCount,jdbcType=BIGINT},
       </if>
       <if test="useCount != null" >
-        use_count = #{useCount,jdbcType=TINYINT},
+        use_count = #{useCount,jdbcType=BIGINT},
       </if>
       <if test="createUser != null" >
         create_user = #{createUser,jdbcType=VARCHAR},
@@ -136,5 +138,13 @@
     </set>
     where batch_id = #{batchId,jdbcType=VARCHAR}
   </update>
+  
+  <insert id="copyFromInstance" parameterType="java.lang.String">
+      insert into t_s_partner_his_order_resources 
+      (select batch_id, partner_code, pre_count, use_count, charge_count, warn_threshold, create_user, create_time, end_time
+       from t_s_partner_order_resources
+       where batch_id = #{batchId,jdbcType=VARCHAR}
+       )
+  </insert>
 
 </mapper>

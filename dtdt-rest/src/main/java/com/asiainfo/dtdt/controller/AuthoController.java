@@ -3,7 +3,6 @@ package com.asiainfo.dtdt.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.File;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -11,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +21,6 @@ import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.util.PhoneUtil;
 import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.SignUtil;
-import com.asiainfo.dtdt.config.RedisUtil;
 import com.asiainfo.dtdt.config.SMSContentConfig;
 import com.asiainfo.dtdt.entity.ResponseCode;
 import com.asiainfo.dtdt.entity.ResponseData;
@@ -48,9 +44,6 @@ public class AuthoController extends BaseController{
 
 	@Resource
 	private IAuthoService authoService;
-	
-	@Resource(name="redisObject")
-	private RedisTemplate<String, String> redisTemplate;
 	
 	@Resource
 	private RedisAssistant redis;

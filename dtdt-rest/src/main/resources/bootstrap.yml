@@ -4,4 +4,4 @@ spring:
   cloud:
     zookeeper:
       enabled: true
-      connect-string: zkdtdt1.conf.com:51002,zkdtdt1.conf.com:51003,zkdtdt1.conf.com:51004
+      connect-string: 120.52.120.162:51002,120.52.120.162:51003,120.52.120.162:51004

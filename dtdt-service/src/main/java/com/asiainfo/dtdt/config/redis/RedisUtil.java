@@ -200,4 +200,12 @@ public class RedisUtil {
 		jedis.expire(key, seconds);
 		jedis.close();
 	}
+	
+	public void incrBy(String key, int num )
+	{
+		Jedis jedis = pool.getResource();
+		jedis.incrBy(key, num);
+		jedis.close();
+	
+	}
 }

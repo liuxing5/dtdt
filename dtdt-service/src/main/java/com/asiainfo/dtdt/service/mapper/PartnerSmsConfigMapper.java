@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import java.util.List;
+
 import com.asiainfo.dtdt.entity.PartnerSmsConfig;
 
 public interface PartnerSmsConfigMapper {
@@ -12,4 +14,6 @@ public interface PartnerSmsConfigMapper {
     PartnerSmsConfig selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(PartnerSmsConfig record);
+    
+    List<PartnerSmsConfig> loadAll();
 }

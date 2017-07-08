@@ -1,16 +1,12 @@
 dubbo:
   consumer:
     appname: dtdt-rest
-    group: elf
 spring:
   http:
     encoding:
       enabled: true
       charset: utf-8
       force: true
-  redis:
-    host: 120.52.120.162
-    port: 51005
 server:
   context-path: /dtdt-rest
   port: 8088

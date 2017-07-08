@@ -6,7 +6,7 @@
     <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
     <result column="contacts" property="contacts" jdbcType="VARCHAR" />
     <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
-    <result column="threshold" property="threshold" jdbcType="BIGINT" />
+    <result column="warn_threshold" property="warnThreshold" jdbcType="BIGINT" />
     <result column="mail" property="mail" jdbcType="VARCHAR" />
     <result column="create_user" property="createUser" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -17,6 +17,11 @@
     id, partner_code, contacts, mobilephone, threshold, mail, create_user, create_time, 
     end_time
   </sql>
+  
+  <select id="loadAll" resultMap="BaseResultMap">
+      select partner_code, mobilephone, warn_threshold, mail
+      from t_s_partner_sms_config 
+  </select>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 

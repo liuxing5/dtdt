@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import java.util.List;
+
 import com.asiainfo.dtdt.entity.PartnerOrderResources;
 
 public interface PartnerOrderResourcesMapper {
@@ -12,4 +14,8 @@ public interface PartnerOrderResourcesMapper {
     PartnerOrderResources selectByPrimaryKey(String batchId);
 
     int updateByPrimaryKeySelective(PartnerOrderResources record);
+    
+    List<PartnerOrderResources> getAll();
+    
+    List<PartnerOrderResources> getByPartnerCode(String partnerCode);
 }

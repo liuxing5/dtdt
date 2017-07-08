@@ -29,7 +29,7 @@ public class PartnerSmsConfig {
     /**
      * 告警阈值
      */
-    private Long threshold;
+    private Long warnThreshold;
 
     /**
      * 邮箱

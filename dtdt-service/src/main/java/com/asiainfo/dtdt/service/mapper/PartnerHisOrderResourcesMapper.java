@@ -12,4 +12,6 @@ public interface PartnerHisOrderResourcesMapper {
     PartnerHisOrderResources selectByPrimaryKey(String batchId);
 
     int updateByPrimaryKeySelective(PartnerHisOrderResources record);
+    
+    int copyFromInstance(String batchId);
 }

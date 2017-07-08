@@ -18,13 +18,23 @@ public class PartnerOrderResources {
     /**
      * 预存订购次数
      */
-    private Byte preCount;
+    private Long preCount;
 
     /**
-     * 失效后，使用了的次数
+     * 使用了的次数
      */
-    private Byte useCount;
-
+    private Long useCount;
+    
+    /**
+     * 充值次数
+     */
+    private Long chargeCount;
+    
+    /**
+     * 告警阈值
+     */
+    private Long warnThreshold;
+    
     /**
      * 创建者
      */

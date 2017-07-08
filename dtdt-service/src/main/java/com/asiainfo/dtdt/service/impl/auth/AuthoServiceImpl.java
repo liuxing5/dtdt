@@ -1,15 +1,13 @@
 package com.asiainfo.dtdt.service.impl.auth;
 
-import javax.annotation.Resource;
-
 import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.util.SignUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.Partner;
@@ -24,8 +22,6 @@ import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 public class AuthoServiceImpl implements IAuthoService
 {
 
-	@Resource(name="redisObject")
-	private RedisTemplate<?, ?> redisTemplate;
 	
 	@Autowired
 	private AppMapper appMapper;
@@ -34,7 +30,6 @@ public class AuthoServiceImpl implements IAuthoService
 	
 	public String getSMSCode(String phoneNum)
 	{
-		//redisTemplate.getStringSerializer();
 		return "hello elf!";
 	}
 
@@ -49,18 +44,18 @@ public class AuthoServiceImpl implements IAuthoService
 			if (null == partner
 					|| StringUtils.isEmpty(partner.getPartnerCode()))
 			{
-				return new ResponseData("20000", "partnerCode非法！");
+				return new ResponseData("20000", "partnerCode或appkey非法！");
 			}
 			String appkey = reqjson.getString("appkey");
 			App appinfo = appMapper.queryAppInfo(appkey);
 			if (null == appinfo || StringUtils.isEmpty(appinfo.getAppKey()))
 			{
-				return new ResponseData("20000", "appkey非法！");
+				return new ResponseData("20000", "partnerCode或appkey非法！");
 			}
 
 			if (!appinfo.getPartnerId().equals(partner.getPartnerId()))
 			{ 
-				return new ResponseData("20000", "partnerCode与appkey错误！");
+				return new ResponseData("20000", "partnerCode或appkey非法！");
 			}
 
 			// 验证签名
@@ -70,7 +65,7 @@ public class AuthoServiceImpl implements IAuthoService
 			if (!StringUtils.pathEquals(singstr,
 					reqjson.getString("appSignature")))
 			{
-				return new ResponseData("20000", "签名错误！");
+				return new ResponseData(Constant.PARAM_WRONG_SIGN, "签名错误！");
 			}
 		} catch (Exception e)
 		{

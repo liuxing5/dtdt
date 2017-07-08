@@ -103,12 +103,29 @@ public class SignUtil {
 		parameters.put("phone", "18516222335");
 		System.out.println(createSign(parameters, "utf-8"));
 		
+		/**
+		 * {
+	"seq":"1234543245",
+	"phone":"18516222338"，
+	"productCode":"100101",
+	"partnerOrderId":"3456432134567543456750",
+	"orderMethod":"1",
+	"partnerCode":"1234543245",
+"appkey":"fwerh4356ytrt54",
+"timestamp":"1499443544141",
+"appSignature":"40BB9846E00D1D1C69B851264315BF8E"
+}
+		 */
 		parameters.put("partnerCode", "1234543245");
 		parameters.put("appkey", "fwerh4356ytrt54");
-		parameters.put("timestamp", "1499235630342");
+		parameters.put("timestamp", "1499443544141");
 		parameters.put("secret", "ewer5retyt");
-		parameters.put("phone", "18600000000");
-		parameters.put("appSignature", "956B6123531BA8269DD067271BA1E360");
+		parameters.put("phone", "18516222338");
+		parameters.put("seq", "1234543245");
+		parameters.put("productCode", "100101");
+		parameters.put("partnerOrderId", "3456432134567543456750");
+		parameters.put("orderMethod", "1");
+		
 		
 		System.out.println(createSign(parameters, "utf-8"));
 		System.out.println(new Date().getTime());
