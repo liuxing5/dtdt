@@ -111,6 +111,7 @@ public class NoticeController {
 	* @throws
 	 */
 	@RequestMapping("/test/partnerNotice")
+	@ResponseBody
 	public synchronized String partnerNotice(HttpServletRequest request, HttpServletResponse response){
 		log.info("**********合作方接收通知开始**********");
 		JSONObject resultJson = new JSONObject();
