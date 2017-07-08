@@ -14,4 +14,8 @@ public interface BatchOrderMapper {
     int updateByPrimaryKeySelective(BatchOrder record);
     
     int updateBatchOrderState(String batchOrderId);
+
+    BatchOrder getBatchOrder(String partnerOrderId);
+    
+    int getBatchOrderCountByPOID(String partnerOrderId);
 }

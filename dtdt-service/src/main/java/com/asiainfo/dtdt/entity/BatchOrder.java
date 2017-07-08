@@ -7,6 +7,10 @@ import lombok.Data;
 @Data
 public class BatchOrder implements Serializable{
 	private static final long serialVersionUID = 1L;
+	
+	public static final String STATE_INIT = "0";
+	public static final String STATE_END = "1";
+	
     /**
      * 批量订单ID
      */

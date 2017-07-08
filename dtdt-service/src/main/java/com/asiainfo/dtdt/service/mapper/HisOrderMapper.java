@@ -1,5 +1,7 @@
 package com.asiainfo.dtdt.service.mapper;
 
+import java.util.List;
+
 import com.asiainfo.dtdt.entity.HisOrder;
 
 public interface HisOrderMapper {
@@ -9,5 +11,7 @@ public interface HisOrderMapper {
     int insertSelective(HisOrder record);
 
     int updateByPrimaryKeySelective(HisOrder record);
+    
+    List<HisOrder> getListByPartnerOrderId(String partnerOrderId);
 
 }
