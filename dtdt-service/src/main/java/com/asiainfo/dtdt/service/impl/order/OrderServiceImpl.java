@@ -456,6 +456,16 @@ public class OrderServiceImpl implements IOrderService{
 			}
 
 		}
+		Long count = Long.valueOf(redisAssistant.getStringValue(key));
+		if (count == 0l)
+		{
+			log.info("订购次数已用完，key：{}", key);
+
+			sendWarnMsg(partnerCode);
+
+			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
+					Constant.NO_ORDER_RESOURCE_MSG, null);
+		}
 		log.info("使用一次key:{}", key);
 		redisAssistant.increateValue(key, -1);
 		

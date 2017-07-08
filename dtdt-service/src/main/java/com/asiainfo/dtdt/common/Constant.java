@@ -238,5 +238,11 @@ public class Constant {
      */
     public static final Integer RECHARGE_TIMEOUT_CODE		   		= 918;
     public static final String RECHARGE_TIMEOUT_MSG		   		= "充值超时";
+    
+    /**
+     * 历史订单表state 
+     */
+    public static final String HISORDER_STATE_NOT_UNICOM		   		= "99";
+    public static final String HISORDER_STATE_NOT_UNICOM_REMARK		   	= "非联通号码";
 
 }
