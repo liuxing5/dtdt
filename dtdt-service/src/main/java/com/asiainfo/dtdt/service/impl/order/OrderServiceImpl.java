@@ -1200,6 +1200,9 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
+		if(StringUtils.isBlank(product.getWoProductCode())){
+			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG+":"+product.getProductName(), null);
+		}
 		if(product.getType() == 1){
 			return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
 		}
