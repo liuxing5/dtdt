@@ -37,7 +37,7 @@ public class QueryOrderController {
 	@ResponseBody
 	public String queryOrder(HttpServletRequest request) {
 		log.info("OrderController queryOrderRecord() phone=" + request.getParameter("phone"));
-		return queryOrderService.queryOrderRecord(request.getParameter("phone"), request.getHeader("appkey"));
+		return queryOrderService.queryOrderRecord(request.getParameter("phone"), request.getHeader("appkey"), request.getHeader("partnerCode"));
 	}
 	
 	/**
@@ -50,6 +50,6 @@ public class QueryOrderController {
 	@ResponseBody
 	public String queryOrderState(HttpServletRequest request) {
 		log.info("OrderController queryOrderState() orderId=" + request.getParameter("orderId"));
-		return queryOrderService.queryOrderState(request.getParameter("orderId"));
+		return queryOrderService.queryOrderState(request.getParameter("orderId"), request.getHeader("appkey"), request.getHeader("partnerCode"));
 	}
 }

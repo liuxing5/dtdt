@@ -5,10 +5,12 @@ public interface IProductService {
 	/**
 	* @Title: getProductList 
 	* @Description: 查询可订购产品列表服务
+	* @param appkey
+	* @param partnerCode
 	* @return String
 	* @throws
 	 */
-	String getProductList(String appkey);
+	String getProductList(String appkey, String partnerCode);
 	
 	/**
 	 * 

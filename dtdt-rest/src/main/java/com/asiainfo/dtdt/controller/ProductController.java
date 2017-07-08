@@ -38,7 +38,7 @@ public class ProductController {
 	@RequestMapping(value="/getProductList")
 	@ResponseBody
 	public String getProductList(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        log.info("getProductList request.getHeader('appkey')=" + request.getHeader("appkey"));
-		return productService.getProductList(request.getHeader("appkey"));
+        log.info("getProductList request.getHeader('appkey')=" + request.getHeader("appkey") + " request.getHeader('appkey')=" + request.getHeader("partnerCode"));
+		return productService.getProductList(request.getHeader("appkey"), request.getHeader("partnerCode"));
 	}
 }
