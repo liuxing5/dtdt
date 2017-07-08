@@ -60,4 +60,6 @@ public class HisOrder implements Serializable {
 
 	private String redirectUrl;
 
+	private String allowAutoPay;
+
 }

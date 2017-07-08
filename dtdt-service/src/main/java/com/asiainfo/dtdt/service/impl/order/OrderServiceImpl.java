@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,6 +26,8 @@ import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.common.util.UuidUtil;
 import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.App;
+import com.asiainfo.dtdt.entity.BatchOrder;
+import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
@@ -37,11 +41,13 @@ import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
+import com.asiainfo.dtdt.service.mapper.BatchOrderMapper;
+import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
-
+import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
 import lombok.extern.log4j.Log4j2;
 
 /** 
@@ -64,6 +70,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private OrderMapper orderMapper;
+
+	@Autowired
+	private HisOrderMapper hisOrderMapper;
 	
 	@Autowired
 	private OrderRecordMapper orderRecordMapper;
@@ -73,6 +82,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private HisOrderRecordMapper hisOrderRecordMapper;
+	
+	@Autowired
+	private BatchOrderMapper batchOrderMapper;
 	
 	@Autowired
 	private ICodeService codeService;
@@ -243,7 +255,7 @@ public class OrderServiceImpl implements IOrderService{
 			e.printStackTrace();
 			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
 		}
-		String seq = null;
+//		String seq = null;
 		String partnerCode = null;
 		String appKey = null;
 		String phone = null;
@@ -252,11 +264,11 @@ public class OrderServiceImpl implements IOrderService{
 		String partnerOrderId = null;
 		
 		try {
-			seq = jsonObject.getString("seq");
-//			partnerCode = jsonObject.getString("partnerCode").toString();
-//			appKey = jsonObject.getString("appKey").toString();
-			partnerCode = "1234543245";
-			appKey = "fwerh4356ytrt54";
+//			seq = jsonObject.getString("seq");
+			partnerCode = jsonObject.getString("partnerCode");
+			appKey = jsonObject.getString("appKey");
+//			partnerCode = "1234543245";
+//			appKey = "fwerh4356ytrt54";
 			phone = jsonObject.getString("phone").toString();
 			productCode = jsonObject.getString("productCode").toString();
 			orderMethod = jsonObject.get("orderMethod").toString();
@@ -266,10 +278,16 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
 		}
 		/**获取接口中传递的参数  end*/
-		/**校验接口中传递的参数是否合法  start*/
-		if (StringUtils.isBlank(seq)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+		
+		boolean isBatch = false;
+		if(jsonObject.containsKey("isBatch")){
+			isBatch = jsonObject.getBoolean("isBatch");
 		}
+		
+		/**校验接口中传递的参数是否合法  start*/
+//		if (StringUtils.isBlank(seq)) {
+//			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+//		}
 		if (StringUtils.isBlank(partnerCode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -279,9 +297,7 @@ public class OrderServiceImpl implements IOrderService{
 		if (StringUtils.isBlank(phone)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
 		}
-		if (!IsMobileNo.isMobile(phone)) {
-			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-		}
+		
 		if (StringUtils.isBlank(productCode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -307,6 +323,17 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
 		/**查询产品价格信息 end**/
+		if (!IsMobileNo.isMobile(phone)) {
+			if(isBatch){//历史数据表中插入失败数据并返回
+				createHisOrder(appKey,partnerCode,partnerOrderId,
+						phone,product,orderMethod,null,
+						Constant.HISORDER_STATE_NOT_UNICOM,
+						Constant.HISORDER_STATE_NOT_UNICOM_REMARK);//入历史表
+				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+			}else{
+				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+			}
+		}
 		/**检查是否存在互斥产品并存储在途数据**/
 		Order order = null;
 		//记录订购在途表
@@ -369,6 +396,180 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, json.toString());
 		
+	}
+	
+	public void createHisOrder(String appKey,String partnerCode,String partnerOrderId,
+			String phone,Product product,String orderMethod,
+			String redirectUrl,String state,String copyRemark){
+		HisOrder hisOrder = new HisOrder();
+		hisOrder.setOrderId(BaseSeq.getLongSeq());//订购订单号
+		hisOrder.setPartnerCode(partnerCode);//合作方编码
+		hisOrder.setPartnerOrderId(partnerOrderId);//合作方订购订单ID
+		hisOrder.setProductCode(product.getProductCode());//定向流量产品编码
+		hisOrder.setOperType(Constant.ORDER_OPER_TYPE_0);//订购类型 订购：0，退订：1
+		hisOrder.setIsRealRequestWoplat(Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);//是否真实请求沃家总管
+		hisOrder.setState(state);//状态
+		hisOrder.setMobilephone(phone);//订购手机号码
+		hisOrder.setOrderChannel(orderMethod);//订购渠道
+		hisOrder.setCreateTime(new Date());//订购时间
+		hisOrder.setValidTime(new Date());//有效时间
+		hisOrder.setRedirectUrl(redirectUrl);//支付成功跳转URL
+		hisOrder.setPrice(product.getPrice());//产品价格
+		hisOrder.setCount(1);//订购数量
+		hisOrder.setMoney((long)product.getPrice()*hisOrder.getCount());//订单价格
+		hisOrder.setAllowAutoPay("1");
+		//根据接入方设置填写
+		/**查询接入方设置的信息 start**/
+		App app = JSONObject.parseObject(appService.queryAppInfo(appKey), App.class);
+		/**查询接入方设置的信息 end**/
+		hisOrder.setAppKey(appKey);//合作方产品ID
+		hisOrder.setIsNeedCharge(app.getIsNeedCharge());//是否需要返充话费
+		hisOrder.setCopyRemark(copyRemark);
+		
+		hisOrderMapper.insertSelective(hisOrder);
+	}
+	
+	/**
+	 * 后向流量批量订购
+	 */
+	@Override
+	public String batchPostfixOrder(String jsonStr) {
+		//参数校验
+		log.info("OrderServiceImpl postfixOrder() jsonStr:" + jsonStr);
+		JSONObject jsonObject = null;
+		/**获取接口中传递的参数  start*/
+		try {
+			jsonObject =JSONObject.parseObject(jsonStr);
+		} catch (Exception e) {
+			log.error("orderService postfixOrder check param is json error；"+e.getMessage(),e);
+			e.printStackTrace();
+			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		}
+//		String seq = null;
+		String partnerCode = null;
+		String appKey = null;
+		JSONArray phones = null;
+		String productCode = null;
+		String orderMethod = null;
+		String partnerOrderId = null;
+		
+		try {
+//			seq = jsonObject.getString("seq");
+			partnerCode = jsonObject.getString("partnerCode");
+			appKey = jsonObject.getString("appKey");
+//			partnerCode = "1234543245";
+//			appKey = "fwerh4356ytrt54";
+			phones = jsonObject.getJSONArray("phone");
+			productCode = jsonObject.getString("productCode");
+			orderMethod = jsonObject.getString("orderMethod").toString();
+			partnerOrderId = jsonObject.getString("partnerOrderId");
+		} catch (NullPointerException e) {
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}
+		
+		/**校验接口中传递的参数是否合法  start*/
+		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
+		}else{
+			if(1 == existPartnerOrderId(partnerOrderId)){
+				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
+			}
+		}
+		
+//		if (StringUtils.isBlank(seq)) {
+//			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
+//		}
+		if (StringUtils.isBlank(partnerCode)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(appKey)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "appKey"+Constant.PARAM_NULL_MSG, null);
+		}
+		
+		if(null == phones || phones.size() <= 0 ){
+			return ReturnUtil.returnJsonInfo(Constant.PHONES_ERROR_CODE, Constant.PHONES_ERROR_MSG, null);
+		}
+		
+		if(phones.size() > 50 ){
+			return ReturnUtil.returnJsonInfo(Constant.PHONES_TOO_LONG_CODE, Constant.PHONES_TOO_LONG_MSG, null);
+		}
+		
+//		if (!IsMobileNo.isMobile(phones)) {
+//			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
+//		}
+		if (StringUtils.isBlank(productCode)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
+		}
+		if (StringUtils.isBlank(orderMethod)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
+		}
+
+	
+		/**查询产品价格信息 start**/
+		String strProduct = productService.queryProduct(productCode);
+		if(StringUtils.isBlank(strProduct)){
+			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE, Constant.PRODUCT_EXISTENCE_MSG, null);
+		}
+		Product product = JSONObject.parseObject(strProduct, Product.class);
+		if(product.getType() != 1){
+			return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
+		}
+		BatchOrder batchOrder = null;
+		
+		batchOrder  = createBatchOrder(appKey, partnerCode, partnerOrderId,
+				phones.toJSONString(), product, phones.size());
+		
+		if(null == batchOrder){//创建失败
+			return ReturnUtil.returnJsonError(Constant.BATCH_ORDER_FAIL_CODE, Constant.BATCH_ORDER_FAIL_MSG
+					+ partnerOrderId, null);
+		}
+		
+		//创建线程拆单订购
+		BatchPostFixOrderThread boThread = new BatchPostFixOrderThread(batchOrder);
+		Thread t = new Thread(boThread);
+		t.start();
+				
+		//返回订单受理成功
+		JSONObject json = new JSONObject();
+		json.put("batchOrderId", batchOrder.getBatchId());
+		return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
+	}
+	public int existPartnerOrderId(String partnerOrderId){
+		return	orderMapper.existPartnerOrderId(partnerOrderId);
+	}
+	
+	/**
+	 * 创建批量订单
+	 * @param appKey
+	 * @param partnerCode
+	 * @param partnerOrderId
+	 * @param setMobilephones
+	 * @param product
+	 * @param state
+	 * @param mobilephonesCount
+	 * @return
+	 */
+	public BatchOrder createBatchOrder(String appKey,String partnerCode,String partnerOrderId,
+			String setMobilephones,Product product,Integer mobilephonesCount){
+		Date date = new Date();
+		BatchOrder batchOrder = new BatchOrder();
+		batchOrder.setBatchId(BaseSeq.getLongSeq());//订购订单号
+		batchOrder.setAppKey(appKey);
+		batchOrder.setPartnerCode(partnerCode);//合作方编码
+		batchOrder.setPartnerOrderId(partnerOrderId);//合作方订购订单ID
+		batchOrder.setProductCode(product.getProductCode());//定向流量产品编码
+		batchOrder.setOperType(Constant.ORDER_OPER_TYPE_0);//订购类型 订购：0，退订：1
+		batchOrder.setState("0");//初始状态0
+		batchOrder.setCreateTime(date);
+		batchOrder.setUpdateTime(date);
+		batchOrder.setPrice(product.getPrice());
+		batchOrder.setMobilephones(setMobilephones);
+		batchOrder.setMobilephonesCount(mobilephonesCount);
+		int i = batchOrderMapper.insert(batchOrder);
+		if(1 != i)
+			return null;
+		return batchOrder;
 	}
 
 	/**
@@ -1187,6 +1388,7 @@ public class OrderServiceImpl implements IOrderService{
 			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia closeOrder param:" + jsonObject.toString());
+//			result = HttpClientUtil.httpPost(woplatConfig.getOrderUrl(), jsonObject);
 			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
 			log.info("wojia closeOrder return result:"+result);
 		} catch (Exception e) {
@@ -1222,7 +1424,6 @@ public class OrderServiceImpl implements IOrderService{
 			orderRecord.setUpdateTime(date);
 			orderRecord.setRefundTime(date);
 			orderRecordMapper.updateOrderRecord(orderRecord);
-			
 			if ("19".equals(state)) {
 				orderRecord.setRemark("退订成功");
 				orderRecord.setRefundValidTime(DateUtil.getCurrentMonthEndTime(date));//月底
@@ -1233,5 +1434,10 @@ public class OrderServiceImpl implements IOrderService{
 			log.info("OrderServiceImpl closeOrderUpdateTable() Exception e=" + e);
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public int updateBatchOrderState(String batchOrderId) {
+		return batchOrderMapper.updateBatchOrderState(batchOrderId);
 	}
 }
