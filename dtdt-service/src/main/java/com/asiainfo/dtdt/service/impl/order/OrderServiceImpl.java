@@ -1339,7 +1339,7 @@ public class OrderServiceImpl implements IOrderService{
 		String emsg = wojiaJson.getString("emsg");
 		if("0".equals(ecode)){
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
-			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode);
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode + " emsg=" + emsg);
 			try {
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
@@ -1351,9 +1351,17 @@ public class OrderServiceImpl implements IOrderService{
 			}
 		} else {
 			//如果退订失败需返回失败原因
-			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder fail ecode=" + ecode);
-			data.put("failMsg", emsg);
-			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
+			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail ecode=" + ecode + " emsg=" + emsg);
+			//wojia返回一种信息： 	emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
+			try {
+				//t_s_order 表到 t_s_his_order 表
+				insertFromHisOrderById(orderId, "0", "退订失败 ecode=" + ecode + " emsg=" + emsg);
+				orderMapper.deleteByPrimaryKey(orderId);
+			} catch (Exception e) {
+				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail Exception e" + e);
+				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+			}
+			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, null);
 		} 
 	}
 	
@@ -1427,7 +1435,7 @@ public class OrderServiceImpl implements IOrderService{
 		String emsg = wojiaJson.getString("emsg");
 		if("0".equals(ecode)){
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
-			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order success ecode=" + ecode);
+			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order success ecode=" + ecode + " emsg=" + emsg);
 			try {
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getDateTime(orderRecord.getRefundTime()));
@@ -1439,9 +1447,18 @@ public class OrderServiceImpl implements IOrderService{
 			}
 		} else {
 			//如果退订失败需返回失败原因
-			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode);
-			data.put("failMsg", emsg);
-			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
+			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode + " emsg=" + emsg);
+			//wojia返回一种信息： 	emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
+			
+			try {
+				//t_s_order 表到 t_s_his_order 表
+				insertFromHisOrderById(orderId, "0", "退订失败 ecode=" + ecode + " emsg=" + emsg);
+				orderMapper.deleteByPrimaryKey(orderId);
+			} catch (Exception e) {
+				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail Exception e" + e);
+				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
+			}
+			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, null);
 		}
 	}
 	
