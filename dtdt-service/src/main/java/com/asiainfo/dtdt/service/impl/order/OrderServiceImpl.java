@@ -54,6 +54,7 @@ import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
+import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
 import com.huawei.insa2.util.SGIPSendMSGUtil;
 
 /** 
