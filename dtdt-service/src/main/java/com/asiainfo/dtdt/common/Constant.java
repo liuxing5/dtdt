@@ -185,6 +185,11 @@ public class Constant {
 	/**充值类型 1-一次性**/
 	public static final byte CHARGE_TYPE_1			=	1;
 	
+	/**是否自动续订 0-续订**/
+	public static final byte ALLOWAUTOPAY_0			=	0;
+	/**是否自动续订 1-不续订**/
+	public static final byte ALLOWAUTOPAY_1			=	1;
+	
 	/**第三方支付状态**/
 	/**0-初始化状态*/
 	public static final String PAY_STATUS_INIT		= "0";
