@@ -160,6 +160,8 @@ public class NotcieServiceImpl implements INoticeService {
 						//订购失败更新在途表状态5-订购失败待原路退款
 						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
+						/**订购失败回调通知**/
+						noticeService.dtdtNoticeOrder(order.getOrderId());
 					}else{
 						log.info("NoticeService optNoticeOrder return code is notSuccess and noError orderState="+resultCode +" orderId="+orderId);
 					}
@@ -178,6 +180,8 @@ public class NotcieServiceImpl implements INoticeService {
 							log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
 							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
 						}
+						/**退订处理完成回调通知**/
+						noticeService.dtdtNoticeOrder(order.getOrderId());
 					}
 				}
 			}
