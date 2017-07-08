@@ -29,6 +29,24 @@ public interface IOrderService {
 	String postfixOrder(String jsonStr);
 	
 	/**
+	 * @Title: IOrderService 
+	 * @Description: (后向流量批量订购接口) 
+	 * @param jsonStr
+	 * @return        
+	 * @throws
+	 */
+	String batchPostfixOrder(String jsonStr);
+	
+	/**
+	 * @Title: IOrderService 
+	 * @Description: (更新后向流量批量订单状态) 
+	 * @param jsonStr
+	 * @return        
+	 * @throws
+	 */
+	int updateBatchOrderState(String batchOrderId);
+	
+	/**
 	* @Title: IOrderService 
 	* @Description: (插入在途订单信息) 
 	* @param orderStr

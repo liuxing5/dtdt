@@ -52,4 +52,11 @@ public interface OrderMapper {
      * @throws
       */
      int insertFromOrderRecordById(@Param("orderId")String orderId,@Param("cycleType")byte cycleType,@Param("woOrder")String woOrder);
+
+     /**
+      * 订单号存在
+      * @param partnerOrderId
+      * @return
+      */
+     int existPartnerOrderId(String partnerOrderId);
 }

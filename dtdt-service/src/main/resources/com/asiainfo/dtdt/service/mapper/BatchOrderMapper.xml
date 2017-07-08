@@ -14,7 +14,7 @@
     <result column="price" property="price" jdbcType="INTEGER" />
     <result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
     <result column="mobilephones" property="mobilephones" jdbcType="VARCHAR" />
-    <result column="mobilephones_count" property="mobilephonesCount" jdbcType="TINYINT" />
+    <result column="mobilephones_count" property="mobilephonesCount" jdbcType="INTEGER" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -70,7 +70,7 @@
          and mobilephones = #{mobilephones,jdbcType=VARCHAR}
       </if>
       <if test="mobilephonesCount != null" >
-         and mobilephones_count = #{mobilephonesCount,jdbcType=TINYINT}
+         and mobilephones_count = #{mobilephonesCount,jdbcType=INTEGER}
       </if>
       <if test="remark != null" >
          and remark = #{remark,jdbcType=VARCHAR}
@@ -93,7 +93,7 @@
       #{partnerOrderId,jdbcType=VARCHAR}, #{productCode,jdbcType=VARCHAR}, #{operType,jdbcType=TINYINT}, 
       #{state,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{price,jdbcType=INTEGER}, #{redirectUrl,jdbcType=VARCHAR}, #{mobilephones,jdbcType=VARCHAR}, 
-      #{mobilephonesCount,jdbcType=TINYINT}, #{remark,jdbcType=VARCHAR})
+      #{mobilephonesCount,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR})
   </insert>
 
   <insert id="insertSelective" parameterType="com.asiainfo.dtdt.entity.BatchOrder" useGeneratedKeys="true" keyProperty="id" >
@@ -180,7 +180,7 @@
         #{mobilephones,jdbcType=VARCHAR},
       </if>
       <if test="mobilephonesCount != null" >
-        #{mobilephonesCount,jdbcType=TINYINT},
+        #{mobilephonesCount,jdbcType=INTEGER},
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
@@ -225,13 +225,16 @@
         mobilephones = #{mobilephones,jdbcType=VARCHAR},
       </if>
       <if test="mobilephonesCount != null" >
-        mobilephones_count = #{mobilephonesCount,jdbcType=TINYINT},
+        mobilephones_count = #{mobilephonesCount,jdbcType=INTEGER},
       </if>
       <if test="remark != null" >
         remark = #{remark,jdbcType=VARCHAR},
       </if>
     </set>
     where batch_id = #{batchId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateBatchOrderState" parameterType="java.lang.String" >
+  
   </update>
 
 </mapper>

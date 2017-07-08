@@ -102,6 +102,22 @@ public class OrderController extends BaseController{
 		return result;
 	}
 	
+	@RequestMapping(value="/batch/postfix-order",produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String batchPostfixOrder(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		InputStream ins = request.getInputStream();
+		BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+		StringBuilder sb = new StringBuilder();
+		String line = "";
+		while ((line = in.readLine()) != null) {
+			sb.append(line);
+		}
+		String orderJson = sb.toString(); //接收到通知信息。
+		logger.info("pre-order param data:"+orderJson);
+		String result = orderService.batchPostfixOrder(orderJson);
+		return result;
+	}
+	
 	/**
 	* @Title: OrderController 
 	* @Description: (退订定向流量) 

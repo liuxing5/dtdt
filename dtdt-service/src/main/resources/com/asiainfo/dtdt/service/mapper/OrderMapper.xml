@@ -32,6 +32,16 @@
     update_time, valid_time, invalid_time, price, count, money, is_need_charge, 
     remark, allow_auto_pay,redirect_url
   </sql>
+  
+  <select id="existPartnerOrderId" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    SELECT IF((SELECT COUNT(1) FROM t_s_batch_order bo WHERE bo.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR})!=0,1,
+	IF((SELECT COUNT(1) FROM `t_s_order` o WHERE o.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR})!=0,1,
+		IF((SELECT COUNT(1) FROM `t_s_his_order` ho WHERE ho.`partner_order_id` = #{partnerOrderId,jdbcType=VARCHAR})!=0,1,0
+			)
+		)
+	 ) COUNT;
+  </select>
+  
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

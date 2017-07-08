@@ -70,7 +70,7 @@ public class BatchOrder implements Serializable{
     /**
      * 手机号码个数
      */
-    private Byte mobilephonesCount;
+    private Integer mobilephonesCount;
 
     /**
      * 

@@ -52,6 +52,11 @@ public class Constant {
 	/**参数错误描述**/
 	public static final String PARAM_ILLEGAL_MSG		= "消息体不是合法的json字符串";
 	public static final String PARAM_WRONG_SIGN		= "20002";
+
+	/**签名错误码**/
+	public static final String PARTNERORDERID_EXIST_CODE		= "99997";
+	/**签名错误描述**/
+	public static final String PARTNERORDERID_EXIST_MSG		= "合作伙伴订单号重复";
 	
 	/**签名错误码**/
 	public static final String SIGN_ERROR_CODE		= "99998";
@@ -72,6 +77,21 @@ public class Constant {
 	public static final String NOT_UNICOM_CODE 		= "20001";
 	/**非联通号码描述**/
 	public static final String NOT_UNICOM_MSG 		= "非联通号码";
+	
+	/**手机号码列表异常号码**/
+	public static final String PHONES_ERROR_CODE 		= "20002";
+	/**手机号码列表异常号码描述**/
+	public static final String PHONES_ERROR_MSG 		= "手机号码列表异常";
+	
+	/**手机号码个数太长code**/
+	public static final String PHONES_TOO_LONG_CODE 		= "20003";
+	/**手机号码个数太长描述**/
+	public static final String PHONES_TOO_LONG_MSG 		= "手机号码个数太长";
+	
+	/**后向流量批量订购失败code**/
+	public static final String BATCH_ORDER_FAIL_CODE 		= "20004";
+	/**后向流量批量订购失败描述**/
+	public static final String BATCH_ORDER_FAIL_MSG 		= "后向流量批量订购失败,订单id：";
 	
 	/**发送短信异常码**/
 	public static final String SENDSMS_ERROR_CODE	= "30000";
