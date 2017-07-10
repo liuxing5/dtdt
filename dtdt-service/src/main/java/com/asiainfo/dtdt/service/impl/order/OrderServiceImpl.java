@@ -327,6 +327,9 @@ public class OrderServiceImpl implements IOrderService{
 						Constant.PRODUCT_EXISTENCE_MSG, null);
 			}
 			Product product = JSONObject.parseObject(strProduct, Product.class);
+			if(product.getType() != 1){
+				return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
+			}
 			/**查询产品价格信息 end**/
 			if (!IsMobileNo.isMobile(phone)) {
 				if(isBatch){//历史数据表中插入失败数据并返回
@@ -369,28 +372,20 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE,
 						Constant.SUCCESS_MSG, json);
 			}
-			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
-					|| StringUtils.isBlank(woResult))
-			{//请求沃家总管超时或者异常
-				//更新在途订购订单状态7-订购失败
-				updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
-						Constant.IS_NEED_CHARGE_1,
-						Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-				//将在途表信息存放在备份表中
-				insertOrderBakAndDelOrder(order.getOrderId(), "0",
-						woJson.getString("emsg") + "),订购处理失败");
-				json.put("orderId", order.getOrderId());
-				return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
-						Constant.ORDER_ERROR_MSG, json.toString());
-			}
 			//更新在途订购订单状态7-订购失败
 			updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
 					Constant.IS_NEED_CHARGE_1,
 					Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 			//将在途表信息存放在备份表中
 			insertOrderBakAndDelOrder(order.getOrderId(), "0",
-					woJson.getString("emsg") + ",订购处理失败");
-			json.put("orderId", order.getOrderId());
+					woJson.getString("emsg") + "),订购处理失败");
+			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
+					|| StringUtils.isBlank(woResult))
+			{//请求沃家总管超时或者异常
+				
+				return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
+						Constant.ORDER_ERROR_MSG, json.toString());
+			}
 			String msg = buildMsgFromWoReturn(phone, product, woJson);
 			
 			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
@@ -526,28 +521,28 @@ public class OrderServiceImpl implements IOrderService{
 			msg = "接口调用次数超过限制";
 		} else if (woJson.getString("ecode").equals("100"))
 		{
-			msg = "缺少参数  " + woJson.getString("emsg");
+			msg = "缺少参数  " ;
 		} else if (woJson.getString("ecode").equals("110"))
 		{
-			msg = "操作超时，超时时间 " + woJson.getString("emsg");
+			msg = "操作超时，超时时间 ";
 		} else if (woJson.getString("ecode").equals("1450"))
 		{
-			msg = "appid不存在" + woJson.getString("emsg");
+			msg = "appid不存在";
 		} else if (woJson.getString("ecode").equals("1451"))
 		{
 			msg = "appid或appkey错误";
 		} else if (woJson.getString("ecode").equals("1452"))
 		{
-			msg = "当前合作伙伴没有定购产品的权限" + woJson.getString("emsg");
+			msg = "当前合作伙伴没有定购产品的权限" ;
 		} else if (woJson.getString("ecode").equals("1453"))
 		{
-			msg = "当前合作伙伴没有定购产品的额度" + woJson.getString("emsg");
+			msg = "当前合作伙伴没有定购产品的额度";
 		} else if (woJson.getString("ecode").equals("4003"))
 		{
-			msg = "订购关系不存在" + woJson.getString("emsg");
+			msg = "订购关系不存在" ;
 		} else if (woJson.getString("ecode").equals("4004"))
 		{
-			msg = "产品无法退订" + woJson.getString("emsg");
+			msg = "产品无法退订";
 		} else if (woJson.getString("ecode").equals("1405"))
 		{
 			msg = "用户 " + phone + " 不存在";
@@ -689,7 +684,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 //			seq = jsonObject.getString("seq");
 			partnerCode = jsonObject.getString("partnerCode");
-			appKey = jsonObject.getString("appKey");
+			appKey = jsonObject.getString("appkey");
 //			partnerCode = "1234543245";
 //			appKey = "fwerh4356ytrt54";
 			phones = jsonObject.getJSONArray("phone");
@@ -1156,29 +1151,14 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
-//		if (CheckParam.checkParamIsNull(seq)) {
-//			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
-//		}
-		if (CheckParam.checkParamIsNull(phone)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"+Constant.PARAM_NULL_MSG, null);
+		String checkpR = checkParam(partnerCode, appkey, phone, productCode,
+				orderMethod, partnerOrderId);
+		if(null != checkpR)
+		{
+			return checkpR;
 		}
-		if (!IsMobileNo.isMobile(phone)) {
-			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-		}
-		if (CheckParam.checkParamIsNull(productCode)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (CheckParam.checkParamIsNull(orderMethod)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
-		}
-	/*	if(StringUtils.isBlank(allowAutoPay)){
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "allowAutoPay"+Constant.PARAM_NULL_MSG, null);
-		}*/
 		if (CheckParam.checkParamIsNull(vcode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "vcode"+Constant.PARAM_NULL_MSG, null);
-		}
-		if (CheckParam.checkParamIsNull(partnerOrderId)) {
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
 		}
 		String paramErr =  CheckParam.checkParam(Constant.lengthParam, jsonStr);
 		if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
@@ -1238,39 +1218,17 @@ public class OrderServiceImpl implements IOrderService{
 		if(woplatConfig.getWoplat_success_code().equals(woJson.getString("ecode"))){
 			updateOrder(order.getOrderId(),woJson.getString("orderId"), null,Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			json.put("orderId", order.getOrderId());
-//			json.put("partnerOrderId", order.getPartnerOrderId());
-////			json.put("status", order.getState());
-//			json.put("money", order.getMoney());
-//			json.put("createTime", order.getCreateTime());
-//			List list = new ArrayList();
-//			JSONObject listItem = new JSONObject();
-//			listItem.put("productCode", order.getProductCode());
-//			listItem.put("productName", product.getProductName());
-//			listItem.put("productType", product.getCycleType());
-//			listItem.put("state", order.getState());
-//			listItem.put("price", order.getPrice());
-////			listItem.put("count", order.getCount());
-//			listItem.put("allowAutoPay", order.getAllowAutoPay());
-//			listItem.put("validTime", order.getValidTime());
-//			listItem.put("invalidTime", order.getInvalidTime());
-//			list.add(listItem);
-//			json.put("item", listItem);
 			/**组装支付订单信息返回给接入商 end**/
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);
 		}
+		//更新在途订购订单状态7-订购失败
+		updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+		//将在途表信息存放在备份表中
+		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
 		if(woJson.getString("ecode").equals(Constant.ERROR_CODE) || StringUtils.isBlank(woResult)){//请求沃家总管超时或者异常
-			//更新在途订购订单状态7-订购失败
-			updateOrder(order.getOrderId(),woJson.getString("orderId"), "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-			//将在途表信息存放在备份表中
-			insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+"),订购处理失败");
-//			json.put("orderId", order.getOrderId());
+			
 			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG, null);
 		}
-		//更新在途订购订单状态7-订购失败
-		updateOrder(order.getOrderId(),null, "7",Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-		//将在途表信息存放在备份表中
-		insertOrderBakAndDelOrder(order.getOrderId(), "0", woJson.getString("emsg")+",订购处理失败");
-//		json.put("orderId", order.getOrderId());
 		String msg = null;
 		msg = buildMsgFromWoReturn(phone, product, woJson);
 		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE, Constant.ORDER_ERROR_MSG+msg, null);
@@ -1295,7 +1253,6 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			jsonObject.put("seq", UuidUtil.generateUUID());
 			jsonObject.put("appId", woplatConfig.getWoAppId());
-//			jsonObject.put("appId", Constant.APPID);
 			jsonObject.put("operType", 1);
 			jsonObject.put("msisdn", msisdn);
 			jsonObject.put("productId", productCode);
@@ -1304,11 +1261,9 @@ public class OrderServiceImpl implements IOrderService{
 			String timeStamp = DateUtil.getSysdateYYYYMMDDHHMMSS();
 			jsonObject.put("timeStamp", timeStamp);
 			String signStr = woplatConfig.getWoAppId()+msisdn+timeStamp+woplatConfig.getWoAppKey();
-//			String signStr = Constant.APPID+msisdn+timeStamp+Constant.APPKEY;
 			jsonObject.put("appSignature", MD5Util.MD5Encode(signStr));
 			log.info("post wojia order param:"+jsonObject.toString());
 			result = RestClient.doRest(woplatConfig.getOrderUrl(), "POST", jsonObject.toString());
-//			result = RestClient.doRest(Constant.ORDER_URL, "POST", jsonObject.toString());
 			log.info("wojia order return result:"+result);
 		} catch (Exception e) {
 			log.error("post wojia order error:"+e.getMessage(), e);
