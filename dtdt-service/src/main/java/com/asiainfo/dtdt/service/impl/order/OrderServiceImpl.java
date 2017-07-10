@@ -1,8 +1,6 @@
 package com.asiainfo.dtdt.service.impl.order;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +35,6 @@ import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Partner;
-import com.asiainfo.dtdt.entity.PartnerOrderResources;
 import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
@@ -48,6 +45,7 @@ import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
 import com.asiainfo.dtdt.method.OrderMethod;
+import com.asiainfo.dtdt.service.IOrderResourceService;
 import com.asiainfo.dtdt.service.IPartnerOrderResourcesService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.BatchOrderMapper;
@@ -58,7 +56,6 @@ import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
-import com.huawei.insa2.util.SGIPSendMSGUtil;
 
 /** 
 * @author 作者 : xiangpeng
@@ -126,6 +123,8 @@ public class OrderServiceImpl implements IOrderService{
 	@Resource
 	private SMSContentConfig smsContentConfig;
 	
+	@Resource
+	private IOrderResourceService orderResourceService;
 	
 	@Autowired
 	private AppMapper appMapper;
@@ -300,7 +299,7 @@ public class OrderServiceImpl implements IOrderService{
 			orderMethod = jsonObject.get("orderMethod").toString();
 			partnerOrderId = jsonObject.get("partnerOrderId").toString();
 
-			String checkCR = checkCounts(partnerCode);
+			String checkCR = orderResourceService.checkCounts(partnerCode);
 			if(null != checkCR)
 			{
 				return checkCR;
@@ -371,7 +370,11 @@ public class OrderServiceImpl implements IOrderService{
 			}
 			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
 					|| StringUtils.isBlank(woResult))
-			{//请求沃家总管超时或者异常
+			{
+				// 失败后订购次数补偿
+				orderResourceService.refundOrderResource(partnerCode);
+				
+				//请求沃家总管超时或者异常
 				//更新在途订购订单状态7-订购失败
 				updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
 						Constant.IS_NEED_CHARGE_1,
@@ -404,115 +407,6 @@ public class OrderServiceImpl implements IOrderService{
 		}
 	}
 
-	private String checkCounts(String partnerCode)
-	{
-		String key = RedisKey.PARTNER_OR_KEY_PREFIX + partnerCode;
-
-		/*if (!redisSingle.exist(key))
-		{
-			
-			PartnerOrderResources por = pORService.loadByPartnerCode(partnerCode);
-			if(null != por)
-			{
-				redisSingle.set(key, por.getPreCount().toString());
-				log.info("无可用次数！key不存在，key:{},load成功，预存次数{}", key, por.getPreCount());
-			}
-			else
-			{
-				log.info("无可用次数！key不存在，key:{},load无记录", key);
-				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
-						Constant.NO_ORDER_RESOURCE_MSG, null);
-			}
-		Long count = Long.valueOf(redisSingle.get(key));
-		if (count == 0l)
-		{
-			log.info("订购次数已用完，key：{}", key);
-			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
-					Constant.NO_ORDER_RESOURCE_MSG, null);
-		}
-		log.info("使用一次key:{}", key);
-		redisSingle.incrBy(key, -1);*/
-		
-		/*集群方式*/
-		if (org.springframework.util.StringUtils.isEmpty(redisAssistant
-				.getStringValue(key)))
-		{
-
-			PartnerOrderResources por = pORService
-					.loadByPartnerCode(partnerCode);
-			if (null != por)
-			{
-				Long canUsedCount = por.getPreCount() - por.getWarnThreshold()
-						- por.getUseCount();
-				if (!canUsedCount.equals(0l))
-				{
-					redisAssistant.setForever(key, canUsedCount.toString());
-					log.info("无可用次数！key不存在，key:{},load成功，预存次数{},告警阈值{},可用次数{}",
-							key, por.getPreCount(), por.getWarnThreshold(),
-							canUsedCount);
-				} else
-				{
-					log.info("无可用次数！key不存在，key:{},load成功，但是无可用次数", key);
-					return ReturnUtil.returnJsonInfo(
-							Constant.NO_ORDER_RESOURCE_CODE,
-							Constant.NO_ORDER_RESOURCE_MSG, null);
-				}
-
-			} else
-			{
-				log.info("无可用次数！key不存在，key:{},load无记录", key);
-				return ReturnUtil.returnJsonInfo(
-						Constant.NO_ORDER_RESOURCE_CODE,
-						Constant.NO_ORDER_RESOURCE_MSG, null);
-			}
-
-		}
-		Long count = Long.valueOf(redisAssistant.getStringValue(key));
-		if (count <= 0l)
-		{
-			log.info("订购次数已用完，key：{}", key);
-
-			sendWarnMsg(partnerCode);
-
-			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
-					Constant.NO_ORDER_RESOURCE_MSG, null);
-		}
-		log.info("使用一次key:{}", key);
-		redisAssistant.increateValue(key, -1l);
-		
-		return null;
-	}
-
-	private void sendWarnMsg(String partnerCode)
-	{
-		String path = "";
-		if (System.getProperty("os.name").startsWith("win")
-				|| System.getProperty("os.name").startsWith("Win"))
-		{
-			path = OrderServiceImpl.class.getResource("/").getPath();
-		} else
-		{
-			path = System.getProperty("user.dir");
-		}
-		
-		String content = smsContentConfig.getPorMonitorSmsContent();
-		if (StringUtils.isEmpty(content))
-		{
-			content = "";
-		}
-		content = content.replace("{0}", String.valueOf(partnerCode));
-		SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
-		log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
-		String hkey = RedisKey.PARTNER_OR_WARN_KEY_PREFIX + partnerCode;
-		String phones = redisAssistant.hgetString(hkey,
-				RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE);
-		if (!org.springframework.util.StringUtils.isEmpty(phones))
-		{
-			log.info("send warn msg {}", phones);
-			List<String> phoneList = Arrays.asList(phones.split(","));
-			SGIPSendMSGUtil.sendMsg(phoneList, content);
-		}
-	}
 
 	private String buildMsgFromWoReturn(String phone, Product product,
 			JSONObject woJson)
