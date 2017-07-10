@@ -274,11 +274,9 @@ public class OrderServiceImpl implements IOrderService{
 		log.info("OrderServiceImpl postfixOrder() jsonStr:" + jsonStr);
 		JSONObject jsonObject = null;
 		/** 获取接口中传递的参数 start */
-		try
-		{
+		try {
 			jsonObject = JSONObject.parseObject(jsonStr);
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			log.error("orderService postfixOrder check param is json error；"
 					+ e.getMessage(), e);
 			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE,
@@ -290,135 +288,124 @@ public class OrderServiceImpl implements IOrderService{
 		String productCode = null;
 		String orderMethod = null;
 		String partnerOrderId = null;
-		try
-		{
+		try {
 			partnerCode = jsonObject.getString("partnerCode");
 			appKey = jsonObject.getString("appkey");
 			phone = jsonObject.getString("phone");
 			productCode = jsonObject.getString("productCode");
 			orderMethod = jsonObject.get("orderMethod").toString();
 			partnerOrderId = jsonObject.get("partnerOrderId").toString();
-
-			String checkCR = orderResourceService.checkCounts(partnerCode);
-			if(null != checkCR)
-			{
-				return checkCR;
-			}
-			
-			/** 获取接口中传递的参数 end */
-			/** 校验接口中传递的参数是否合法 start */
-			boolean isBatch = false;
-			if(jsonObject.containsKey("isBatch")){
-				isBatch = jsonObject.getBoolean("isBatch");
-			}
-			String checkpR = checkParam(partnerCode, appKey, phone, productCode,
-					orderMethod, partnerOrderId,isBatch);
-			if(null != checkpR)
-			{
-				return checkpR;
-			}
-			String paramErr = CheckParam.checkParam(Constant.POSTFIX_PARAMS_LENGTH, jsonStr);
-			if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
-				return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
-			}
-			
-			/** 查询产品价格信息 start **/
-			String strProduct = productService.queryProduct(productCode);
-			if (StringUtils.isBlank(strProduct))
-			{
-				return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE,
-						Constant.PRODUCT_EXISTENCE_MSG, null);
-			}
-			Product product = JSONObject.parseObject(strProduct, Product.class);
-			if(product.getType() != 1){
-				return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTPOSTFIX_MSG+product.getProductName(), null);
-			}
-			/**查询产品价格信息 end**/
-			if (!IsMobileNo.isMobile(phone)) {
-				if(isBatch){//历史数据表中插入失败数据并返回
-					createHisOrder(appKey,partnerCode,partnerOrderId,
-							phone,product,orderMethod,null,
-							Constant.HISORDER_STATE_NOT_UNICOM,
-							Constant.HISORDER_STATE_NOT_UNICOM_REMARK);//入历史表
-					return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-				}else{
-					return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-				}
-			}
-			/** 查询产品价格信息 end **/
-			/** 检查是否存在互斥产品并存储在途数据 **/
-			Order order = null;
-			//记录订购在途表
-			order = order(appKey, partnerCode, partnerOrderId, phone, product,
-					orderMethod, "0", null, "4");//待订购
-			//发沃家起订购请求
-			int num = updateOrder(order.getOrderId(), null, "9", (byte) 0, (byte) 0);
-			String woResult = null;
-			if (num > 0)
-			{
-				woResult = postWoplatOrder(phone, product.getWoProductCode(),
-						DateUtil.getSysdateYYYYMMDDHHMMSS(), order.getOrderChannel());
-			}
-			/** 组装支付订单信息返回给接入商 start **/
-			JSONObject json = new JSONObject();
-			JSONObject woJson = JSONObject.parseObject(woResult);
-			if (woplatConfig.getWoplat_success_code().equals(
-					woJson.getString("ecode")))
-			{
-				updateOrder(order.getOrderId(), woJson.getString("orderId"), null,
-						Constant.IS_NEED_CHARGE_1,
-						Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-				
-				buildReturnJson(product, order, json);
-				
-				/** 组装支付订单信息返回给接入商 end **/
-				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE,
-						Constant.SUCCESS_MSG, json);
-			}
-			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
-					|| StringUtils.isBlank(woResult))
-			{
-				// 失败后订购次数补偿
-				orderResourceService.refundOrderResource(partnerCode);
-				
-				//请求沃家总管超时或者异常
-				//更新在途订购订单状态7-订购失败
-				updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
-						Constant.IS_NEED_CHARGE_1,
-						Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-				//将在途表信息存放在备份表中
-				insertOrderBakAndDelOrder(order.getOrderId(), "0",
-						woJson.getString("emsg") + "),订购处理失败");
-				json.put("orderId", order.getOrderId());
-				return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
-						Constant.ORDER_ERROR_MSG, json.toString());
-			}
-			//更新在途订购订单状态7-订购失败
-			updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
-					Constant.IS_NEED_CHARGE_1,
-					Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
-			//将在途表信息存放在备份表中
-			log.info("woplat return error msg:"+woJson.getString("emsg"));
-			insertOrderBakAndDelOrder(order.getOrderId(), "0",
-					woJson.getString("emsg") + "),订购处理失败");
-			if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
-					|| StringUtils.isBlank(woResult))
-			{//请求沃家总管超时或者异常
-				
-				return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
-						Constant.ORDER_ERROR_MSG, json.toString());
-			}
-			String msg = buildMsgFromWoReturn(phone, product, woJson);
-			
-			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
-					Constant.ORDER_ERROR_MSG + msg, json.toString());
-			
-		} catch (NullPointerException e)
-		{
+		} catch (NullPointerException e) {
 			log.error("get param error is null");
 			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE,
 					Constant.PARAM_ERROR_MSG, null);
 		}
+		/** 获取接口中传递的参数 end */
+		/** 校验接口中传递的参数是否合法 start */
+		boolean isBatch = false;
+		if (jsonObject.containsKey("isBatch")) {
+			isBatch = jsonObject.getBoolean("isBatch");
+		}
+		String checkpR = checkParam(partnerCode, appKey, phone, productCode,
+				orderMethod, partnerOrderId, isBatch);
+		if (null != checkpR) {
+			return checkpR;
+		}
+		String paramErr = CheckParam.checkParam(Constant.POSTFIX_PARAMS_LENGTH,
+				jsonStr);
+		if (!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)) {
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE,
+					Constant.PARAM_ERROR_MSG + ":" + paramErr, null);
+		}
+
+		/** 查询产品价格信息 start **/
+		String strProduct = productService.queryProduct(productCode);
+		if (StringUtils.isBlank(strProduct)) {
+			return ReturnUtil.returnJsonError(Constant.PRODUCT_EXISTENCE_CODE,
+					Constant.PRODUCT_EXISTENCE_MSG, null);
+		}
+		Product product = JSONObject.parseObject(strProduct, Product.class);
+		if (product.getType() != 1) {
+			return ReturnUtil.returnJsonError(
+					Constant.ORDER_TYPE_NOTFORWARD_CODE,
+					Constant.ORDER_TYPE_NOTPOSTFIX_MSG
+							+ product.getProductName(), null);
+		}
+
+		/** 查询产品价格信息 end **/
+		if (!IsMobileNo.isMobile(phone)) {
+			if (isBatch) {// 历史数据表中插入失败数据并返回
+				createHisOrder(appKey, partnerCode, partnerOrderId, phone,
+						product, orderMethod, null,
+						Constant.HISORDER_STATE_NOT_UNICOM,
+						Constant.HISORDER_STATE_NOT_UNICOM_REMARK);// 入历史表
+				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
+						Constant.NOT_UNICOM_MSG, null);
+			} else {
+				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
+						Constant.NOT_UNICOM_MSG, null);
+			}
+		}
+		/** 查询产品价格信息 end **/
+
+		String checkCR = null;
+		try {
+			checkCR = orderResourceService.checkCounts(partnerCode);
+		} catch (Exception e) {
+			return ReturnUtil.returnJsonError(Constant.ERROR_CODE,
+					Constant.ERROR_MSG, null);
+		}
+		if (null != checkCR) {
+			return checkCR;
+		}
+
+		/** 检查是否存在互斥产品并存储在途数据 **/
+		Order order = null;
+		// 记录订购在途表
+		order = order(appKey, partnerCode, partnerOrderId, phone, product,
+				orderMethod, "0", null, "4");// 待订购
+		// 发沃家起订购请求
+		int num = updateOrder(order.getOrderId(), null, "9", (byte) 0, (byte) 0);
+		String woResult = null;
+		if (num > 0) {
+			woResult = postWoplatOrder(phone, product.getWoProductCode(),
+					DateUtil.getSysdateYYYYMMDDHHMMSS(),
+					order.getOrderChannel());
+		}
+		/** 组装支付订单信息返回给接入商 start **/
+		JSONObject json = new JSONObject();
+		JSONObject woJson = JSONObject.parseObject(woResult);
+		if (woplatConfig.getWoplat_success_code().equals(
+				woJson.getString("ecode"))) {
+			updateOrder(order.getOrderId(), woJson.getString("orderId"), null,
+					Constant.IS_NEED_CHARGE_1,
+					Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
+
+			buildReturnJson(product, order, json);
+
+			/** 组装支付订单信息返回给接入商 end **/
+			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE,
+					Constant.SUCCESS_MSG, json);
+		}
+		// 更新在途订购订单状态7-订购失败
+		updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
+				Constant.IS_NEED_CHARGE_1,
+				Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
+		// 将在途表信息存放在备份表中
+		log.info("woplat return error msg:" + woJson.getString("emsg"));
+		insertOrderBakAndDelOrder(order.getOrderId(), "0",
+				woJson.getString("emsg") + "),订购处理失败");
+		if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
+				|| StringUtils.isBlank(woResult)) {// 请求沃家总管超时或者异常
+
+			return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
+					Constant.ORDER_ERROR_MSG, json.toString());
+		}
+		String msg = buildMsgFromWoReturn(phone, product, woJson);
+
+		return ReturnUtil.returnJsonInfo(Constant.ORDER_ERROR_CODE,
+				Constant.ORDER_ERROR_MSG + msg, json.toString());
+	
 	}
 
 
@@ -511,7 +498,7 @@ public class OrderServiceImpl implements IOrderService{
 		if (StringUtils.isBlank(appKey))
 		{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
-					"appKey" + Constant.PARAM_NULL_MSG, null);
+					"appkey" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (StringUtils.isBlank(phone))
 		{
@@ -603,15 +590,19 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			partnerCode = jsonObject.getString("partnerCode");
 			appKey = jsonObject.getString("appkey");
-			phones = jsonObject.getJSONArray("phones");
 			productCode = jsonObject.getString("productCode");
 			orderMethod = jsonObject.getString("orderMethod").toString();
 			partnerOrderId = jsonObject.getString("partnerOrderId");
 		} catch (NullPointerException e) {
 			log.error("get param error is null");
 			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}		
+		try{
+			phones = jsonObject.getJSONArray("phones");
+		}catch(Exception e){
+			log.error("get param phones error");
+			return ReturnUtil.returnJsonError(Constant.PHONES_GET_ERROR_CODE, Constant.PHONES_GET_ERROR_MSG, null);
 		}
-		
 		/**校验接口中传递的参数是否合法  start*/
 		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);

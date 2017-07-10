@@ -88,9 +88,14 @@ public class Constant {
 	public static final String NOT_UNICOM_MSG 		= "非联通号码";
 	
 	/**手机号码列表异常号码**/
-	public static final String PHONES_ERROR_CODE 		= "20002";
+	public static final String PHONES_ERROR_CODE 		= "20005";
 	/**手机号码列表异常号码描述**/
 	public static final String PHONES_ERROR_MSG 		= "手机号码列表异常";
+	
+	/**手机号码列表异常号码**/
+	public static final String PHONES_GET_ERROR_CODE 		= "20006";
+	/**手机号码列表异常号码描述**/
+	public static final String PHONES_GET_ERROR_MSG 		= "phones参数异常";
 	
 	/**手机号码个数太长code**/
 	public static final String PHONES_TOO_LONG_CODE 		= "20003";
