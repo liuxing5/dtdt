@@ -13,5 +13,16 @@ public interface HisOrderMapper {
     int updateByPrimaryKeySelective(HisOrder record);
     
     List<HisOrder> getListByPartnerOrderId(String partnerOrderId);
+    
+    /**
+    * @Title: queryOrderState 
+    * @Description: 查询订单状态
+    * @param orderId
+    * @param partnerCode
+    * @param appkey
+    * @return Order
+    * @throws
+     */
+    HisOrder queryOrderState(String orderId, String partnerCode, String appkey);
 
 }

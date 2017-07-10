@@ -22,7 +22,6 @@ import lombok.extern.log4j.Log4j2;
 @Service
 public class ProductServiceImpl implements IProductService {
 	
-	
 	@Autowired
 	private ProductMapper productMapper;
 	
@@ -42,13 +41,13 @@ public class ProductServiceImpl implements IProductService {
 		log.info("ProductServiceImpl getProductList() appkey=" + appkey + " partnerCode=" + partnerCode);
 		
 		try {
-			//校验合作方信息
-			if (checkPartner(appkey, partnerCode)) {
+			Partner partner = partnerMapper.getByPartnerCode(partnerCode);
+			if (null == partner){
 				return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 			}
 			
 			App app = appMapper.queryAppInfo(appkey);
-			List<Product> list = productMapper.getProductList(app.getAppId());
+			List<Product> list = productMapper.getProductList(app.getAppId(), partner.getPartnerId());
 			if (list.size() == 0) {
 				return ReturnUtil.returnJsonList(Constant.NO_PRODUCT_CODE, Constant.NO_PRODUCT_MSG, null);
 			}
@@ -58,23 +57,6 @@ public class ProductServiceImpl implements IProductService {
 			log.info("ProductServiceImpl getProductList() Exception e" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 		}
-	}
-	
-	/**
-	* @Title: checkPartner 
-	* @Description: 校验合作方信息
-	* @param appkey
-	* @param partnerCode
-	* @return boolean
-	* @throws
-	 */
-	private boolean checkPartner(String appkey, String partnerCode) {
-		App app = appMapper.queryAppInfo(appkey);
-		Partner partner = partnerMapper.selectByPrimaryKey(app.getPartnerId());
-		if (!partner.getPartnerCode().equals(partnerCode)) {
-			return false;
-		}
-		return true;
 	}
 
 	/**

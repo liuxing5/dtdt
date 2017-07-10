@@ -17,6 +17,17 @@ public interface HisOrderRecordMapper {
     int updateByPrimaryKeySelective(HisOrderRecord record);
 
     /**
+    * @Title: queryOrderState 
+    * @Description: 查询订单状态
+    * @param orderId
+    * @param partnerCode
+    * @param appkey
+    * @return Order
+    * @throws
+     */
+    HisOrderRecord queryOrderState(String orderId, String partnerCode, String appkey);
+    
+    /**
      * @Title: queryOrderRecord 
      * @Description: 查询订购信息服务--失败
      * @param mobilephone
