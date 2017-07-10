@@ -312,7 +312,7 @@ public class OrderServiceImpl implements IOrderService{
 				isBatch = jsonObject.getBoolean("isBatch");
 			}
 			String checkpR = checkParam(partnerCode, appKey, phone, productCode,
-					orderMethod, partnerOrderId);
+					orderMethod, partnerOrderId,isBatch);
 			if(null != checkpR)
 			{
 				return checkpR;
@@ -501,7 +501,7 @@ public class OrderServiceImpl implements IOrderService{
 
 	private String checkParam(String partnerCode, String appKey,
 			String phone, String productCode, String orderMethod,
-			String partnerOrderId)
+			String partnerOrderId,boolean isBatch)
 	{
 		if (StringUtils.isBlank(partnerCode))
 		{
@@ -533,11 +533,14 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
 					"orderMethod" + Constant.PARAM_NULL_MSG, null);
 		}
-		if (StringUtils.isBlank(partnerOrderId))
-		{
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
-					"partnerOrderId" + Constant.PARAM_NULL_MSG, null);
+		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
+		}else{
+			if(!isBatch && 1 == existPartnerOrderId(partnerOrderId)){
+				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
+			}
 		}
+
 		
 		return null;
 	}
@@ -1070,7 +1073,7 @@ public class OrderServiceImpl implements IOrderService{
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
 		String checkpR = checkParam(partnerCode, appkey, phone, productCode,
-				orderMethod, partnerOrderId);
+				orderMethod, partnerOrderId,false);
 		if(null != checkpR)
 		{
 			return checkpR;
