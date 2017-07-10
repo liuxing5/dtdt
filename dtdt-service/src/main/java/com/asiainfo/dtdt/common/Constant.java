@@ -146,6 +146,8 @@ public class Constant {
 	public static final String ORDER_TYPE_NOTFORWARD_CODE	=	"40004";
 	/**非前向订购产品描述**/
 	public static final String ORDER_TYPE_NOTFORWARD_MSG	=	"非前向订购产品：";
+
+	public static final String ORDER_TYPE_NOTPOSTFIX_MSG	=	"非后向订购产品：";
 	
 	/**订单不存在编码**/
 	public static final String NO_ORDER_CODE	=	"40010";
