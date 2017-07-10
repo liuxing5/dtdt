@@ -17,6 +17,8 @@ public class DateUtil {
 	public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 	public static final String YYYYMMDD = "yyyyMMdd";
 	public static final String STANDARD24 = "yyyy-MM-dd HH:mm:ss";
+	public static final String ENDTIME = "23:59:59";
+	
 
 	public static String getWCpayDate(Date date) {
 		// 获取date的YYYY-MM-DD格式的日期
@@ -324,8 +326,20 @@ public class DateUtil {
         return c.getTime();
         
     }
-	public static void main(String[] args) {
+    
+    public static Long getTodayEndTime() throws ParseException
+    {
+    	String today = getDateTimeToDate(new Date());
+    	return df.parse(today + " " + ENDTIME).getTime();
+    }
+	public static void main(String[] args) throws ParseException {
 		System.out.println(new Date().getTime());
 		System.out.println(getDateTime(new Date()));
+		
+		Date afterDate = df.parse("2017-07-10" + " 23:59:59");
+		System.out.println(afterDate.getTime());
+		//23896622
+		System.err.println(getTodayEndTime() - new Date().getTime());
+		System.out.println(23896622/1000/60/60);
 	}
 }

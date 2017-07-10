@@ -66,8 +66,8 @@ public class AuthoController extends BaseController{
 			{
 				return new ResponseData("10000", "手机号号码为空！");
 			}
-			
-			if(!PhoneUtil.isCUCMobile(phone))
+
+			if (!PhoneUtil.isCUCMobile(phone))
 			{
 				return new ResponseData("10000", "非联通号码！");
 			}
@@ -78,53 +78,40 @@ public class AuthoController extends BaseController{
 			sb.append("_").append(phone);
 			int code = (int) ((Math.random() * 9 + 1) * 100000);
 
-			/*
-			 * if (redisUtil.hexist(sb.toString(), "cd")) {
-			 * redisUtil.hset(sb.toString(), "ts", String.valueOf(counts++)); //
-			 * 时间超过配置限制默认（5分钟） 重新生成，否则返回原来的 result.put("smsCode",
-			 * redisUtil.hget(sb.toString(), "cd")); } else {
-			 * redisUtil.hset(sb.toString(), "cd", String.valueOf(code));
-			 * redisUtil.hset(sb.toString(), "t", new Date().toString());
-			 * result.put("smsCode", code); }
-			 */
-
 			// 短信有效时间(单位分钟)
-			/*String smsvalidStr = redisUtil.get("smsc_v_t");
-			if (StringUtils.isEmpty(smsvalidStr))
-			{
-				smsvalidStr = "5";
-				redisUtil.set("smsc_v_t", "5");
-			}
-			redisUtil.set(sb.toString(), String.valueOf(code),
-					Integer.valueOf(smsvalidStr) * 60);*/
-			String smsvalidStr = redis.getStringValue(RedisKey.SMSCODE_VALID_TIME);
+			String smsvalidStr = redis
+					.getStringValue(RedisKey.SMSCODE_VALID_TIME);
 			if (StringUtils.isEmpty(smsvalidStr))
 			{
 				smsvalidStr = "5";
 				redis.setForever(RedisKey.SMSCODE_VALID_TIME, "5");
 			}
-			redis.setValue(sb.toString(), String.valueOf(code), Long.valueOf(smsvalidStr), TimeUnit.MINUTES);
+			redis.setValue(sb.toString(), String.valueOf(code),
+					Long.valueOf(smsvalidStr), TimeUnit.MINUTES);
 
 			String path = "";
-			if (System.getProperty("os.name").startsWith("win") || System.getProperty("os.name").startsWith("Win")){
+			if (System.getProperty("os.name").startsWith("win")
+					|| System.getProperty("os.name").startsWith("Win"))
+			{
 				path = AuthoController.class.getResource("/").getPath();
-			}else{
+			} else
+			{
 				path = System.getProperty("user.dir");
 			}
 
 			log.info("configPath:{}", path);
 			String content = smsContentConfig.getCodeContent();
-			if(StringUtils.isEmpty(content))
+			if (StringUtils.isEmpty(content))
 			{
 				content = "";
 			}
 			content = content.replace("{0}", String.valueOf(code));
-			SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
+			SGIPSendMSGUtil.CONF_PATH = path + File.separator
+					+ "sgip.properties";
 			log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
 			SGIPSendMSGUtil.sendMsg(phone, content);
 
-			log.info("{}|{}|{}|{}",
-					headers.getString("partnerCode"),
+			log.info("{}|{}|{}|{}", headers.getString("partnerCode"),
 					headers.getString("appkey"), phone, content);
 
 			//return result;
