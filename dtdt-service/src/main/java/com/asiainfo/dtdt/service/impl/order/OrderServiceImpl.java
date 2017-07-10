@@ -357,7 +357,7 @@ public class OrderServiceImpl implements IOrderService{
 			if (num > 0)
 			{
 				woResult = postWoplatOrder(phone, product.getWoProductCode(),
-						DateUtil.getDateTime(new Date()), order.getOrderChannel());
+						DateUtil.getSysdateYYYYMMDDHHMMSS(), order.getOrderChannel());
 			}
 			/** 组装支付订单信息返回给接入商 start **/
 			JSONObject json = new JSONObject();
@@ -1131,7 +1131,7 @@ public class OrderServiceImpl implements IOrderService{
 		int num = updateOrder(order.getOrderId(), null, "9", (byte)1, (byte)0);
 		String woResult = null;
 		if(num > 0){
-			woResult = postWoplatOrder(phone, product.getWoProductCode(), DateUtil.getDateTime(new Date()), order.getOrderChannel());
+			woResult = postWoplatOrder(phone, product.getWoProductCode(),DateUtil.getSysdateYYYYMMDDHHMMSS(), order.getOrderChannel());
 		}
 		/**组装支付订单信息返回给接入商 start**/
 		JSONObject json = new JSONObject();
