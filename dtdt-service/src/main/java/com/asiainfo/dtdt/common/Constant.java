@@ -14,7 +14,8 @@ public class Constant {
 	
 	public static final String lengthParam = "{\"orderId\":36,\"appkey\":36,\"pertnerCode\":12,\"phone\":11,\"productCode\":6,\"orderMethod\":1,\"vcode\":6,\"partnerOrderId\":36}";
 
-	public static final String POSTFIX_PARAMS_LENGTH = "{\"appkey\":36,\"partnerCode\":12,\"phone\":11,\"productCode\":6,\"orderMethod\":1,\"partnerOrderId\":36}";
+	public static final String POSTFIX_PARAMS_LENGTH = "{\"appkey\":36,\"partnerCode\":12,\"productCode\":6,\"orderMethod\":1,\"partnerOrderId\":36}";
+//	public static final String POSTFIX_PARAMS_LENGTH = "{\"appkey\":36,\"partnerCode\":12,\"phone\":11,\"productCode\":6,\"orderMethod\":1,\"partnerOrderId\":36}";
 
 	public static final String BATCH_POSTFIX_PARAMS_LENGTH = "{\"appkey\":36,\"partnerCode\":12,\"productCode\":6,\"orderMethod\":1,\"partnerOrderId\":36}";
 	

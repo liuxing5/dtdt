@@ -13,12 +13,14 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
+import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Product;
+import com.asiainfo.dtdt.interfaces.IProductService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
@@ -71,6 +73,9 @@ public class NoticeServiceImpl implements INoticeService {
 	
 	@Resource
 	private IOrderResourceService orderResourceService;
+	
+	@Autowired
+	private IProductService productService;
 
 	
 	/**
@@ -180,7 +185,18 @@ public class NoticeServiceImpl implements INoticeService {
 						
 					}else if(resultCode.equals("6")){//订购失败
 						log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
-						orderResourceService.refundOrderResource(order.getPartnerCode());
+						//判断产品类型，后向的加
+						String strProduct = productService.queryProduct(order.getProductCode());
+						log.debug("NoticeService optNoticeOrder {} get product| {} | ",order.getOrderId(),strProduct);
+						if (StringUtils.isBlank(strProduct)) {
+							log.info("NoticeService Product is null orderId {}" + order.getOrderId());
+						}else{
+							Product product = JSONObject.parseObject(strProduct, Product.class);
+							if (product.getType() == 1) {
+								orderResourceService.refundOrderResource(order.getPartnerCode());
+								log.debug("NoticeService | {} | refundOrderResource",order.getOrderId());
+							}
+						}
 						//订购失败更新在途表状态5-订购失败待原路退款
 						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");

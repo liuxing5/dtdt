@@ -331,21 +331,20 @@ public class OrderServiceImpl implements IOrderService{
 					Constant.ORDER_TYPE_NOTPOSTFIX_MSG
 							+ product.getProductName(), null);
 		}
-
-		/** 查询产品价格信息 end **/
-		if (!IsMobileNo.isMobile(phone)) {
+		/**
+		 * 校验手机号码
+		 */
+		if (StringUtils.isBlank(phone) || !IsMobileNo.isMobile(phone)) {
 			if (isBatch) {// 历史数据表中插入失败数据并返回
 				createHisOrder(appKey, partnerCode, partnerOrderId, phone,
 						product, orderMethod, null,
 						Constant.HISORDER_STATE_NOT_UNICOM,
 						Constant.HISORDER_STATE_NOT_UNICOM_REMARK);// 入历史表
-				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
-						Constant.NOT_UNICOM_MSG, null);
-			} else {
-				return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
-						Constant.NOT_UNICOM_MSG, null);
-			}
+			} 
+			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
+					Constant.NOT_UNICOM_MSG, null);
 		}
+		
 		/** 查询产品价格信息 end **/
 
 		String checkCR = null;
@@ -387,6 +386,8 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE,
 					Constant.SUCCESS_MSG, json);
 		}
+		orderResourceService.refundOrderResource(order.getPartnerCode());//回加次数
+		log.debug("NoticeService | {} | refundOrderResource",order.getOrderId());
 		// 更新在途订购订单状态7-订购失败
 		updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
 				Constant.IS_NEED_CHARGE_1,
@@ -500,7 +501,7 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
 					"appkey" + Constant.PARAM_NULL_MSG, null);
 		}
-		if (StringUtils.isBlank(phone))
+		if (needMobileCheck && StringUtils.isBlank(phone))
 		{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"
 					+ Constant.PARAM_NULL_MSG, null);
@@ -543,7 +544,7 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrder.setOperType(Constant.ORDER_OPER_TYPE_0);//订购类型 订购：0，退订：1
 		hisOrder.setIsRealRequestWoplat(Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);//是否真实请求沃家总管
 		hisOrder.setState(state);//状态
-		hisOrder.setMobilephone(phone);//订购手机号码
+//		hisOrder.setMobilephone(phone);//订购手机号码
 		hisOrder.setOrderChannel(orderMethod);//订购渠道
 		hisOrder.setCreateTime(new Date());//订购时间
 		hisOrder.setValidTime(new Date());//有效时间
@@ -558,7 +559,7 @@ public class OrderServiceImpl implements IOrderService{
 		/**查询接入方设置的信息 end**/
 		hisOrder.setAppKey(appKey);//合作方产品ID
 		hisOrder.setIsNeedCharge(app.getIsNeedCharge());//是否需要返充话费
-		hisOrder.setCopyRemark(copyRemark);
+		hisOrder.setCopyRemark(phone + copyRemark);
 		
 		hisOrderMapper.insertSelective(hisOrder);
 	}
@@ -579,7 +580,6 @@ public class OrderServiceImpl implements IOrderService{
 			e.printStackTrace();
 			return ReturnUtil.returnJsonError(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
 		}
-//		String seq = null;
 		String partnerCode = null;
 		String appKey = null;
 		JSONArray phones = null;
@@ -603,18 +603,7 @@ public class OrderServiceImpl implements IOrderService{
 			log.error("get param phones error");
 			return ReturnUtil.returnJsonError(Constant.PHONES_GET_ERROR_CODE, Constant.PHONES_GET_ERROR_MSG, null);
 		}
-		/**校验接口中传递的参数是否合法  start*/
-		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
-		}else{
-			if(1 == existPartnerOrderId(partnerOrderId)){
-				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
-			}
-		}
 		
-//		if (StringUtils.isBlank(seq)) {
-//			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "seq"+Constant.PARAM_NULL_MSG, null);
-//		}
 		if (StringUtils.isBlank(partnerCode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerCode"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -630,9 +619,6 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PHONES_TOO_LONG_CODE, Constant.PHONES_TOO_LONG_MSG, null);
 		}
 		
-//		if (!IsMobileNo.isMobile(phones)) {
-//			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE, Constant.NOT_UNICOM_MSG, null);
-//		}
 		if (StringUtils.isBlank(productCode)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "productCode"+Constant.PARAM_NULL_MSG, null);
 		}
@@ -640,11 +626,20 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
 		}
 		
+		
 		String paramErr = CheckParam.checkParam(Constant.BATCH_POSTFIX_PARAMS_LENGTH, jsonStr);
 		if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
 			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
 		}
-
+		
+		/**校验接口中传递的参数是否合法  start*/
+		if(StringUtils.isBlank(partnerOrderId)){//校验partnerOrderId 唯一
+			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "partnerOrderId"+Constant.PARAM_NULL_MSG, null);
+		}else{
+			if(1 == existPartnerOrderId(partnerOrderId)){
+				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
+			}
+		}
 	
 		/**查询产品价格信息 start**/
 		String strProduct = productService.queryProduct(productCode);
