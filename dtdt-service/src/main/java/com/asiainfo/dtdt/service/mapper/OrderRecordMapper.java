@@ -10,6 +10,17 @@ public interface OrderRecordMapper {
 	
 	OrderRecord selectByPrimaryKey(String orderId);
 	
+    /**
+    * @Title: queryOrderState 
+    * @Description: 查询订单状态
+    * @param orderId
+    * @param partnerCode
+    * @param appkey
+    * @return Order
+    * @throws
+     */
+	OrderRecord queryOrderState(String orderId, String partnerCode, String appkey);
+    
 	/**
 	* @Title: OrderRecordMapper 
 	* @Description: (删除订购关系信息) 
@@ -54,7 +65,7 @@ public interface OrderRecordMapper {
      * @return List<OrderRecord>
      * @throws
       */
- 	List<OrderRecord> queryOrderRecord(@Param("mobilephone")String phone, @Param("appkey")String appkey);
+ 	List<OrderRecord> queryOrderRecord(@Param("mobilephone")String phone, @Param("partnerCode")String partnerCode, @Param("appkey")String appkey);
  	
  	/**
  	* @Title: selectMonthProduct 

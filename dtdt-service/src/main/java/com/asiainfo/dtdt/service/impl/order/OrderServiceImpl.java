@@ -1373,25 +1373,11 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-		} else if(wojiaJson.getString("ecode").equals("-1")){
-			msg = "系统繁忙";
-		} else if(wojiaJson.getString("ecode").equals("-3")){
-			msg = "接口调用次数超过限制";
-		} else if(wojiaJson.getString("ecode").equals("100")){
-			msg = "缺少参数";
-		} else if(wojiaJson.getString("ecode").equals("101")){
-			msg = "参数 格式错误";
-		} else if(wojiaJson.getString("ecode").equals("110")){
-			msg = "操作超时";
-		} else if(wojiaJson.getString("ecode").equals("1451")){
-			msg = "当前合作伙伴没有定购产品的权限";
-		} else if(wojiaJson.getString("ecode").equals("1453")){
-			msg = "当前合作伙伴没有定购产品的额度";
 		} else if(wojiaJson.getString("ecode").equals("4000")){
 			msg = "产品 不存在或已失效";
 		} else if(wojiaJson.getString("ecode").equals("4003")){
 			msg = "订购关系不存在";
-		}else if(wojiaJson.getString("ecode").equals("4004")){
+		} else if(wojiaJson.getString("ecode").equals("4004")){
 			msg = "产品无法退订";
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail ecode=" + ecode + " emsg=" + emsg);
@@ -1499,20 +1485,6 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-		} else if(wojiaJson.getString("ecode").equals("-1")){
-			msg = "系统繁忙";
-		} else if(wojiaJson.getString("ecode").equals("-3")){
-			msg = "接口调用次数超过限制";
-		} else if(wojiaJson.getString("ecode").equals("100")){
-			msg = "缺少参数";
-		} else if(wojiaJson.getString("ecode").equals("101")){
-			msg = "参数 格式错误";
-		} else if(wojiaJson.getString("ecode").equals("110")){
-			msg = "操作超时";
-		} else if(wojiaJson.getString("ecode").equals("1451")){
-			msg = "当前合作伙伴没有定购产品的权限";
-		} else if(wojiaJson.getString("ecode").equals("1453")){
-			msg = "当前合作伙伴没有定购产品的额度";
 		} else if(wojiaJson.getString("ecode").equals("4000")){
 			msg = "产品 不存在或已失效";
 		} else if(wojiaJson.getString("ecode").equals("4003")){

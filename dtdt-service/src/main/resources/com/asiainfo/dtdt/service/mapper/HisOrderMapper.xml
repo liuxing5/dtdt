@@ -42,6 +42,15 @@
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
   
+  <select id="queryOrderState" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_his_order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+    and partner_code = #{partnerCode,jdbcType=VARCHAR}
+    and app_key = #{appkey,jdbcType=VARCHAR}
+  </select>
+  
   <select id="getListByPartnerOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
