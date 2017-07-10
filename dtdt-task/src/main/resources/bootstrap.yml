@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: dtdt-task
+  cloud:
+    zookeeper:
+      enabled: true
+      connect-string: 120.52.120.162:51002,120.52.120.162:51003,120.52.120.162:51004
+
