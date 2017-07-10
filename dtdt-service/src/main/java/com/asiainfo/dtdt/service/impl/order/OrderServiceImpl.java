@@ -331,7 +331,7 @@ public class OrderServiceImpl implements IOrderService{
 			}
 			Product product = JSONObject.parseObject(strProduct, Product.class);
 			if(product.getType() != 1){
-				return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
+				return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTPOSTFIX_MSG+product.getProductName(), null);
 			}
 			/**查询产品价格信息 end**/
 			if (!IsMobileNo.isMobile(phone)) {
@@ -662,7 +662,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		Product product = JSONObject.parseObject(strProduct, Product.class);
 		if(product.getType() != 1){
-			return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTFORWARD_MSG+product.getProductName(), null);
+			return ReturnUtil.returnJsonError(Constant.ORDER_TYPE_NOTFORWARD_CODE, Constant.ORDER_TYPE_NOTPOSTFIX_MSG+product.getProductName(), null);
 		}
 		BatchOrder batchOrder = null;
 		
