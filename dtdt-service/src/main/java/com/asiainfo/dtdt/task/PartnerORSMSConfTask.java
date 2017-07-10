@@ -23,7 +23,7 @@ public class PartnerORSMSConfTask {
 	
 	@PostConstruct
     public void init() {
-		partnerSMSConf.loadPartnerSMSConf();
+		//partnerSMSConf.loadPartnerSMSConf();
     }
 	
 }

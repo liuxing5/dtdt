@@ -24,11 +24,11 @@ public class PartnerOrderResourceTask {
 	
 	@PostConstruct
     public void init() {
-		partnerORServ.lookRedisPartnerOR();
-		partnerORServ.refreshTask();
+		/*partnerORServ.lookRedisPartnerOR();
+		partnerORServ.refreshTask();*/
     }
 
-	@Scheduled(cron = "0/30 * * * * ?")
+	/*@Scheduled(cron = "0/30 * * * * ?")
     public void lookRedisPartnerOR() {
     	partnerORServ.lookRedisPartnerOR();
     }
@@ -36,6 +36,6 @@ public class PartnerOrderResourceTask {
     @Scheduled(cron = "0 0/2 * * * ?")
     public void reload() {
     	partnerORServ.refreshTask();
-    } 
+    } */
 
 }

@@ -8,8 +8,6 @@ import javax.annotation.Resource;
 
 import lombok.extern.log4j.Log4j2;
 
-import org.springframework.util.StringUtils;
-
 import com.alibaba.dubbo.config.annotation.Service;
 import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
 import com.asiainfo.dtdt.common.util.RedisKey;
@@ -112,9 +110,6 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 			if(null != list)
 			{
 				// 过期列表 移到历史表
-				List<PartnerOrderResources> outDate = new ArrayList<PartnerOrderResources>();
-
-				List<PartnerOrderResources> charge = new ArrayList<PartnerOrderResources>();
 
 				list.forEach(por -> {
 					String key = RedisKey.PARTNER_OR_KEY_PREFIX
@@ -123,7 +118,7 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 					// 如果到期 则清掉key，否则刷新key的值
 					if (por.getEndTime().getTime() < new Date().getTime())
 					{
-						if (!StringUtils.isEmpty(redis.getStringValue(key)))
+						if (redis.exist(key))
 						{
 							log.info("{}到期，移除，预存次数{}，告警阈值{}，剩余次数{}", key,
 									por.getPreCount(), por.getWarnThreshold(),
@@ -131,47 +126,70 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 							por.setUseCount(por.getPreCount()
 									- Long.valueOf(redis.getStringValue(key)));
 						}
-						outDate.add(por);
-					} else if (StringUtils.isEmpty(redis.getStringValue(key)))
+						//outDate.add(por);
+						
+						partnerORMapper.updateByPrimaryKeySelective(por);
+						partnerHisORMapper.copyFromInstance(por.getBatchId());
+						partnerORMapper.deleteByPrimaryKey(por.getBatchId());
+					} else if (!redis.exist(key))
 					{
-						log.info("{}不存在，增加，预存次数{},告警阈值{}", key,
-								por.getPreCount(), redis.getStringValue(key),
-								por.getWarnThreshold());
 						Long canUseCount = por.getPreCount()
 								- por.getWarnThreshold();
 						redis.setForever(key, canUseCount.toString());
+						log.info("{}不存在，增加，预存次数{},告警阈值{},可用次数{}", key,
+								por.getPreCount(), 
+								por.getWarnThreshold(),
+								redis.getStringValue(key));
+						
 					} else
 					{
+						Long oldCanUsed = Long.valueOf(redis.getStringValue(key));
+						log.info("redisValue:{}***oldPreCount:{}**war:{}*****used:{}********************", 
+								oldCanUsed
+								,por.getPreCount()
+								,por.getWarnThreshold()
+								,por.getPreCount()
+								- por.getWarnThreshold()
+								- oldCanUsed);
 						por.setUseCount(por.getPreCount()
 								- por.getWarnThreshold()
-								- Long.valueOf(redis.getStringValue(key)));
-						Long newCount = Long.valueOf(redis.getStringValue(key))
-								+ por.getChargeCount();
+								- oldCanUsed);
+						
+						redis.increateValue(key, por.getChargeCount());
+						
 						log.info(
-								"{}存在未过期，刷新，预存次数{}，告警阈值{}，剩余次数{}，充值次数{}，刷新后次数{}",
+								"{}存在未过期，刷新，原预存次数{}，告警阈值{}，剩余次数{}，充值次数{}，刷新后次数{}",
 								key, por.getPreCount(), por.getWarnThreshold(),
-								redis.getStringValue(key),
-								por.getChargeCount(), newCount);
-						redis.setForever(key, String.valueOf(newCount));
-
+								oldCanUsed,
+								por.getChargeCount(), redis.getStringValue(key));
 						por.setPreCount(por.getPreCount()
 								+ por.getChargeCount());
 						por.setChargeCount(0l);
-
-						charge.add(por);
+						partnerORMapper.updateByPrimaryKeySelective(por);
+						
 					}
 				});
 
 				// 过期的copy到历史表
-				outDate.forEach(od -> {
+				/*outDate.forEach(od -> {
+					partnerORMapper.updateByPrimaryKeySelective(od);
 					partnerHisORMapper.copyFromInstance(od.getBatchId());
 					partnerORMapper.deleteByPrimaryKey(od.getBatchId());
 				});
 
 				// 充值的将充值次数加到预存上去
 				charge.forEach(c -> {
-					partnerORMapper.updateByPrimaryKeySelective(c);
-				});
+					
+					String key = RedisKey.PARTNER_OR_KEY_PREFIX
+							+ c.getPartnerCode();
+					redis.increateValue(key, c.getChargeCount());
+					
+					log.info(
+							"{}存在未过期，刷新，预存次数{}，告警阈值{}，刷新后次数{}",
+							key, c.getPreCount(), c.getWarnThreshold(),
+							redis.getStringValue(key)
+							);
+				});*/
 			}
 		
 		
@@ -195,7 +213,7 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 				list.forEach(por -> {
 					String key = RedisKey.PARTNER_OR_KEY_PREFIX
 							+ por.getPartnerCode();
-					log.info("key:{}|exist:{}|value:{}", key,
+					log.info("key:{}|exist:{}|value:{}", key, redis.exist(key),
 							 redis.getStringValue(key));
 				});
 			}
