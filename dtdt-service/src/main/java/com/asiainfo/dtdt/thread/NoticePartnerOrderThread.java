@@ -28,11 +28,11 @@ public class  NoticePartnerOrderThread implements Runnable {
 	}
 	
 	private void NoticePartnerOrder(){
-		log.info("noticeOrder thread {} start woOrderId=",woOrderId);
+		log.info("noticeOrder thread woOrderId={} start woOrderId=",woOrderId);
 		if(StringUtils.isNotBlank(woOrderId)){
 			noticeService.optNoticeOrder(orderState, woOrderId);
 		}
-		log.info("noticeOrder thread {} end woOrderId=",woOrderId);
+		log.info("noticeOrder thread woOrderId={} end ",woOrderId);
 	}
 
 }

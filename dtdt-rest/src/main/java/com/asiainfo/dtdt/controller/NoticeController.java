@@ -53,7 +53,7 @@ public class NoticeController {
 	@ResponseBody
 	public synchronized String notice(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
-        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "utf-8"));
         StringBuilder sb = new StringBuilder();
         String line = "";
         while ((line = in.readLine()) != null) {
@@ -117,7 +117,7 @@ public class NoticeController {
 		JSONObject resultJson = new JSONObject();
 		try {
 			InputStream ins = request.getInputStream();
-	        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "ISO-8859-1"));
+	        BufferedReader in = new BufferedReader(new InputStreamReader(ins, "utf-8"));
 	        StringBuilder sb = new StringBuilder();
 	        String line = "";
 	        while ((line = in.readLine()) != null) {
