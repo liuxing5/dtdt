@@ -51,31 +51,6 @@ public class OrderResourceServiceImpl implements IOrderResourceService{
 	{
 		String key = RedisKey.PARTNER_OR_KEY_PREFIX + partnerCode;
 
-		/*if (!redisSingle.exist(key))
-		{
-			
-			PartnerOrderResources por = pORService.loadByPartnerCode(partnerCode);
-			if(null != por)
-			{
-				redisSingle.set(key, por.getPreCount().toString());
-				log.info("无可用次数！key不存在，key:{},load成功，预存次数{}", key, por.getPreCount());
-			}
-			else
-			{
-				log.info("无可用次数！key不存在，key:{},load无记录", key);
-				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
-						Constant.NO_ORDER_RESOURCE_MSG, null);
-			}
-		Long count = Long.valueOf(redisSingle.get(key));
-		if (count == 0l)
-		{
-			log.info("订购次数已用完，key：{}", key);
-			return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_RESOURCE_CODE,
-					Constant.NO_ORDER_RESOURCE_MSG, null);
-		}
-		log.info("使用一次key:{}", key);
-		redisSingle.incrBy(key, -1);*/
-		
 		/*集群方式*/
 		if (org.springframework.util.StringUtils.isEmpty(redisAssistant
 				.getStringValue(key)))
