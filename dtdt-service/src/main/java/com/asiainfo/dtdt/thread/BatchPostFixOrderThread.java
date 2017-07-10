@@ -36,7 +36,7 @@ public class  BatchPostFixOrderThread implements Runnable {
 				JSONObject json = new JSONObject();
 //				json.put("seq", "");
 				json.put("partnerCode", batchOrder.getPartnerCode());
-				json.put("appKey", batchOrder.getAppKey());
+				json.put("appkey", batchOrder.getAppKey());
 				json.put("productCode", batchOrder.getProductCode());
 				json.put("orderMethod", "1");
 				json.put("partnerOrderId", batchOrder.getPartnerOrderId());
