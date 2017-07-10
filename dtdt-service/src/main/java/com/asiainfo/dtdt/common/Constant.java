@@ -90,7 +90,7 @@ public class Constant {
 	/**手机号码列表异常号码**/
 	public static final String PHONES_ERROR_CODE 		= "20005";
 	/**手机号码列表异常号码描述**/
-	public static final String PHONES_ERROR_MSG 		= "手机号码列表异常";
+	public static final String PHONES_ERROR_MSG 		= "手机号码列表为空";
 	
 	/**手机号码列表异常号码**/
 	public static final String PHONES_GET_ERROR_CODE 		= "20006";
