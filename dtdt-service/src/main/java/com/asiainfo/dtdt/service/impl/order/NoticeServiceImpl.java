@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import lombok.extern.log4j.Log4j2;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +19,6 @@ import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Product;
-import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
@@ -34,6 +31,8 @@ import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.NoticePartnerOrderThread;
 
+import lombok.extern.log4j.Log4j2;
+
 /** 
 * @author 作者 : xiangpeng
 * @date 创建时间：2017年7月3日 上午11:31:25 
@@ -44,7 +43,7 @@ import com.asiainfo.dtdt.thread.NoticePartnerOrderThread;
 */
 @Log4j2
 @Service
-public class NotcieServiceImpl implements INoticeService {
+public class NoticeServiceImpl implements INoticeService {
 
 	@Resource
 	private IOrderService orderService;
@@ -55,14 +54,8 @@ public class NotcieServiceImpl implements INoticeService {
 	@Autowired
 	private OrderRecordMapper orderRecordMapper;
 	
-	@Autowired 
-	private IChargeService chargeService;
-	
 	@Autowired
 	private IPayOrderService payOrderService;
-	
-	@Autowired
-	private INoticeService noticeService;
 	
 	@Autowired
 	private AppMapper appMapper;
@@ -114,7 +107,9 @@ public class NotcieServiceImpl implements INoticeService {
 //				list.add(mapList);
 //			}
 			/**处理业务开始*/
-			optNoticeOrder(orderState, orderId);
+			NoticePartnerOrderThread noticePartnerOrderThread = new NoticePartnerOrderThread(orderId,orderState);
+			Thread thread = new Thread(noticePartnerOrderThread);
+			thread.start();
 			/**处理业务结束*/
 			returnJson.put("ecode", "0");
 			returnJson.put("emsg", "成功");
@@ -173,18 +168,14 @@ public class NotcieServiceImpl implements INoticeService {
 								batchOrder = getBatchOrder(order.getPartnerOrderId());
 								if(BatchOrder.STATE_END.equals(batchOrder.getState())){
 									/**订购失败回调通知**/
-									NoticePartnerOrderThread noticePartnerOrderThread = new NoticePartnerOrderThread(order.getOrderId());
-									Thread thread = new Thread(noticePartnerOrderThread);
-									thread.start();
+									dtdtNoticeOrder(order.getOrderId());
 								}
 							}else{
 								log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
 							}
 						}else{					
 							/**订购失败回调通知**/
-							NoticePartnerOrderThread noticePartnerOrderThread = new NoticePartnerOrderThread(order.getOrderId());
-							Thread thread = new Thread(noticePartnerOrderThread);
-							thread.start();
+							dtdtNoticeOrder(order.getOrderId());
 						}
 						
 					}else if(resultCode.equals("6")){//订购失败
@@ -194,9 +185,7 @@ public class NotcieServiceImpl implements INoticeService {
 						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
 						/**订购失败回调通知**/
-						NoticePartnerOrderThread noticePartnerOrderThread = new NoticePartnerOrderThread(order.getOrderId());
-						Thread thread = new Thread(noticePartnerOrderThread);
-						thread.start();
+						dtdtNoticeOrder(order.getOrderId());
 						log.info("NoticeService optNoticeOrder return code is notSuccess and noError orderState="+resultCode +" orderId="+orderId);
 					}
 				}else{//处理退订的业务
@@ -215,9 +204,7 @@ public class NotcieServiceImpl implements INoticeService {
 							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
 						}
 						/**退订处理完成回调通知**/
-						NoticePartnerOrderThread noticePartnerOrderThread = new NoticePartnerOrderThread(order.getOrderId());
-						Thread thread = new Thread(noticePartnerOrderThread);
-						thread.start();
+						dtdtNoticeOrder(order.getOrderId());
 					}
 				}
 			}

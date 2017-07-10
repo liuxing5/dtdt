@@ -34,4 +34,13 @@ public interface INoticeService {
 	* @throws
 	 */
 	boolean thirdPayNotice(String params);
+	
+	/**
+	* @Title: INoticeService 
+	* @Description: (回调处理业务处理) 
+	* @param resultCode
+	* @param orderId        
+	* @throws
+	 */
+	void optNoticeOrder(String resultCode, String orderId);
 }

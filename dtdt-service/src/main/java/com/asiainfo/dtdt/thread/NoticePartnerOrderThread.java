@@ -11,10 +11,13 @@ import lombok.extern.log4j.Log4j2;
 public class  NoticePartnerOrderThread implements Runnable {
 	private INoticeService noticeService;
 	
-	private String orderId = "";
+	private String woOrderId ;
 	
-	public NoticePartnerOrderThread(String orderId) {
-		this.orderId = orderId;
+	private String orderState;
+	
+	public NoticePartnerOrderThread(String woOrderId,String orderState) {
+		this.woOrderId = woOrderId;
+		this.orderState = orderState;
 		ApplicationContext context = SpringContextUtil.getApplicationContext();  
 		noticeService = (INoticeService) context.getBean("noticeServiceImpl");
 	}
@@ -25,11 +28,11 @@ public class  NoticePartnerOrderThread implements Runnable {
 	}
 	
 	private void NoticePartnerOrder(){
-		log.info("noticeOrder thread {} start",orderId);
-		if(StringUtils.isNotBlank(orderId)){
-			noticeService.dtdtNoticeOrder(orderId);
+		log.info("noticeOrder thread {} start woOrderId=",woOrderId);
+		if(StringUtils.isNotBlank(woOrderId)){
+			noticeService.optNoticeOrder(orderState, woOrderId);
 		}
-		log.info("noticeOrder thread {} end",orderId);
+		log.info("noticeOrder thread {} end woOrderId=",woOrderId);
 	}
 
 }

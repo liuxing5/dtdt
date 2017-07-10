@@ -49,7 +49,7 @@ public class NoticeController {
 	* @throws IOException        
 	* @throws
 	 */
-	@RequestMapping("/order")
+	@RequestMapping(value="/order",produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public synchronized String notice(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		InputStream ins = request.getInputStream();
@@ -110,7 +110,7 @@ public class NoticeController {
 	* @return        
 	* @throws
 	 */
-	@RequestMapping("/test/partnerNotice")
+	@RequestMapping(value="/test/partnerNotice",produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public synchronized String partnerNotice(HttpServletRequest request, HttpServletResponse response){
 		log.info("**********合作方接收通知开始**********");
