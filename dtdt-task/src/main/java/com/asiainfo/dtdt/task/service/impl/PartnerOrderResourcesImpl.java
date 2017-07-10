@@ -62,6 +62,7 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 									redis.getStringValue(key));
 							por.setUseCount(por.getPreCount()
 									- Long.valueOf(redis.getStringValue(key)));
+							redis.clear(key);
 						}
 						partnerORMapper.updateByPrimaryKeySelective(por);
 						partnerHisORMapper.copyFromInstance(por.getBatchId());
