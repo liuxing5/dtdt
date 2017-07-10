@@ -44,11 +44,11 @@ public class  BatchPostFixOrderThread implements Runnable {
 				for(int i = 0;i < size; i++){
 					phoneNum = (String) ja.get(i);
 					log.debug("for batchOrder {}|{}|",batchOrder.getBatchId(),phoneNum);
-					if(StringUtils.isNotBlank(phoneNum)){
-						json.put("phone", phoneNum);
-						String result = orderService.postfixOrder(json.toJSONString());
-						log.info("batchOrderId|{}|{}|",batchOrder.getBatchId(),result);
-					}
+//					if(StringUtils.isNotBlank(phoneNum)){
+					json.put("phone", phoneNum);
+					String result = orderService.postfixOrder(json.toJSONString());
+					log.info("batchOrderId|{}|{}|",batchOrder.getBatchId(),result);
+//					}
 					phoneNum = null;
 				}
 			}
