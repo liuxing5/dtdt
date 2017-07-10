@@ -1,23 +1,20 @@
 package com.asiainfo.dtdt.service.impl.order;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
+
+import lombok.extern.log4j.Log4j2;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.alibaba.dubbo.common.json.JSON;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
-import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
@@ -28,14 +25,13 @@ import com.asiainfo.dtdt.interfaces.order.IChargeService;
 import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.pay.IPayOrderService;
+import com.asiainfo.dtdt.service.IOrderResourceService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.BatchOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
-
-import lombok.extern.log4j.Log4j2;
 
 /** 
 * @author 作者 : xiangpeng
@@ -78,6 +74,10 @@ public class NotcieServiceImpl implements INoticeService {
 	
 	@Autowired
 	private BatchOrderMapper batchOrderMapper;
+	
+	@Resource
+	private IOrderResourceService orderResourceService;
+
 	
 	/**
 	 * (非 Javadoc) 
@@ -182,7 +182,7 @@ public class NotcieServiceImpl implements INoticeService {
 						
 					}else if(resultCode.equals("6")){//订购失败
 						log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
-						orderResourceService.refundOrderResource(partnerCode);
+						orderResourceService.refundOrderResource(order.getPartnerCode());
 						//订购失败更新在途表状态5-订购失败待原路退款
 						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
