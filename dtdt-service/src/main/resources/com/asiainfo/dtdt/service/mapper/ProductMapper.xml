@@ -40,6 +40,7 @@
 	WHERE pp.product_id = pd.id
 	AND pp.state = 0 
 	AND app_id = #{appId,jdbcType=BIGINT}
+	AND partner_id = #{partnerId,jdbcType=BIGINT}
   </select>
   <!-- 根据产品 编码查询产品 -->
   <select id="queryProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >

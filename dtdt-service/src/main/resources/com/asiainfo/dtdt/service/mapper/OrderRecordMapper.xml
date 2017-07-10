@@ -41,6 +41,16 @@
     from t_s_order_record
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
+  
+  <select id="queryOrderState" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_order_record
+    where order_id = #{orderId,jdbcType=VARCHAR}
+    and partner_code = #{partnerCode,jdbcType=VARCHAR}
+    and app_key = #{appkey,jdbcType=VARCHAR}
+  </select>
+  
   <select id="selectMonthProduct" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
@@ -82,7 +92,8 @@
     	price,count,money,valid_time,invalid_time
     from t_s_order_record
     where mobilephone = #{mobilephone,jdbcType=VARCHAR}
-    and  app_key = #{appkey,jdbcType=VARCHAR}
+    and app_key = #{appkey,jdbcType=VARCHAR}
+    and partner_code = #{partnerCode,jdbcType=VARCHAR}
   </select>
   <delete id="deleteOrderRecord" parameterType="java.lang.String" >
     delete from t_s_order_record

@@ -34,7 +34,7 @@ public class CheckParam {
 	}
 	public static String checkParam(String paramsLength,String json){
 		StringBuffer sbBuffer  = new StringBuffer();
-		String errMsg = null;
+		String errMsg = "";
 		Map<String, Integer> map = JSONObject.parseObject(paramsLength, HashMap.class);
 		try {
 			JSONObject jsonObject = JSONObject.parseObject(json);

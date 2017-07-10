@@ -17,6 +17,17 @@ public interface OrderMapper {
     int insertOrder(Order record);
 
     Order selectByPrimaryKey(String orderId);
+    
+    /**
+    * @Title: queryOrderState 
+    * @Description: 查询订单状态
+    * @param orderId
+    * @param partnerCode
+    * @param appkey
+    * @return Order
+    * @throws
+     */
+    Order queryOrderState(String orderId, String partnerCode, String appkey);
 
     int updateByPrimaryKeySelective(Order record);
     
