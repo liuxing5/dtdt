@@ -19,7 +19,7 @@ public interface OrderRecordMapper {
     * @return Order
     * @throws
      */
-	OrderRecord queryOrderState(String orderId, String partnerCode, String appkey);
+	OrderRecord queryOrderState(@Param("orderId")String orderId, @Param("partnerCode")String partnerCode, @Param("appkey")String appkey);
     
 	/**
 	* @Title: OrderRecordMapper 

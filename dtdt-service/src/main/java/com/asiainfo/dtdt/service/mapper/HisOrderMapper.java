@@ -2,6 +2,8 @@ package com.asiainfo.dtdt.service.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.asiainfo.dtdt.entity.HisOrder;
 
 public interface HisOrderMapper {
@@ -23,6 +25,6 @@ public interface HisOrderMapper {
     * @return Order
     * @throws
      */
-    HisOrder queryOrderState(String orderId, String partnerCode, String appkey);
+    HisOrder queryOrderState(@Param("orderId")String orderId, @Param("partnerCode")String partnerCode, @Param("appkey")String appkey);
 
 }
