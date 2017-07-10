@@ -164,27 +164,8 @@ public class NoticeServiceImpl implements INoticeService {
 						}
 						orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
-
-						/**订购成功回调通知**/
-						if(isBatchOrder(order.getPartnerOrderId())){//批量订单和单个分开通知
-							BatchOrder batchOrder = null;
-							if(StringUtils.isNotBlank(order.getPartnerOrderId())){
-								orderService.updateBatchOrderState(order.getPartnerOrderId());
-								batchOrder = getBatchOrder(order.getPartnerOrderId());
-								if(BatchOrder.STATE_END.equals(batchOrder.getState())){
-									/**订购失败回调通知**/
-									dtdtNoticeOrder(order.getOrderId());
-								}
-							}else{
-								log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
-							}
-						}else{					
-							/**订购失败回调通知**/
-							dtdtNoticeOrder(order.getOrderId());
-						}
 						
 					}else if(resultCode.equals("6")){//订购失败
-						log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
 						//判断产品类型，后向的加
 						String strProduct = productService.queryProduct(order.getProductCode());
 						log.debug("NoticeService optNoticeOrder {} get product| {} | ",order.getOrderId(),strProduct);
@@ -197,13 +178,35 @@ public class NoticeServiceImpl implements INoticeService {
 								log.debug("NoticeService | {} | refundOrderResource",order.getOrderId());
 							}
 						}
+						log.info("NoticeService optNoticeOrder wojia return resultCode 7-订购失败");
 						//订购失败更新在途表状态5-订购失败待原路退款
 						orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 						orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
 						/**订购失败回调通知**/
-						dtdtNoticeOrder(order.getOrderId());
+//						dtdtNoticeOrder(order.getOrderId());
 						log.info("NoticeService optNoticeOrder return code is notSuccess and noError orderState="+resultCode +" orderId="+orderId);
 					}
+					
+					/**订购成功回调通知**/
+					if(isBatchOrder(order.getPartnerOrderId())){//批量订单和单个分开通知
+						log.debug("order | {} | is batch order",order.getOrderId());
+						BatchOrder batchOrder = null;
+						if(StringUtils.isNotBlank(order.getPartnerOrderId())){
+							orderService.updateBatchOrderState(order.getPartnerOrderId());
+							batchOrder = getBatchOrder(order.getPartnerOrderId());
+							log.debug("batchOrder |{}| state is | {} |",batchOrder.getBatchId(),batchOrder.getState());
+							if(BatchOrder.STATE_END.equals(batchOrder.getState())){
+								/** 批量的通知 **/
+								dtdtNoticeBatchOrder(batchOrder);
+							}
+						}else{
+							log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
+						}
+					}else{					
+						/**订购失败回调通知**/
+						dtdtNoticeOrder(order.getOrderId());
+					}
+					
 				}else{//处理退订的业务
 					OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
 					if(orderRecord == null){
@@ -240,6 +243,7 @@ public class NoticeServiceImpl implements INoticeService {
 	 */
 	@Override
 	public void dtdtNoticeOrder(String orderId) {
+		log.debug("dtdtNoticeOrder |{}| start",orderId);
 		try {
 			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
 			App app = appMapper.queryAppInfo(orderRecord.getAppKey());
@@ -304,6 +308,7 @@ public class NoticeServiceImpl implements INoticeService {
 	}
 
 	public void dtdtNoticeBatchOrder(BatchOrder batchOrder) {
+		log.debug("dtdtNoticeBatchOrder start | {} |",batchOrder.toString());
 		try {
 			App app = appMapper.queryAppInfo(batchOrder.getAppKey());
 			Product product = productMapper.queryProduct(batchOrder.getProductCode());

@@ -331,32 +331,32 @@ public class OrderServiceImpl implements IOrderService{
 					Constant.ORDER_TYPE_NOTPOSTFIX_MSG
 							+ product.getProductName(), null);
 		}
+		String returnStr = "";
+		
 		/**
 		 * 校验手机号码
 		 */
 		if (StringUtils.isBlank(phone) || !IsMobileNo.isMobile(phone)) {
-			if (isBatch) {// 历史数据表中插入失败数据并返回
-				createHisOrder(appKey, partnerCode, partnerOrderId, phone,
-						product, orderMethod, null,
-						Constant.HISORDER_STATE_NOT_UNICOM,
-						Constant.HISORDER_STATE_NOT_UNICOM_REMARK);// 入历史表
-			} 
-			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
+			returnStr =  ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
 					Constant.NOT_UNICOM_MSG, null);
 		}
 		
 		/** 查询产品价格信息 end **/
-
-		String checkCR = null;
 		try {
-			checkCR = orderResourceService.checkCounts(partnerCode);
+			returnStr = orderResourceService.checkCounts(partnerCode);
 		} catch (Exception e) {
-			return ReturnUtil.returnJsonError(Constant.ERROR_CODE,
+			returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
 					Constant.ERROR_MSG, null);
 		}
-		if (null != checkCR) {
-			return checkCR;
-		}
+		if (StringUtils.isNotBlank(returnStr)) {// 历史数据表中插入失败数据并返回
+			if(isBatch){
+				createHisOrder(appKey, partnerCode, partnerOrderId, phone,
+						product, orderMethod, null,
+						Constant.HISORDER_STATE_NOT_UNICOM,
+						Constant.HISORDER_STATE_NOT_UNICOM_REMARK);// 入历史表
+			}
+			return returnStr;
+		} 
 
 		/** 检查是否存在互斥产品并存储在途数据 **/
 		Order order = null;
