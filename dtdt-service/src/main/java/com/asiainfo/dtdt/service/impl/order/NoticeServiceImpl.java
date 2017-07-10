@@ -13,7 +13,6 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
-import com.asiainfo.dtdt.common.ReturnUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
@@ -206,27 +205,34 @@ public class NoticeServiceImpl implements INoticeService {
 						/**订购失败回调通知**/
 						dtdtNoticeOrder(order.getOrderId());
 					}
-					
-				}else{//处理退订的业务
-					OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(order.getOrderId());
-					if(orderRecord == null){
-						log.info("NoticeService optNoticeOrder closeOrder queryOrderRecord is null by orderId="+order.getOrderId());
-					}else{
-						if(resultCode.equals("5")){//退订成功（可再订购）
-							log.info("NoticeService optNoticeOrder wojia return resultCode 5-退订成功（可再订购）");
-							//退订成功将订单关系数据转移到备份表中
-//								orderService.updateOrder(order.getOrderId(), null, "19", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-//								orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "邮箱侧退订成功");
-							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "19");
-						}else if(resultCode.equals("7")){//退订失败
-							log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
-							orderService.closeOrderUpdateTable(order.getOrderId(), JSONObject.toJSONString(orderRecord), "23");//我方平台自定义退订失败状态为23
-						}
-						/**退订处理完成回调通知**/
-						dtdtNoticeOrder(order.getOrderId());
-					}
 				}
 			}
+			
+			//处理退订的业务
+			log.info("repeat-order：begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
+			boolean flag = (order == null ? true:false);
+			
+			OrderRecord orderRecord = null;
+			try {
+				orderRecord = orderRecordMapper.queryOrderRecordByWoOrderId(orderId);
+			} catch (Exception e) {
+				log.info("NoticeService queryOrderRecordByWoOrderId Exception e=" + e);
+				e.printStackTrace();
+			}
+			
+			if (!(orderRecord == null && order == null)) {
+				if(resultCode.equals("3")){//退订中（退订申请已通过，产品次月失效，当月不可再订购。）
+					log.info("NoticeService optNoticeOrder wojia return resultCode 3-退订中（退订申请已通过，产品次月失效，当月不可再订购。）");
+					orderService.closeOrderUpdateTable(flag? null:order.getOrderId(), JSONObject.toJSONString(orderRecord), "20", flag);//状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
+				}else if(resultCode.equals("7")){//退订失败
+					log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
+					orderService.closeOrderUpdateTable(flag? null:order.getOrderId(), JSONObject.toJSONString(orderRecord), "23", flag);//我方平台自定义退订失败状态为23
+				}
+				/**退订处理完成回调通知**/
+				dtdtNoticeOrder(orderRecord.getOrderId());
+			}
+			log.info("repeat-order：end");
+			
 		} catch (Exception e) {
 			log.error("NoticeService optNoticeOrder fail:"+e.getMessage(),e);
 			e.printStackTrace();

@@ -87,4 +87,13 @@ public interface OrderRecordMapper {
  	 */
  	OrderRecord selectOrderRecord(@Param("orderId")String orderId, @Param("appkey")String appkey, @Param("partnerCode")String partnerCode);
  	
+ 	/**
+ 	* @Title: queryOrderByWoOrderId 
+ 	* @Description: TODO(这里用一句话描述这个方法的作用)
+ 	* @param woOrderId
+ 	* @return Order
+ 	* @throws
+ 	 */
+ 	OrderRecord queryOrderRecordByWoOrderId(@Param("woOrderId")String woOrderId);
+ 	
 }

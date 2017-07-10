@@ -70,6 +70,14 @@
     and partner_code = #{partnerCode,jdbcType=VARCHAR}
     and parent_order_id is null or parent_order_id=''
   </select>
+  
+  <select id="queryOrderRecordByWoOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_order_record
+    where wo_order_id = #{woOrderId,jdbcType=VARCHAR}
+  </select>
+  
   <select id="queryOrderRecordByParam" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

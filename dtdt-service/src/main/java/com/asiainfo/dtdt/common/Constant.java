@@ -155,6 +155,11 @@ public class Constant {
 
 	public static final String ORDER_TYPE_NOTPOSTFIX_MSG	=	"非后向订购产品：";
 	
+	/**重复退订免流产品错误编码**/
+	public static final String CLOSE_ORDER_EXISTENCE_CODE	=	"40009";
+	/**重复退订免流产品错误描述**/
+	public static final String CLOSE_ORDER_EXISTENCE_MSG		=	"重复退订产品：";
+	
 	/**订单不存在编码**/
 	public static final String NO_ORDER_CODE	=	"40010";
 	/**订单不存在编码描述**/

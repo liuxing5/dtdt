@@ -164,7 +164,8 @@ public interface IOrderService {
     * @param orderId
     * @param orderRecord
     * @param state void
+    * @param boolean flag
     * @throws
      */
-    void closeOrderUpdateTable(String orderId, String orderRecordJson, String state);
+    void closeOrderUpdateTable(String orderId, String orderRecordJson, String state, boolean flag);
 }

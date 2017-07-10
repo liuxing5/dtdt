@@ -1307,6 +1307,11 @@ public class OrderServiceImpl implements IOrderService{
 			orderRecord = orderRecordMapper.selectOrderRecord(orderId, appkey, partnerCode);
 			if (null == orderRecord)
 				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
+			
+			//等幂性校验：同一订单每次请求,根据woOrderId在orderRecord表中肯定有一条订购成功信息；在订单表order中有小于或者等于1条数据
+			Order order = orderMapper.queryOrderByWoOrderId(orderRecord.getWoOrderId());
+			if (order != null) return ReturnUtil.returnJsonInfo(Constant.CLOSE_ORDER_EXISTENCE_CODE, Constant.CLOSE_ORDER_EXISTENCE_MSG, null);
+			
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrderNew() selectByPrimaryKey() Exception e=" + e);
 			return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -1538,35 +1543,38 @@ public class OrderServiceImpl implements IOrderService{
 	
 	/**
 	* @Title: closeOrderUpdateTable 
-	* @Description: 沃家退订接口回调后，更新 order和orderRecord表状态并迁移到历史表
+	* @Description: 沃家退订接口回调后，更新 order和orderRecord表：
+	* 						包月，包年，包半年：月底通知我们，所以回调中：迁order数据，改订购关系表状态
 	* @param newOrderId
 	* @param orderRecord
 	* @param state
 	* @return String
 	* @throws
 	 */
-	public void closeOrderUpdateTable(String orderId, String orderRecordJson, String state) {
-		log.info("OrderServiceImpl closeOrderUpdateTable() orderRecordJson =" + orderRecordJson);
+	public void closeOrderUpdateTable(String orderId, String orderRecordJson, String state, boolean isOrderNull) {
+		log.info("OrderServiceImpl closeOrderUpdateTable() orderRecordJson =" + orderRecordJson + " state=" + state);
 		
 		OrderRecord orderRecord = JSONObject.parseObject(orderRecordJson, OrderRecord.class);
 		Date date = new Date();
 		try {
-			//t_s_order 表到 t_s_his_order 表
-			insertFromHisOrderById(orderId, "0", "包月退订");//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
-			orderMapper.deleteByPrimaryKey(orderId);
+			if (!isOrderNull) {
+				//t_s_order 表到 t_s_his_order 表
+				insertFromHisOrderById(orderId, "0", "包月退订-" + (state.equals("20")?"成功":"失败"));//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+				orderMapper.deleteByPrimaryKey(orderId);
+			}
 			
-			//t_s_order_record 表到 t_s_his_order_record 表
-			orderRecord.setState(state);//设置状态：19-退订成功 23-退订失败
-			orderRecord.setRemark("退订失败");
+			//更新t_s_order_record表
+			orderRecord.setState(state);//设置状态：状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中； 23-退订失败
 			orderRecord.setUpdateTime(date);
 			orderRecord.setRefundTime(date);
+			orderRecord.setInvalidTime(DateUtil.getCurrentMonthEndTime(date));//月底
+			orderRecord.setRefundValidTime(DateUtil.getCurrentMonthEndTime(date));//月底
+			orderRecord.setRemark("退订-" + (state.equals("20")?"成功":"失败"));
 			orderRecordMapper.updateOrderRecord(orderRecord);
-			if ("19".equals(state)) {
-				orderRecord.setRemark("退订成功");
-				orderRecord.setRefundValidTime(DateUtil.getCurrentMonthEndTime(date));//月底
-				insertHisOrderRecord(orderRecord);
-				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
-			}
+//			if ("20".equals(state)) {
+//				insertHisOrderRecord(orderRecord);//不挪表数据
+//				orderRecordMapper.deleteOrderRecord(orderRecord.getOrderId());
+//			}
 		} catch (Exception e) {
 			log.info("OrderServiceImpl closeOrderUpdateTable() Exception e=" + e);
 			e.printStackTrace();
