@@ -307,7 +307,7 @@ public class OrderServiceImpl implements IOrderService{
 			isBatch = jsonObject.getBoolean("isBatch");
 		}
 		String checkpR = checkParam(partnerCode, appKey, phone, productCode,
-				orderMethod, partnerOrderId, isBatch);
+				orderMethod, partnerOrderId, isBatch,false);
 		if (null != checkpR) {
 			return checkpR;
 		}
@@ -488,7 +488,7 @@ public class OrderServiceImpl implements IOrderService{
 
 	private String checkParam(String partnerCode, String appKey,
 			String phone, String productCode, String orderMethod,
-			String partnerOrderId,boolean isBatch)
+			String partnerOrderId,boolean isBatch,boolean needMobileCheck)
 	{
 		if (StringUtils.isBlank(partnerCode))
 		{
@@ -505,7 +505,7 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"
 					+ Constant.PARAM_NULL_MSG, null);
 		}
-		if (!IsMobileNo.isMobile(phone))
+		if (needMobileCheck && !IsMobileNo.isMobile(phone))
 		{
 			return ReturnUtil.returnJsonInfo(Constant.NOT_UNICOM_CODE,
 					Constant.NOT_UNICOM_MSG, null);
@@ -1064,7 +1064,7 @@ public class OrderServiceImpl implements IOrderService{
 		/**获取接口中传递的参数  end*/
 		/**校验接口中传递的参数是否合法  start*/
 		String checkpR = checkParam(partnerCode, appkey, phone, productCode,
-				orderMethod, partnerOrderId,false);
+				orderMethod, partnerOrderId,false,true);
 		if(null != checkpR)
 		{
 			return checkpR;
