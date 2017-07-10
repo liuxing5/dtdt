@@ -318,6 +318,10 @@ public class OrderServiceImpl implements IOrderService{
 			{
 				return checkpR;
 			}
+			String paramErr = CheckParam.checkParam(Constant.POSTFIX_PARAMS_LENGTH, jsonStr);
+			if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
+				return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
+			}
 			
 			/** 查询产品价格信息 start **/
 			String strProduct = productService.queryProduct(productCode);
@@ -682,12 +686,9 @@ public class OrderServiceImpl implements IOrderService{
 		String partnerOrderId = null;
 		
 		try {
-//			seq = jsonObject.getString("seq");
 			partnerCode = jsonObject.getString("partnerCode");
 			appKey = jsonObject.getString("appkey");
-//			partnerCode = "1234543245";
-//			appKey = "fwerh4356ytrt54";
-			phones = jsonObject.getJSONArray("phone");
+			phones = jsonObject.getJSONArray("phones");
 			productCode = jsonObject.getString("productCode");
 			orderMethod = jsonObject.getString("orderMethod").toString();
 			partnerOrderId = jsonObject.getString("partnerOrderId");
@@ -731,6 +732,11 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		if (StringUtils.isBlank(orderMethod)) {
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "orderMethod"+Constant.PARAM_NULL_MSG, null);
+		}
+		
+		String paramErr = CheckParam.checkParam(Constant.BATCH_POSTFIX_PARAMS_LENGTH, jsonStr);
+		if(!CheckParam.checkParamIsNull(paramErr) && !"null".equals(paramErr)){
+			return ReturnUtil.returnJsonError(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+":"+paramErr, null);
 		}
 
 	
