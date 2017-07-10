@@ -97,11 +97,11 @@ public class AuthoController extends BaseController{
 			}
 			redisUtil.set(sb.toString(), String.valueOf(code),
 					Integer.valueOf(smsvalidStr) * 60);*/
-			String smsvalidStr = redis.getStringValue("smsc_v_t");
+			String smsvalidStr = redis.getStringValue(RedisKey.SMSCODE_VALID_TIME);
 			if (StringUtils.isEmpty(smsvalidStr))
 			{
 				smsvalidStr = "5";
-				redis.setForever("smsc_v_t", "5");
+				redis.setForever(RedisKey.SMSCODE_VALID_TIME, "5");
 			}
 			redis.setValue(sb.toString(), String.valueOf(code), Long.valueOf(smsvalidStr), TimeUnit.MINUTES);
 

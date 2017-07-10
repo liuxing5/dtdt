@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.awim.bean.SpringContextHolder;
 import com.asiainfo.awim.microservice.config.assistant.RedisAssistant;
+import com.asiainfo.dtdt.common.util.RedisKey;
 import com.asiainfo.dtdt.entity.ResponseCode;
 import com.asiainfo.dtdt.entity.ResponseData;
 import com.asiainfo.dtdt.interfaces.IAuthoService;
@@ -181,11 +182,11 @@ public class AuthFilter implements Filter{
 			}
 			
 			// 校验timestamp(配置已秒为单位)
-			String validTimeStr = redis.getStringValue("ser_v_t");
+			String validTimeStr = redis.getStringValue(RedisKey.SERVICE_VALID_TIME);
 			if(StringUtils.isEmpty(validTimeStr))
 			{
 				validTimeStr = "60";
-				redis.setForever("ser_v_t", validTimeStr);
+				redis.setForever(RedisKey.SERVICE_VALID_TIME, validTimeStr);
 			}
 			long timestamp = Long.valueOf(requestJson.getString("timestamp"));
 			long validTime = Long.valueOf(validTimeStr) * 1000l;
