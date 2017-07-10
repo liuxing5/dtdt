@@ -1215,7 +1215,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		//校验合作方信息
-		if (checkPartner(appkey, partnerCode)) {
+		if (!checkPartner(appkey, partnerCode)) {
 			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
@@ -1327,7 +1327,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		//校验合作方信息
-		if (checkPartner(appkey, partnerCode)) {
+		if (!checkPartner(appkey, partnerCode)) {
 			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
