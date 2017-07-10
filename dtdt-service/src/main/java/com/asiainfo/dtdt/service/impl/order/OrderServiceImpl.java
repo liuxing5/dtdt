@@ -414,31 +414,6 @@ public class OrderServiceImpl implements IOrderService{
 			JSONObject woJson)
 	{
 		String msg = "";
-//		if (woJson.getString("ecode").equals("-1"))
-//		{
-//			msg = "系统繁忙";
-//		} else if (woJson.getString("ecode").equals("-3"))
-//		{
-//			msg = "接口调用次数超过限制";
-//		} else if (woJson.getString("ecode").equals("100"))
-//		{
-//			msg = "缺少参数  " ;
-//		} else if (woJson.getString("ecode").equals("110"))
-//		{
-//			msg = "操作超时，超时时间 ";
-//		} else if (woJson.getString("ecode").equals("1450"))
-//		{
-//			msg = "appid不存在";
-//		} else if (woJson.getString("ecode").equals("1451"))
-//		{
-//			msg = "appid或appkey错误";
-//		} else if (woJson.getString("ecode").equals("1452"))
-//		{
-//			msg = "当前合作伙伴没有定购产品的权限" ;
-//		} else if (woJson.getString("ecode").equals("1453"))
-//		{
-//			msg = "当前合作伙伴没有定购产品的额度";
-//		} else 
 		if (woJson.getString("ecode").equals("4003"))
 		{
 			msg = "订购关系不存在" ;
