@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/7/7 12:25:39                            */
+/* Created on:     2017/7/10 9:34:19                            */
 /*==============================================================*/
 
 
@@ -352,14 +352,16 @@ create table t_s_partner
 /*==============================================================*/
 create table t_s_partner_his_order_resources
 (
-   batch_id             varchar(32) not null comment '资源批次ID',
+   batch_id             varchar(32) comment '资源批次ID',
    partner_code         varchar(12) comment '合作方编码',
-   pre_count            tinyint default 0 comment '预存订购次数',
-   use_count            tinyint comment '失效后，使用了的次数',
-   create_user          varchar(50) comment '创建者',
+   pre_count            bigint default 0 comment '预存订购次数',
+   use_count            bigint comment '失效后，使用了的次数',
+   charge_count         bigint comment '充值次数',
+   warn_threshold       bigint default 0 comment '告警阈值',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',
-   primary key (batch_id)
+   create_user          varchar(50) comment '创建者',
+   primary key ()
 );
 
 alter table t_s_partner_his_order_resources comment '合作方订购资源批次历史记录表';
@@ -371,11 +373,13 @@ create table t_s_partner_order_resources
 (
    batch_id             varchar(32) not null comment '资源批次ID',
    partner_code         varchar(12) comment '合作方编码',
-   pre_count            tinyint default 0 comment '预存订购次数',
-   use_count            tinyint comment '失效后，使用了的次数',
-   create_user          varchar(50) comment '创建者',
+   pre_count            bigint default 0 comment '预存订购次数',
+   use_count            bigint default 0 comment '失效后，使用了的次数',
+   charge_count         bigint default 0 comment '充值次数',
+   warn_threshold       bigint default 0 comment '告警阈值',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',
+   create_user          varchar(50) comment '创建者',
    primary key (batch_id)
 );
 
@@ -388,10 +392,10 @@ create table t_s_partner_sms_config
 (
    id                   varchar(32) not null,
    partner_code         varchar(12) comment '合作方编码',
-   contacts             varchar(20) default '0' comment '预存订购次数',
-   mobilephone          varchar(200) comment '手机号码',
-   threshold            bigint comment '告警阈值',
-   mail                 varchar(500) comment '邮箱',
+   contacts             varchar(20) comment '联系人',
+   warn_threshold       bigint default 0 comment '告警阈值',
+   mobilephone          varchar(200) comment '手机号码，多个用英文逗号间隔（,）',
+   mail                 varchar(500) comment '邮箱，多个用英文逗号间隔（,）',
    create_user          varchar(50) comment '创建者',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',
