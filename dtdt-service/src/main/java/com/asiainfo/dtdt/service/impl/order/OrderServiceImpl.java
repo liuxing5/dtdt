@@ -342,11 +342,13 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		/** 查询产品价格信息 end **/
-		try {
-			returnStr = orderResourceService.checkCounts(partnerCode);
-		} catch (Exception e) {
-			returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
-					Constant.ERROR_MSG, null);
+		if(StringUtils.isBlank(returnStr)){
+			try {
+				returnStr = orderResourceService.checkCounts(partnerCode);
+			} catch (Exception e) {
+				returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
+						Constant.ERROR_MSG, null);
+			}
 		}
 		if (StringUtils.isNotBlank(returnStr)) {// 历史数据表中插入失败数据并返回
 			if(isBatch){
