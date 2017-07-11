@@ -109,9 +109,9 @@
         </dependency>
         
         <dependency>
-            <groupId>com.huawei</groupId>
-            <artifactId>smproxy</artifactId>
-            <version>1.4</version>
+            <groupId>com.asiainfo.common</groupId>
+            <artifactId>asiainfo-sgip</artifactId>
+            <version>1.0</version>
         </dependency>
 		
 		<!-- liuxing5 add start -->
