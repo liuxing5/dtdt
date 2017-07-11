@@ -315,6 +315,7 @@ public class NoticeServiceImpl implements INoticeService {
 		App app = appMapper.queryAppInfo(appKey);
 		Product product = productMapper.queryProduct(productCode);
 		JSONObject json = new JSONObject();
+		json.put("type", 0);
 		json.put("orderId", orderId);
 		json.put("partnerOrderId", partnerOrderId);
 		json.put("productCode", productCode);
@@ -365,6 +366,7 @@ public class NoticeServiceImpl implements INoticeService {
 			log.info("NoticeServiceImpl dtdtNoticeOrder() state=" + state);
 			JSONObject json = new JSONObject();
 			json.put("batchId", batchOrder.getBatchId());
+			json.put("type", 1);
 			json.put("partnerOrderId", batchOrder.getPartnerOrderId());
 			json.put("productCode", batchOrder.getProductCode());
 			json.put("productName", product.getProductName());
