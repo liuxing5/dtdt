@@ -379,8 +379,10 @@ public class NoticeServiceImpl implements INoticeService {
 				JSONObject phoneJson = null;
 				for(int i = 0; i < size; i++){
 					phoneJson = new JSONObject();
-					phoneJson.put(hisOrderList.get(i).getMobilephone(),
-							noticeStateFormat(hisOrderList.get(i).getState()));
+					String phone = hisOrderList.get(i).getMobilephone();
+					phoneJson.put(StringUtils.isBlank(phone) ? "" : phone, 
+							noticeStateFormat(hisOrderList
+							.get(i).getState()));
 					phonesJson.add(phoneJson);
 					phoneJson = null;
 				}
