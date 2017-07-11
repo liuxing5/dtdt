@@ -301,6 +301,18 @@ public class DateUtil {
         return now;
     }
     
+    public static Date getNextMonthStartTime() {
+        Calendar c = Calendar.getInstance();
+        try {
+        	c.setTime(d.parse(d.format(new Date())));
+            c.set(Calendar.DATE, 1);
+            c.add(Calendar.MONTH, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return c.getTime();
+    }
+    
     public static   Date getCurrentNextYear(Date dateTime,int n) {
         Calendar c = Calendar.getInstance();
         Date now = null;
@@ -333,13 +345,6 @@ public class DateUtil {
     	return df.parse(today + " " + ENDTIME).getTime();
     }
 	public static void main(String[] args) throws ParseException {
-		System.out.println(new Date().getTime());
-		System.out.println(getDateTime(new Date()));
-		
-		Date afterDate = df.parse("2017-07-10" + " 23:59:59");
-		System.out.println(afterDate.getTime());
-		//23896622
-		System.err.println(getTodayEndTime() - new Date().getTime());
-		System.out.println(23896622/1000/60/60);
+		System.out.println(getNextMonthStartTime());
 	}
 }

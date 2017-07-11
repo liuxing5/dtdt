@@ -137,16 +137,20 @@ public class NoticeServiceImpl implements INoticeService {
 		
 		log.info("begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
 		try {
-			Order order = orderMapper.queryOrderByWoOrderId(orderId);
-			if(order == null){
-				log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat orderState="+resultCode);
-			}else{
-				if(order.getOperType() == 1){
-					orderNotice(resultCode, orderId, order);
-				}
-			}
 			
-			closeOrderNotice(resultCode, orderId, order);
+			Order order = orderMapper.queryOrderByWoOrderId(orderId);
+			
+			if (resultCode.equals(2) || resultCode.equals(6)) {
+				if(order == null){
+					log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat orderState="+resultCode);
+				}else{
+					if(order.getOperType() == 1){
+						orderNotice(resultCode, orderId, order);
+					}
+				}
+			} else if (resultCode.equals(3) || resultCode.equals(7)) {
+				closeOrderNotice(resultCode, orderId, order);
+			} 
 			
 		} catch (Exception e) {
 			log.error("NoticeService optNoticeOrder fail:"+e.getMessage(),e);
@@ -160,30 +164,31 @@ public class NoticeServiceImpl implements INoticeService {
 	 * @param orderId
 	 * @param order
 	 */
-	private void closeOrderNotice(String resultCode, String orderId,
-			Order order) {
-		//处理退订的业务
-		log.info("repeat-order：begin NoticeService optNoticeOrder param:{resultCode="+resultCode+",orderId="+orderId+"}");
-		boolean flag = (order == null ? true:false);
+	private void closeOrderNotice(String resultCode, String orderId, Order order) {
+		log.info("repeat-order：begin NoticeServiceImpl closeOrderNotice param:{resultCode="+resultCode+",orderId="+orderId+"}");
+		boolean flag = order == null ? true : false;
 		
+		//order表为空，则表示是通过其他方式退订的我方的订购产品（如：10010人工退订），这时，订单表无数据，则要查订单订购关系表
 		OrderRecord orderRecord = null;
 		try {
 			orderRecord = orderRecordMapper.queryOrderRecordByWoOrderId(orderId);
 		} catch (Exception e) {
-			log.info("NoticeService queryOrderRecordByWoOrderId Exception e=" + e);
+			log.info("NoticeServiceImpl queryOrderRecordByWoOrderId Exception e=" + e);
 			e.printStackTrace();
 		}
 		
-		if (!(orderRecord == null && order == null)) {
+		if (orderRecord != null) {
 			if(resultCode.equals("3")){//退订中（退订申请已通过，产品次月失效，当月不可再订购。）
 				log.info("NoticeService optNoticeOrder wojia return resultCode 3-退订中（退订申请已通过，产品次月失效，当月不可再订购。）");
-				orderService.closeOrderUpdateTable(flag? null:order.getOrderId(), JSONObject.toJSONString(orderRecord), "20", flag);//状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
+				orderService.closeOrderUpdateTable(flag ? null : order.getOrderId(), JSONObject.toJSONString(orderRecord), "20", flag);//状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
+				/**退订处理完成回调通知**/
+				dtdtNoticeOrder(orderRecord.getOrderId(), true);
 			}else if(resultCode.equals("7")){//退订失败
 				log.info("NoticeService optNoticeOrder wojia return resultCode 7-退订失败");
-				orderService.closeOrderUpdateTable(flag? null:order.getOrderId(), JSONObject.toJSONString(orderRecord), "23", flag);//我方平台自定义退订失败状态为23
+				orderService.closeOrderUpdateTable(flag ? null : order.getOrderId(), JSONObject.toJSONString(orderRecord), "23", flag);//我方平台自定义退订失败状态为23
+				/**退订处理完成回调通知**/
+				dtdtNoticeOrder(orderRecord.getOrderId(), false);
 			}
-			/**退订处理完成回调通知**/
-			dtdtNoticeOrder(orderRecord.getOrderId(),true);
 		}
 		log.info("repeat-order：end");
 	}
@@ -227,8 +232,6 @@ public class NoticeServiceImpl implements INoticeService {
 			//订购失败更新在途表状态5-订购失败待原路退款
 			orderService.updateOrder(order.getOrderId(), null, "7", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
 			orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购失败");
-			/**订购失败回调通知**/
-//						dtdtNoticeOrder(order.getOrderId());
 			log.info("NoticeService optNoticeOrder return code is notSuccess and noError orderState="+resultCode +" orderId="+orderId);
 		}
 		
@@ -245,8 +248,11 @@ public class NoticeServiceImpl implements INoticeService {
 					dtdtNoticeBatchOrder(batchOrder);
 				}
 			}else{
-				log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
+				log.info("notice batchOrder {} partnerOrderId is null");
 			}
+		}else{
+			/**订购失败回调通知**/
+			dtdtNoticeOrder(order.getOrderId(), noticeSuccess);
 		}
 	}
 	
@@ -297,8 +303,7 @@ public class NoticeServiceImpl implements INoticeService {
 			log.info("dtdtNoticeFail order |{}| state |{}|",orderId,state);
 			noticePartner(orderId, hisOrder.getPartnerOrderId(), hisOrder.getProductCode(),
 					hisOrder.getAppKey(),hisOrder.getPrice(), hisOrder.getAllowAutoPay(),
-					hisOrder.getCreateTime(), hisOrder.getValidTime(), hisOrder.getInvalidTime(),
-					state);
+					hisOrder.getCreateTime(), null, null, state);
 		} catch (Exception e) {
 			log.error("noticeService dtdtNoticeOrder fail by orderId="+orderId);
 		}
@@ -315,7 +320,7 @@ public class NoticeServiceImpl implements INoticeService {
 		json.put("productCode", productCode);
 		json.put("productName", product.getProductName());
 		json.put("createTime", DateUtil.getDateTime(createTime));
-		json.put("validTime", DateUtil.getDateTime(validTime));
+		json.put("validTime", validTime==null?"":DateUtil.getDateTime(validTime));
 		json.put("invalidTime", invalidTime==null?"":DateUtil.getDateTime(invalidTime));
 		json.put("state",noticeStateFormat(state));
 		log.info("doRest |{}| param |{}",app.getNoticeUrl(),json.toString());
