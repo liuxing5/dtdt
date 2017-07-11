@@ -1246,7 +1246,7 @@ public class OrderServiceImpl implements IOrderService{
 			try {
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getSysdate());//退订时间-当前时间
-				data.put("refundValidTime", DateUtil.getNextMonthStartTime());//退订生效时间-下月初
+				data.put("refundValidTime", DateUtil.getNextNMonthStartTime(1));//退订生效时间-下月初
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder getDateTime Exception e" + e);
@@ -1363,7 +1363,7 @@ public class OrderServiceImpl implements IOrderService{
 			try {
 				data.put("productName", product.getProductName());
 				data.put("refundTime", DateUtil.getSysdate());//退订时间-当前时间
-				data.put("refundValidTime", DateUtil.getNextMonthStartTime());//退订生效时间-下月初
+				data.put("refundValidTime", DateUtil.getNextNMonthStartTime(1));//退订生效时间-下月初
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder getDateTime Exception e" + e);
@@ -1432,8 +1432,8 @@ public class OrderServiceImpl implements IOrderService{
 		order.setOrderChannel(orderRecord.getOrderChannel());
 		order.setCreateTime(now);
 		order.setUpdateTime(now);
-		order.setValidTime(now);
-		order.setInvalidTime(DateUtil.getCurrentMonthEndTime(now));//失效时间-月底
+		order.setValidTime(orderRecord.getValidTime());
+		order.setInvalidTime(orderRecord.getInvalidTime());
 		order.setPrice(orderRecord.getPrice());
 		order.setCount(orderRecord.getCount());
 		order.setMoney(orderRecord.getMoney());
@@ -1516,7 +1516,14 @@ public class OrderServiceImpl implements IOrderService{
 			
 			//更新t_s_order_record表
 			orderRecord.setState(state);//设置状态：状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中； 23-退订失败
-			orderRecord.setRefundValidTime(DateUtil.getNextMonthStartTime());//下月初
+			//包半年，包年也会调此接口，所以这里得判断然后修改退订生效时间
+			if (orderRecord.getCycleType() == 0) {
+				orderRecord.setRefundValidTime(DateUtil.getNextNMonthStartTime(1));//下月初
+			} else if (orderRecord.getCycleType() == 1) {
+				orderRecord.setRefundValidTime(DateUtil.getNextNMonthStartTime(6));//6月后
+			} else if (orderRecord.getCycleType() == 2) {
+				orderRecord.setRefundValidTime(DateUtil.getNextNMonthStartTime(12));//12月后
+			} 
 			orderRecord.setRefundTime(date);
 			orderRecord.setUpdateTime(date);
 			orderRecord.setRemark((state.equals("20")?"退订中":"退订失败"));

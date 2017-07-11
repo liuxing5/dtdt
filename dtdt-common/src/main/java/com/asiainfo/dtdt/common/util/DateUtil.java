@@ -301,12 +301,12 @@ public class DateUtil {
         return now;
     }
     
-    public static Date getNextMonthStartTime() {
+    public static Date getNextNMonthStartTime(int n) {
         Calendar c = Calendar.getInstance();
         try {
         	c.setTime(d.parse(d.format(new Date())));
             c.set(Calendar.DATE, 1);
-            c.add(Calendar.MONTH, 1);
+            c.add(Calendar.MONTH, n);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -345,6 +345,6 @@ public class DateUtil {
     	return df.parse(today + " " + ENDTIME).getTime();
     }
 	public static void main(String[] args) throws ParseException {
-		System.out.println(getNextMonthStartTime());
+		System.out.println(getNextNMonthStartTime(1));
 	}
 }
