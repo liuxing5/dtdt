@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
+import com.asiainfo.dtdt.common.util.DateUtil;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
@@ -205,19 +206,8 @@ public class NoticeServiceImpl implements INoticeService {
 			}*/
 			/**调用反冲话费 end**/
 			orderService.updateOrder(order.getOrderId(), null, "11", Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_0);
-			String pcStr = order.getProductCode().substring(2, 4);//当前订购流量包
-			byte cycleType = 0;
-			if(Constant.CYCLE_TYPE_01.equals(pcStr)){//包月
-				//判断wojia总管订购流量包为包月并且当前也为包月流量包
-				cycleType = 0;
-			}else if(Constant.CYCLE_TYPE_02.equals(pcStr)){//包半年
-				//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
-				cycleType = 1;
-			}else if(Constant.CYCLE_TYPE_03.equals(pcStr)){//包年
-				//判断wojia总管订购流量包为包年并且当前也为包年流量包
-				cycleType = 2;
-			}
-			orderService.insertFromOrderRecordById(order.getOrderId(),cycleType, "0");
+			Product product =  productMapper.queryProduct(order.getProductCode());
+			orderService.insertFromOrderRecordById(order.getOrderId(),product.getCycleType(), "0");
 			orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
 			
 		}else if(resultCode.equals("6")){//订购失败
@@ -257,9 +247,6 @@ public class NoticeServiceImpl implements INoticeService {
 			}else{
 				log.info("notice batchOrder {} partnerOrderId is null",batchOrder.getBatchId());
 			}
-		}else{					
-			/**订购失败回调通知**/
-			dtdtNoticeOrder(order.getOrderId(),noticeSuccess);
 		}
 	}
 	
@@ -327,11 +314,9 @@ public class NoticeServiceImpl implements INoticeService {
 		json.put("partnerOrderId", partnerOrderId);
 		json.put("productCode", productCode);
 		json.put("productName", product.getProductName());
-		json.put("price", price);
-		json.put("allowAutoPay", allowAutoPay);
-		json.put("createTime", createTime);
-		json.put("validTime", validTime);
-		json.put("invalidTime", invalidTime);
+		json.put("createTime", DateUtil.getDateTime(createTime));
+		json.put("validTime", DateUtil.getDateTime(validTime));
+		json.put("invalidTime", invalidTime==null?"":DateUtil.getDateTime(invalidTime));
 		json.put("state",noticeStateFormat(state));
 		log.info("doRest |{}| param |{}",app.getNoticeUrl(),json.toString());
 		String  result = RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
@@ -378,7 +363,6 @@ public class NoticeServiceImpl implements INoticeService {
 			json.put("partnerOrderId", batchOrder.getPartnerOrderId());
 			json.put("productCode", batchOrder.getProductCode());
 			json.put("productName", product.getProductName());
-			json.put("price", batchOrder.getPrice());
 			json.put("createTime", batchOrder.getCreateTime());
 			List<HisOrder> hisOrderList = hisOrderMapper.getListByPartnerOrderId(batchOrder.getPartnerOrderId());
 			String phones = "";
