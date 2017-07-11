@@ -26,7 +26,7 @@ import com.asiainfo.dtdt.interfaces.order.IOrderService;
 * @return 
 */
 @Controller
-@RequestMapping(value="/product",method=RequestMethod.POST)
+@RequestMapping(method=RequestMethod.POST)
 public class OrderController extends BaseController{
 	
 	private Logger logger = Logger.getLogger(OrderController.class);
