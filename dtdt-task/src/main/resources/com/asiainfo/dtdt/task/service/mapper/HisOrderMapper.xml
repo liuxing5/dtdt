@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dtdt.task.service.mapper.HisOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.task.entity.HisOrder" >
+    <id column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="wo_order_id" property="woOrderId" jdbcType="VARCHAR" />
+    <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
+    <result column="app_key" property="appKey" jdbcType="VARCHAR" />
+    <result column="partner_order_id" property="partnerOrderId" jdbcType="VARCHAR" />
+    <result column="product_code" property="productCode" jdbcType="VARCHAR" />
+    <result column="oper_type" property="operType" jdbcType="TINYINT" />
+    <result column="refund_order_id" property="refundOrderId" jdbcType="VARCHAR" />
+    <result column="is_real_request_woplat" property="isRealRequestWoplat" jdbcType="TINYINT" />
+    <result column="state" property="state" jdbcType="VARCHAR" />
+    <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
+    <result column="order_channel" property="orderChannel" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="valid_time" property="validTime" jdbcType="TIMESTAMP" />
+    <result column="invalid_time" property="invalidTime" jdbcType="TIMESTAMP" />
+    <result column="price" property="price" jdbcType="INTEGER" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="BIGINT" />
+    <result column="is_need_charge" property="isNeedCharge" jdbcType="TINYINT" />
+    <result column="allow_auto_pay" property="allowAutoPay" jdbcType="TINYINT" />
+    <result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR"/>
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="copy_time" property="copyTime" jdbcType="TIMESTAMP" />
+    <result column="copy_type" property="copyType" jdbcType="TINYINT" />
+    <result column="copy_remark" property="copyRemark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
+    refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
+    update_time, valid_time, invalid_time, price, count, money, is_need_charge,
+    remark, copy_time, copy_type, copy_remark , allow_auto_pay,redirect_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_s_his_order
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.asiainfo.dtdt.task.entity.HisOrder" >
+    update t_s_his_order
+    <set >
+      <if test="woOrderId != null" >
+        wo_order_id = #{woOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerCode != null" >
+        partner_code = #{partnerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appKey != null" >
+        app_key = #{appKey,jdbcType=VARCHAR},
+      </if>
+      <if test="partnerOrderId != null" >
+        partner_order_id = #{partnerOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="productCode != null" >
+        product_code = #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="operType != null" >
+        oper_type = #{operType,jdbcType=TINYINT},
+      </if>
+      <if test="refundOrderId != null" >
+        refund_order_id = #{refundOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="isRealRequestWoplat != null" >
+        is_real_request_woplat = #{isRealRequestWoplat,jdbcType=TINYINT},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="mobilephone != null" >
+        mobilephone = #{mobilephone,jdbcType=VARCHAR},
+      </if>
+      <if test="orderChannel != null" >
+        order_channel = #{orderChannel,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validTime != null" >
+        valid_time = #{validTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="invalidTime != null" >
+        invalid_time = #{invalidTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=INTEGER},
+      </if>
+      <if test="count != null" >
+        count = #{count,jdbcType=INTEGER},
+      </if>
+      <if test="money != null" >
+        money = #{money,jdbcType=BIGINT},
+      </if>
+      <if test="isNeedCharge != null" >
+        is_need_charge = #{isNeedCharge,jdbcType=TINYINT},
+      </if>
+      <if test="allowAutoPay != null">
+      	allow_auto_pay = #{allowAutoPay},
+      </if>
+      <if test="redirectUrl != null">
+      	redirect_url = #{redirectUrl},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="copyTime != null" >
+        copy_time = #{copyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="copyType != null" >
+        copy_type = #{copyType,jdbcType=TINYINT},
+      </if>
+      <if test="copyRemark != null" >
+        copy_remark = #{copyRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=VARCHAR}
+  </update>
+</mapper>
