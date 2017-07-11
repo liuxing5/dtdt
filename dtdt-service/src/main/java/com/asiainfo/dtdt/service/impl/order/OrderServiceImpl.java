@@ -1172,7 +1172,7 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
 		}
 		
 		//校验合作方信息
@@ -1284,7 +1284,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
 		}
 		
 		//校验合作方信息
