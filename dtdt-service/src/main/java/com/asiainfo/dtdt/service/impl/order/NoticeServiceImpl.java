@@ -140,7 +140,7 @@ public class NoticeServiceImpl implements INoticeService {
 			
 			Order order = orderMapper.queryOrderByWoOrderId(orderId);
 			
-			if (resultCode.equals(2) || resultCode.equals(6)) {
+			if (resultCode.equals("2") || resultCode.equals("6")) {
 				if(order == null){
 					log.info("NoticeService optNoticeOrder queryOrderByWoOrderId is null by woOrderId="+orderId+" woPlat orderState="+resultCode);
 				}else{
@@ -148,7 +148,7 @@ public class NoticeServiceImpl implements INoticeService {
 						orderNotice(resultCode, orderId, order);
 					}
 				}
-			} else if (resultCode.equals(3) || resultCode.equals(7)) {
+			} else if (resultCode.equals("3") || resultCode.equals("7")) {
 				closeOrderNotice(resultCode, orderId, order);
 			} 
 			
