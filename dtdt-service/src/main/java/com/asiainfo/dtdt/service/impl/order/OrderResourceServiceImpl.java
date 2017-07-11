@@ -52,10 +52,8 @@ public class OrderResourceServiceImpl implements IOrderResourceService{
 		String key = RedisKey.PARTNER_OR_KEY_PREFIX + partnerCode;
 
 		/*集群方式*/
-		if (org.springframework.util.StringUtils.isEmpty(redisAssistant
-				.getStringValue(key)))
+		if (!redisAssistant.exist(key))
 		{
-
 			PartnerOrderResources por = pORService
 					.loadByPartnerCode(partnerCode);
 			if (null != por)
