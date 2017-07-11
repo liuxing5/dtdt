@@ -384,7 +384,7 @@ public class OrderServiceImpl implements IOrderService{
 					Constant.SUCCESS_MSG, json);
 		}
 		orderResourceService.refundOrderResource(order.getPartnerCode());//回加次数
-		log.debug("NoticeService | {} | refundOrderResource",order.getOrderId());
+		log.info("NoticeService | {} | refundOrderResource",order.getOrderId());
 		// 更新在途订购订单状态7-订购失败
 		updateOrder(order.getOrderId(), woJson.getString("orderId"), "7",
 				Constant.IS_NEED_CHARGE_1,
@@ -393,6 +393,7 @@ public class OrderServiceImpl implements IOrderService{
 		log.info("woplat return error msg:" + woJson.getString("emsg"));
 		insertOrderBakAndDelOrder(order.getOrderId(), "0",
 				woJson.getString("emsg") + "),订购处理失败");
+		if(isBatch){batchNotice(partnerOrderId);}
 		if (woJson.getString("ecode").equals(Constant.ERROR_CODE)
 				|| StringUtils.isBlank(woResult)) {// 请求沃家总管超时或者异常
 
