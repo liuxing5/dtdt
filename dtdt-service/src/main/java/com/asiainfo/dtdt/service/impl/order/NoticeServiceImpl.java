@@ -283,7 +283,7 @@ public class NoticeServiceImpl implements INoticeService {
 	private void dtdtNoticeSuccess(String orderId){
 		try {
 			OrderRecord orderRecord = orderRecordMapper.selectByPrimaryKey(orderId);
-			noticePartner(orderId, orderRecord.getParentOrderId(), orderRecord.getProductCode(),
+			noticePartner(orderId, orderRecord.getPartnerOrderId(), orderRecord.getProductCode(),
 					orderRecord.getAppKey(), orderRecord.getPrice(), 
 					String.valueOf(orderRecord.getAllowAutoPay()), orderRecord.getCreateTime(), 
 					orderRecord.getValidTime(), orderRecord.getInvalidTime(), orderRecord.getState());
