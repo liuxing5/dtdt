@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import lombok.extern.log4j.Log4j2;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +29,6 @@ import com.asiainfo.dtdt.config.woplat.WoplatConfig;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
-import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.entity.Partner;
@@ -40,7 +37,6 @@ import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.ICodeService;
 import com.asiainfo.dtdt.interfaces.IProductService;
-import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
@@ -50,12 +46,13 @@ import com.asiainfo.dtdt.service.IPartnerOrderResourcesService;
 import com.asiainfo.dtdt.service.mapper.AppMapper;
 import com.asiainfo.dtdt.service.mapper.BatchOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
-import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
+
+import lombok.extern.log4j.Log4j2;
 
 /** 
 * @author 作者 : xiangpeng
@@ -91,9 +88,6 @@ public class OrderServiceImpl implements IOrderService{
 	private ProductMapper productMapper;
 	
 	@Autowired
-	private HisOrderRecordMapper hisOrderRecordMapper;
-	
-	@Autowired
 	private BatchOrderMapper batchOrderMapper;
 	
 	@Autowired
@@ -113,9 +107,6 @@ public class OrderServiceImpl implements IOrderService{
 	
 //	@Autowired
 //	private IPayOrderService payOrderService;
-	
-	@Autowired
-	private INoticeService noticeService;
 	
 	@Resource
 	private IPartnerOrderResourcesService pORService;
@@ -342,11 +333,13 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		/** 查询产品价格信息 end **/
-		try {
-			returnStr = orderResourceService.checkCounts(partnerCode);
-		} catch (Exception e) {
-			returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
-					Constant.ERROR_MSG, null);
+		if(StringUtils.isBlank(returnStr)){
+			try {
+				returnStr = orderResourceService.checkCounts(partnerCode);
+			} catch (Exception e) {
+				returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
+						Constant.ERROR_MSG, null);
+			}
 		}
 		if (StringUtils.isNotBlank(returnStr)) {// 历史数据表中插入失败数据并返回
 			if(isBatch){
@@ -828,7 +821,7 @@ public class OrderServiceImpl implements IOrderService{
 							//疑问？：重复订购
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_1, "13", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 							insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "邮箱侧订购成功&沃家总管侧存在有效订购关系&无需返充话费");
-							noticeService.dtdtNoticeOrder(woOrderId);
+//							noticeService.dtdtNoticeOrder(woOrderId);
 							return;
 						}else if("4005".equals(ecode)){
 							//订购互斥产品
@@ -837,7 +830,7 @@ public class OrderServiceImpl implements IOrderService{
 							//邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求，此时邮箱侧合作方查询该笔订购状态为：订购成功；
 							optOrderRecord(orderId, woOrderId, Constant.WOORDER_TYPE_3, "14", order.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 							insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "沃家总管返回互斥订购：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
-							noticeService.dtdtNoticeOrder(orderId);
+//							noticeService.dtdtNoticeOrder(orderId);
 							return ;
 						}
 					}else {//存在介入方产品使用此免流产品,重复订购
@@ -851,7 +844,7 @@ public class OrderServiceImpl implements IOrderService{
 //					String cycleType = woOrder.getProductCode().substring(2, 3);//当前订购流量包
 					optOrderRecord(orderId, null, Constant.WOORDER_TYPE_3, "14", woOrder.getPartnerCode(),Constant.IS_NEED_CHARGE_1,Constant.ORDER_IS_REAL_REQUEST_WOPLAT_1);
 					insertOrderBakAndDelOrder(orderId, Constant.HISORDER_TYPE_0, "沃家总管同步记录中存在订购关系：邮箱侧订购成功&沃家总管侧不存在有效订购关系&待邮箱侧向沃家总管侧发起订购请求");
-					noticeService.dtdtNoticeOrder(orderId);
+//					noticeService.dtdtNoticeOrder(orderId);
 					return ;
 				}
 			}else {//支付失败
@@ -1243,8 +1236,8 @@ public class OrderServiceImpl implements IOrderService{
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode + " emsg=" + emsg);
 			try {
 				data.put("productName", product.getProductName());
-				data.put("refundTime", orderRecord.getRefundTime());
-				data.put("refundValidTime", orderRecord.getRefundValidTime());
+				data.put("refundTime", DateUtil.getSysdate());//退订时间-当前时间
+				data.put("refundValidTime", DateUtil.getNextMonthStartTime());//退订生效时间-下月初
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder getDateTime Exception e" + e);
@@ -1360,8 +1353,8 @@ public class OrderServiceImpl implements IOrderService{
 			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order success ecode=" + ecode + " emsg=" + emsg);
 			try {
 				data.put("productName", product.getProductName());
-				data.put("refundTime", orderRecord.getRefundTime());
-				data.put("refundValidTime", orderRecord.getRefundValidTime());	
+				data.put("refundTime", DateUtil.getSysdate());//退订时间-当前时间
+				data.put("refundValidTime", DateUtil.getNextMonthStartTime());//退订生效时间-下月初
 				return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, data);
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder getDateTime Exception e" + e);
@@ -1425,20 +1418,13 @@ public class OrderServiceImpl implements IOrderService{
 		order.setProductCode(orderRecord.getProductCode());
 		order.setOperType((byte)2);
 		order.setRefundOrderId(orderRecord.getOrderId());
-		/**
-		 * 是否真实请求沃家总管（0：真实请求 1：未请求）
-            	如果我方同一手机号码，在多个app下订购了同一流量产品，
-            	则1、只有第一次订购会像沃家总管发起订购请求；
-            	2、只有最后一个退订时，才能真实像沃家总管发起退订请求；
-		 */
-		order.setIsRealRequestWoplat((byte)1);
 		order.setState(orderRecord.getState());
 		order.setMobilephone(orderRecord.getMobilephone());
 		order.setOrderChannel(orderRecord.getOrderChannel());
 		order.setCreateTime(now);
 		order.setUpdateTime(now);
 		order.setValidTime(now);
-		order.setInvalidTime(DateUtil.getCurrentMonthEndTime(now));//月底
+		order.setInvalidTime(DateUtil.getCurrentMonthEndTime(now));//失效时间-月底
 		order.setPrice(orderRecord.getPrice());
 		order.setCount(orderRecord.getCount());
 		order.setMoney(orderRecord.getMoney());
@@ -1446,55 +1432,11 @@ public class OrderServiceImpl implements IOrderService{
 		order.setAllowAutoPay(orderRecord.getAllowAutoPay());
 		order.setRedirectUrl(orderRecord.getRedirectUrl());
 		order.setIsRealRequestWoplat((byte)1);
-		order.setRemark("退订");
+		order.setRemark("退订入库");
 		try {
 			orderMapper.insertOrder(order);
 		} catch (Exception e) {
 			log.info("OrderServiceImpl insertOrder() Exception: e=" + e);
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	* @Title: insertHisOrderRecord 
-	* @Description: 根据订单关系表入库订单关系历史表
-	* @param orderRecord void
-	* @throws
-	 */
-	private void insertHisOrderRecord(OrderRecord orderRecord) {
-		log.info("OrderServiceImpl insertHisOrderRecord() orderRecord:" + orderRecord);
-		
-		HisOrderRecord hisOrderRecord = new HisOrderRecord();
-		hisOrderRecord.setOrderId(orderRecord.getOrderId());
-		hisOrderRecord.setParentOrderId(orderRecord.getParentOrderId());
-		hisOrderRecord.setPartnerCode(orderRecord.getPartnerCode());
-		hisOrderRecord.setAppKey(orderRecord.getAppKey());
-		hisOrderRecord.setPartnerOrderId(orderRecord.getPartnerOrderId());
-		hisOrderRecord.setCycleType(orderRecord.getCycleType());
-		hisOrderRecord.setProductCode(orderRecord.getProductCode());
-		hisOrderRecord.setState(orderRecord.getState());
-		hisOrderRecord.setMobilephone(orderRecord.getMobilephone());
-		hisOrderRecord.setOrderChannel(orderRecord.getOrderChannel());
-		hisOrderRecord.setPrice(orderRecord.getPrice());
-		hisOrderRecord.setCount(orderRecord.getCount());
-		hisOrderRecord.setMoney(orderRecord.getMoney());
-		hisOrderRecord.setIsNeedCharge(orderRecord.getIsNeedCharge());
-		hisOrderRecord.setOperSource(orderRecord.getOperSource());
-		hisOrderRecord.setAllowAutoPay(orderRecord.getAllowAutoPay());
-		hisOrderRecord.setWoOrder(orderRecord.getWoOrder());
-		hisOrderRecord.setRefundValidTime(orderRecord.getRefundValidTime());;
-		hisOrderRecord.setRefundTime(orderRecord.getRefundTime());
-		hisOrderRecord.setValidTime(orderRecord.getValidTime());
-		hisOrderRecord.setInvalidTime(orderRecord.getInvalidTime());
-		hisOrderRecord.setCreateTime(orderRecord.getCreateTime());
-		hisOrderRecord.setUpdateTime(orderRecord.getUpdateTime());
-		hisOrderRecord.setRedirectUrl(orderRecord.getRedirectUrl());
-		hisOrderRecord.setWoOrderId(orderRecord.getWoOrderId());
-		hisOrderRecord.setRemark("退订移历史表");
-		try {
-			hisOrderRecordMapper.insertSelective(hisOrderRecord);
-		} catch (Exception e) {
-			log.info("OrderServiceImpl insertHisOrderRecord() Exception e=" + e);
 			e.printStackTrace();
 		}
 	}
@@ -1558,17 +1500,17 @@ public class OrderServiceImpl implements IOrderService{
 		Date date = new Date();
 		try {
 			if (!isOrderNull) {
-				//t_s_order 表到 t_s_his_order 表
-				insertFromHisOrderById(orderId, "0", "包月退订-" + (state.equals("20")?"成功":"失败"));//copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+				//t_s_order 表到 t_s_his_order 表	copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
+				orderMapper.insertHisOrder(orderId, state, "0", "退订-" + (state.equals("20")?"成功":"失败"));
 				orderMapper.deleteByPrimaryKey(orderId);
 			}
 			
 			//更新t_s_order_record表
 			orderRecord.setState(state);//设置状态：状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中； 23-退订失败
-			orderRecord.setUpdateTime(date);
+			orderRecord.setRefundValidTime(DateUtil.getNextMonthStartTime());//下月初
 			orderRecord.setRefundTime(date);
-			orderRecord.setInvalidTime(DateUtil.getCurrentMonthEndTime(date));//月底
-			orderRecord.setRefundValidTime(DateUtil.getCurrentMonthEndTime(date));//月底
+			orderRecord.setInvalidTime(DateUtil.getCurrentMonthEndTime(date));//月底 
+			orderRecord.setUpdateTime(date);
 			orderRecord.setRemark("退订-" + (state.equals("20")?"成功":"失败"));
 			orderRecordMapper.updateOrderRecord(orderRecord);
 //			if ("20".equals(state)) {

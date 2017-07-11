@@ -297,6 +297,20 @@
     	remark, allow_auto_pay,redirect_url ,now() , #{copyType} ,#{copyRemark} 
       FROM t_s_order WHERE order_id = #{orderId,jdbcType=VARCHAR});
   </insert>
+  <!-- 将在途订购信息存放在备份表中 改状态 -->
+  <insert id="insertHisOrder" parameterType="java.lang.String">
+      INSERT INTO t_s_his_order 
+      (   order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
+    refund_order_id, is_real_request_woplat, state, mobilephone, order_channel, create_time, 
+    update_time, valid_time, invalid_time, price, count, money, is_need_charge,
+    remark, allow_auto_pay,redirect_url,copy_time, copy_type, copy_remark 
+      )
+      (SELECT order_id, wo_order_id, partner_code, app_key, partner_order_id, product_code, oper_type, 
+    	refund_order_id, is_real_request_woplat, #{state}, mobilephone, order_channel, create_time, 
+    	update_time, valid_time, invalid_time, price, count, money, is_need_charge, 
+    	remark, allow_auto_pay,redirect_url ,now() , #{copyType} ,#{copyRemark} 
+      FROM t_s_order WHERE order_id = #{orderId,jdbcType=VARCHAR});
+  </insert>
   <insert id="insertFromOrderRecordById" parameterType="java.util.Map">
       INSERT INTO t_s_order_record 
       (   order_id,wo_order_id, partner_code, app_key, partner_order_id, product_code,oper_source,

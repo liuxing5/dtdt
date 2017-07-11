@@ -54,6 +54,18 @@ public interface OrderMapper {
      int insertFromHisOrderById(@Param("orderId")String orderId,@Param("copyType")String copyType,@Param("copyRemark")String copyRemark);
      
      /**
+     * @Title: insertHisOrder 
+     * @Description:  (将在途订购信息存放到备份表中-状态改) 
+     * @param orderId
+     * @param state
+     * @param copyType
+     * @param copyRemark
+     * @return int
+     * @throws
+      */
+      int insertHisOrder(@Param("orderId")String orderId,@Param("state")String state,@Param("copyType")String copyType,@Param("copyRemark")String copyRemark);
+     
+     /**
      * @Title: OrderMapper 
      * @Description: (将在途订购信息沉淀到订购关系表) 
      * @param orderId 订单ID
