@@ -376,7 +376,7 @@ public class NoticeServiceImpl implements INoticeService {
 			json.put("productName", product.getProductName());
 			json.put("createTime", batchOrder.getCreateTime()==null?"":DateUtil.getDateTime(batchOrder.getCreateTime()));
 			List<HisOrder> hisOrderList = hisOrderMapper.getListByPartnerOrderId(batchOrder.getPartnerOrderId());
-			String phones = "";
+			JSONArray phones = null;
 			int size = hisOrderList.size();
 			if(size > 0){
 				JSONArray phonesJson  = new JSONArray(size);
@@ -390,7 +390,7 @@ public class NoticeServiceImpl implements INoticeService {
 					phonesJson.add(phoneJson);
 					phoneJson = null;
 				}
-				phones = phonesJson.toString();
+				phones = phonesJson;
 			}
 			json.put("phones", phones);
 			log.info("dtdtNoticeBatchOrder context param {} ",json.toString());
