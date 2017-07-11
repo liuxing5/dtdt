@@ -27,11 +27,6 @@ public class PartnerHisOrderResources {
     private Long useCount;
     
     /**
-     * 告警阈值
-     */
-    private Long warnThreshold;
-
-    /**
      * 创建者
      */
     private String createUser;

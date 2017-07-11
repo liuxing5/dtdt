@@ -57,8 +57,8 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 					{
 						if (redis.exist(key))
 						{
-							log.info("{}到期，移除，预存次数{}，告警阈值{}，剩余次数{}", key,
-									por.getPreCount(), por.getWarnThreshold(),
+							log.info("{}到期，移除，预存次数{}，剩余次数{}", key,
+									por.getPreCount(), 
 									redis.getStringValue(key));
 							por.setUseCount(por.getPreCount()
 									- Long.valueOf(redis.getStringValue(key)));
@@ -71,9 +71,8 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 					{
 						Long canUseCount = por.getPreCount();
 						redis.setForever(key, canUseCount.toString());
-						log.info("{}不存在，增加，预存次数{},告警阈值{},可用次数{}", key,
+						log.info("{}不存在，增加，预存次数{},可用次数{}", key,
 								por.getPreCount(), 
-								por.getWarnThreshold(),
 								redis.getStringValue(key));
 						
 					} else
@@ -81,17 +80,17 @@ public class PartnerOrderResourcesImpl implements IPartnerOrderResourcesService{
 						Long oldCanUsed = Long.valueOf(redis
 								.getStringValue(key));
 						log.info(
-								"redisValue:{}***oldPreCount:{}**war:{}*****used:{}********************",
+								"redisValue:{}***oldPreCount:{}****used:{}********************",
 								oldCanUsed, por.getPreCount(),
-								por.getWarnThreshold(), por.getPreCount()
+								 por.getPreCount()
 										- oldCanUsed);
 						por.setUseCount(por.getPreCount() - oldCanUsed);
 
 						redis.increateValue(key, por.getChargeCount());
 
 						log.info(
-								"{}存在未过期，刷新，原预存次数{}，告警阈值{}，剩余次数{}，充值次数{}，刷新后次数{}",
-								key, por.getPreCount(), por.getWarnThreshold(),
+								"{}存在未过期，刷新，原预存次数{}，剩余次数{}，充值次数{}，刷新后次数{}",
+								key, por.getPreCount(), 
 								oldCanUsed, por.getChargeCount(),
 								redis.getStringValue(key));
 						por.setPreCount(por.getPreCount()
