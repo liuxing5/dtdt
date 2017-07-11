@@ -7,14 +7,13 @@
     <result column="pre_count" property="preCount" jdbcType="BIGINT" />
     <result column="use_count" property="useCount" jdbcType="BIGINT" />
     <result column="charge_count" property="chargeCount" jdbcType="BIGINT" />
-    <result column="warn_threshold" property="warnThreshold" jdbcType="BIGINT" />
     <result column="create_user" property="createUser" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <sql id="Base_Column_List" >
-    batch_id, partner_code, pre_count, use_count, charge_count, create_user, warn_threshold, create_time, end_time
+    batch_id, partner_code, pre_count, use_count, charge_count, create_user, create_time, end_time
   </sql>
   
   <select id="getAll" resultMap="BaseResultMap">

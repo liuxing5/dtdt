@@ -31,11 +31,6 @@ public class PartnerOrderResources {
     private Long chargeCount;
     
     /**
-     * 告警阈值
-     */
-    private Long warnThreshold;
-    
-    /**
      * 创建者
      */
     private String createUser;

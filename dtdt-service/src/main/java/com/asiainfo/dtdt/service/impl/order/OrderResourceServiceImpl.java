@@ -62,8 +62,8 @@ public class OrderResourceServiceImpl implements IOrderResourceService{
 				if (!canUsedCount.equals(0l))
 				{
 					redisAssistant.setForever(key, canUsedCount.toString());
-					log.info("无可用次数！key不存在，key:{},load成功，预存次数{},告警阈值{},可用次数{}",
-							key, por.getPreCount(), por.getWarnThreshold(),
+					log.info("无可用次数！key不存在，key:{},load成功，预存次数{},可用次数{}",
+							key, por.getPreCount(),
 							canUsedCount);
 				} else
 				{
