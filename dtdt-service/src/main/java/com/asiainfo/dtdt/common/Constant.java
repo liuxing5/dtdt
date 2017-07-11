@@ -46,11 +46,6 @@ public class Constant {
 	/**合作方信息错误描述**/
 	public static final String PARTNER_ERROR_MSG		= "合作伙伴信息错误";
 	
-	/**参数长度错误码**/
-	public static final String PARAM_LENGTH_CODE	= "10100";
-	/**参数长度错误描述**/
-	public static final String PARAM_LENGTH_MSG		= "参数长度有误";
-	
 	/**参数错误码**/
 	public static final String PARAM_ERROR_CODE		= "20000";
 	/**参数错误描述**/
@@ -58,7 +53,7 @@ public class Constant {
 	
 	
 	/**参数错误码**/
-	public static final String PARAM_ILLEGAL_CODE		= "20001";
+	public static final String PARAM_ILLEGAL_CODE		= "20007";
 	/**参数错误描述**/
 	public static final String PARAM_ILLEGAL_MSG		= "消息体不是合法的json字符串";
 	public static final String PARAM_WRONG_SIGN		= "20002";
@@ -67,11 +62,6 @@ public class Constant {
 	public static final String PARTNERORDERID_EXIST_CODE		= "99997";
 	/**签名错误描述**/
 	public static final String PARTNERORDERID_EXIST_MSG		= "合作伙伴订单号重复";
-	
-	/**签名错误码**/
-	public static final String SIGN_ERROR_CODE		= "99998";
-	/**签名错误描述**/
-	public static final String SIGN_ERROR_MSG		= "签名错误";
 	
 	/**系统异常错误码**/
 	public static final String ERROR_CODE			= "99999";
@@ -89,29 +79,24 @@ public class Constant {
 	public static final String NOT_UNICOM_MSG 		= "非联通号码";
 	
 	/**手机号码列表异常号码**/
-	public static final String PHONES_ERROR_CODE 		= "20005";
+	public static final String PHONES_ERROR_CODE 		= "20004";
 	/**手机号码列表异常号码描述**/
 	public static final String PHONES_ERROR_MSG 		= "手机号码列表为空";
 	
 	/**手机号码列表异常号码**/
-	public static final String PHONES_GET_ERROR_CODE 		= "20006";
+	public static final String PHONES_GET_ERROR_CODE 		= "20005";
 	/**手机号码列表异常号码描述**/
 	public static final String PHONES_GET_ERROR_MSG 		= "phones参数异常";
 	
 	/**手机号码个数太长code**/
 	public static final String PHONES_TOO_LONG_CODE 		= "20003";
 	/**手机号码个数太长描述**/
-	public static final String PHONES_TOO_LONG_MSG 		= "手机号码个数太长";
+	public static final String PHONES_TOO_LONG_MSG 		= "手机号码超过最大个数";
 	
 	/**后向流量批量订购失败code**/
-	public static final String BATCH_ORDER_FAIL_CODE 		= "20004";
+	public static final String BATCH_ORDER_FAIL_CODE 		= "40009";
 	/**后向流量批量订购失败描述**/
 	public static final String BATCH_ORDER_FAIL_MSG 		= "后向流量批量订购失败,订单id：";
-	
-	/**发送短信异常码**/
-	public static final String SENDSMS_ERROR_CODE	= "30000";
-	/**发送短信异常描述**/
-	public static final String SENDSMS_ERROR_MSG	= "发送短信异常";
 	
 	/**短信验证码过期错误码**/
 	public static final String SENDSMS_EXPIRED_CODE	= "30001";
@@ -156,16 +141,16 @@ public class Constant {
 	public static final String ORDER_TYPE_NOTPOSTFIX_MSG	=	"非后向订购产品：";
 	
 	/**重复退订免流产品错误编码**/
-	public static final String CLOSE_ORDER_EXISTENCE_CODE	=	"40009";
+	public static final String CLOSE_ORDER_EXISTENCE_CODE	=	"40006";
 	/**重复退订免流产品错误描述**/
 	public static final String CLOSE_ORDER_EXISTENCE_MSG		=	"重复退订产品：";
 	
 	/**订单不存在编码**/
-	public static final String NO_ORDER_CODE	=	"40010";
+	public static final String NO_ORDER_CODE	=	"40007";
 	/**订单不存在编码描述**/
 	public static final String NO_ORDER_MSG	=	"订单不存在";
 	
-	public static final String NO_ORDER_RESOURCE_CODE	=	"40011";
+	public static final String NO_ORDER_RESOURCE_CODE	=	"40008";
 	public static final String NO_ORDER_RESOURCE_MSG	=	"没有订购资源";
 	
 	/**定向流量产品第二三位表示产品周期*/

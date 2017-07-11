@@ -61,7 +61,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		if (phone.length() != 11) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "phone" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": phone不能超过指定长度！", null);
 		}
 		
 		if (!IsMobileNo.isMobile(phone)) {
@@ -83,10 +83,11 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 //			data.put("failOrders", hisOrderRecordlist);
 			
 			//拼返回参数
-			JSONObject data = new JSONObject();
+			JSONObject data = null;
 			List returnList = new ArrayList<>();
 			
 			for (int i = 0; i < orderRecordList.size(); i++) {
+				data = new JSONObject();
 				OrderRecord orderRecord = orderRecordList.get(i);
 				Product product = productMapper.queryProduct(orderRecord.getProductCode());
 				
@@ -120,7 +121,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
 		}
 		
 		try {

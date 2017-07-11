@@ -1182,7 +1182,7 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
 		}
 		
 		//校验合作方信息
@@ -1294,7 +1294,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_LENGTH_CODE, "orderId" + Constant.PARAM_LENGTH_MSG, null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
 		}
 		
 		//校验合作方信息
@@ -1509,7 +1509,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			if (!isOrderNull) {
 				//t_s_order 表到 t_s_his_order 表	copy_type：入表方式（0：包月退订 1：包半年、包年到期失效 2：人工操作）
-				orderMapper.insertHisOrder(orderId, state, "0", "退订-" + (state.equals("20")?"成功":"失败"));
+				orderMapper.insertHisOrder(orderId, state, "0", (state.equals("20")?"退订中":"退订失败"));
 				orderMapper.deleteByPrimaryKey(orderId);
 			}
 			
@@ -1517,9 +1517,8 @@ public class OrderServiceImpl implements IOrderService{
 			orderRecord.setState(state);//设置状态：状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中； 23-退订失败
 			orderRecord.setRefundValidTime(DateUtil.getNextMonthStartTime());//下月初
 			orderRecord.setRefundTime(date);
-			orderRecord.setInvalidTime(DateUtil.getCurrentMonthEndTime(date));//月底 
 			orderRecord.setUpdateTime(date);
-			orderRecord.setRemark("退订-" + (state.equals("20")?"成功":"失败"));
+			orderRecord.setRemark((state.equals("20")?"退订中":"退订失败"));
 			orderRecordMapper.updateOrderRecord(orderRecord);
 //			if ("20".equals(state)) {
 //				insertHisOrderRecord(orderRecord);//不挪表数据
