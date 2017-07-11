@@ -43,4 +43,6 @@ public interface INoticeService {
 	* @throws
 	 */
 	void optNoticeOrder(String resultCode, String orderId);
+	
+	void dtdtNoticeBatchOrder (String partnerOrderId);
 }

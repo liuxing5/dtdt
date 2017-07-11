@@ -238,18 +238,7 @@ public class NoticeServiceImpl implements INoticeService {
 		/**订购成功回调通知**/
 		if(isBatchOrder(order.getPartnerOrderId())){//批量订单和单个分开通知
 			log.debug("order | {} | is batch order",order.getOrderId());
-			BatchOrder batchOrder = null;
-			if(StringUtils.isNotBlank(order.getPartnerOrderId())){
-				orderService.updateBatchOrderState(order.getPartnerOrderId());
-				batchOrder = getBatchOrder(order.getPartnerOrderId());
-				log.debug("batchOrder |{}| state is | {} |",batchOrder.getBatchId(),batchOrder.getState());
-				if(BatchOrder.STATE_END.equals(batchOrder.getState())){
-					/** 批量的通知 **/
-					dtdtNoticeBatchOrder(batchOrder);
-				}
-			}else{
-				log.info("notice batchOrder {} partnerOrderId is null");
-			}
+			dtdtNoticeBatchOrder(order.getPartnerOrderId());
 		}else{
 			/**订购失败回调通知**/
 			dtdtNoticeOrder(order.getOrderId(), noticeSuccess);
@@ -356,8 +345,23 @@ public class NoticeServiceImpl implements INoticeService {
 		}
 		return false;
 	}
+	@Override
+	public void dtdtNoticeBatchOrder(String partnerOrderId){
+		BatchOrder batchOrder = null;
+		if(StringUtils.isNotBlank(partnerOrderId)){
+			orderService.updateBatchOrderState(partnerOrderId);
+			batchOrder = getBatchOrder(partnerOrderId);
+			log.debug("batchOrder |{}| state is | {} |",batchOrder.getBatchId(),batchOrder.getState());
+			if(BatchOrder.STATE_END.equals(batchOrder.getState())){
+				/** 批量的通知 **/
+				doDtdtNoticeBatchOrder(batchOrder);
+			}
+		}else{
+			log.info("notice batchOrder {} partnerOrderId is null");
+		}
+	}
 
-	public void dtdtNoticeBatchOrder(BatchOrder batchOrder) {
+	public void doDtdtNoticeBatchOrder(BatchOrder batchOrder) {
 		log.debug("dtdtNoticeBatchOrder start | {} |",batchOrder.toString());
 		try {
 			App app = appMapper.queryAppInfo(batchOrder.getAppKey());
@@ -389,7 +393,7 @@ public class NoticeServiceImpl implements INoticeService {
 				phones = phonesJson.toString();
 			}
 			json.put("phones", phones);
-			log.debug("dtdtNoticeBatchOrder context param {} ",json.toString());
+			log.info("dtdtNoticeBatchOrder context param {} ",json.toString());
 			String  result = RestClient.doRest(app.getNoticeUrl(), "POST", json.toString());
 			log.info("合作方返回当前订单（"+batchOrder.getBatchId()+"）回调内容："+result);
 		} catch (Exception e) {

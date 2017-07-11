@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,6 +39,7 @@ import com.asiainfo.dtdt.entity.WoplatOrder;
 import com.asiainfo.dtdt.interfaces.IAppService;
 import com.asiainfo.dtdt.interfaces.ICodeService;
 import com.asiainfo.dtdt.interfaces.IProductService;
+import com.asiainfo.dtdt.interfaces.order.INoticeService;
 import com.asiainfo.dtdt.interfaces.order.IOrderRecordService;
 import com.asiainfo.dtdt.interfaces.order.IOrderService;
 import com.asiainfo.dtdt.interfaces.order.IWoplatOrderService;
@@ -51,8 +54,6 @@ import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.PartnerMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.BatchPostFixOrderThread;
-
-import lombok.extern.log4j.Log4j2;
 
 /** 
 * @author 作者 : xiangpeng
@@ -95,6 +96,9 @@ public class OrderServiceImpl implements IOrderService{
 	
 	@Autowired
 	private IOrderRecordService orderRecordService;
+
+	@Autowired
+	private INoticeService noticeService;
 	
 	@Autowired
 	private IWoplatOrderService woplatOrderService;
@@ -530,6 +534,12 @@ public class OrderServiceImpl implements IOrderService{
 		hisOrder.setCopyRemark(phone + copyRemark);
 		
 		hisOrderMapper.insertSelective(hisOrder);
+		//触发通知业务
+		batchNotice(partnerOrderId);
+	}
+	
+	private void  batchNotice(String partnerOrderId){
+		noticeService.dtdtNoticeBatchOrder(partnerOrderId);
 	}
 	
 	/**
