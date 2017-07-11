@@ -24,7 +24,7 @@ public interface INoticeService {
 	* @return        
 	* @throws
 	 */
-	void dtdtNoticeOrder(String orderId);
+	void dtdtNoticeOrder(String orderId,boolean noticeSuccess);
 	
 	/**
 	* @Title: INoticeService 
