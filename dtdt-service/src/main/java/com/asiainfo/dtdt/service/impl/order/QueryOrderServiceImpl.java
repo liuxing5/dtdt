@@ -83,10 +83,11 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 //			data.put("failOrders", hisOrderRecordlist);
 			
 			//拼返回参数
-			JSONObject data = new JSONObject();
+			JSONObject data = null;
 			List returnList = new ArrayList<>();
 			
 			for (int i = 0; i < orderRecordList.size(); i++) {
+				data = new JSONObject();
 				OrderRecord orderRecord = orderRecordList.get(i);
 				Product product = productMapper.queryProduct(orderRecord.getProductCode());
 				
