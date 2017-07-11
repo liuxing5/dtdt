@@ -694,15 +694,13 @@ public class OrderServiceImpl implements IOrderService{
 		order.setCreateTime(new Date());//订购时间
 		order.setValidTime(new Date());//有效时间
 		order.setRedirectUrl(redirectUrl);//支付成功跳转URL
+		order.setAllowAutoPay(Constant.ALLOWAUTOPAY_1);
 		if(product.getType().equals((byte)1)){//包月后向流量
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月失效时间
-			order.setAllowAutoPay(Constant.ALLOWAUTOPAY_1);
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
-			order.setAllowAutoPay(Constant.ALLOWAUTOPAY_1);
 		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_03)){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),12)));//包年失效时间
-			order.setAllowAutoPay(Constant.ALLOWAUTOPAY_1);
 		}
 		order.setPrice(product.getPrice());//产品价格
 		order.setCount(1);//订购数量

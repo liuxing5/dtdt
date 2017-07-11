@@ -370,7 +370,7 @@ public class NoticeServiceImpl implements INoticeService {
 			json.put("partnerOrderId", batchOrder.getPartnerOrderId());
 			json.put("productCode", batchOrder.getProductCode());
 			json.put("productName", product.getProductName());
-			json.put("createTime", batchOrder.getCreateTime());
+			json.put("createTime", batchOrder.getCreateTime()==null?"":DateUtil.getDateTime(batchOrder.getCreateTime()));
 			List<HisOrder> hisOrderList = hisOrderMapper.getListByPartnerOrderId(batchOrder.getPartnerOrderId());
 			String phones = "";
 			int size = hisOrderList.size();
