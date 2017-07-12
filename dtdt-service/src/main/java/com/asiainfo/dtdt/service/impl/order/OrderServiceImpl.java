@@ -1519,6 +1519,7 @@ public class OrderServiceImpl implements IOrderService{
 			//包半年，包年也会调此接口，所以这里得判断然后修改退订生效时间
 			if (orderRecord.getCycleType() == 0) {
 				orderRecord.setRefundValidTime(DateUtil.getNextNMonthStartTime(1));//下月初
+				orderRecord.setInvalidTime(DateUtil.getCurrentMonthEndTime(date));//包月产品：月底
 			} else if (orderRecord.getCycleType() == 1) {
 				orderRecord.setRefundValidTime(DateUtil.getNextNMonthStartTime(6));//6月后
 			} else if (orderRecord.getCycleType() == 2) {
