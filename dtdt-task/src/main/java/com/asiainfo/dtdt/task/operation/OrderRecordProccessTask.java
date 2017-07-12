@@ -20,10 +20,10 @@ public class OrderRecordProccessTask {
 	@Resource
 	IOrderRecordProccessService orderRecordProccessService;
 	
-	@PostConstruct
-    public void init() {
-		orderRecordProccessService.closeOrderTask();
-    }
+//	@PostConstruct
+//    public void init() {
+//		orderRecordProccessService.closeOrderTask();
+//    }
 
 	//每月月底/次月月初  执行
 	@Scheduled(cron = "0 0 0 1 * ?")
