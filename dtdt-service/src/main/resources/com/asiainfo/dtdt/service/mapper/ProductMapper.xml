@@ -33,7 +33,7 @@
 	SELECT 
 	  pd.product_code,
 	  pd.product_name,
-	  pd.cycle_type
+	  pd.cycle_type,
 	  pd.type
 	FROM
 	  t_s_product_price pp,
