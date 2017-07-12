@@ -120,8 +120,8 @@ public class NoticeServiceImpl implements INoticeService {
 			returnJson.put("ecode", "0");
 			returnJson.put("emsg", "成功");
 //			returnJson.put("seq", seq);
-		} catch (JSONException jsone) {
-			log.error("wojia notice check param json is error:"+jsone.getMessage(),jsone);
+		} catch (Exception jsone) {
+			log.error("wojia notice check param{} json is error:"+jsone.getMessage(), notifyJson,jsone);
 		}
 		return returnJson.toString();
 	}
