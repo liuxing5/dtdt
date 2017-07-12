@@ -1271,7 +1271,7 @@ public class OrderServiceImpl implements IOrderService{
 			}
 			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
 		} 
-		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG +msg==""?"":(":" + msg), null);
+		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG +(msg==""?"":(":" + msg)), null);
 	}
 	
 	/**
@@ -1387,7 +1387,7 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		}
-		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG + msg==""?"":(":" + msg), null);
+		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG + (msg==""?"":(":" + msg)), null);
 	}
 	
 	/**
