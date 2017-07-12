@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/7/10 9:34:19                            */
+/* Created on:     2017/7/12 10:59:40                           */
 /*==============================================================*/
 
 
@@ -269,7 +269,7 @@ create table t_s_order
    count                int default 1 comment '订购数量',
    money                bigint comment '订单价格',
    is_need_charge       tinyint comment '是否需要返充话费（0：需要 1：不需要）',
-   allow_auto_pay       tinyint comment '每月固定时间：0，一次性：1',
+   allow_auto_pay       tinyint default 1 comment '每月固定时间：0，一次性：1',
    redirect_url         varchar(100) comment '支付成功跳转Url',
    remark               varchar(100),
    primary key (order_id)
@@ -299,7 +299,7 @@ create table t_s_order_record
    money                bigint comment '订单价格',
    is_need_charge       tinyint comment '是否需要返充话费（0：需要 1：不需要）',
    oper_source          tinyint default 0 comment '操作来源（0：定向流量平台内 1：沃家总管同步 ）',
-   allow_auto_pay       tinyint default 0 comment '0：允许 1：不允许',
+   allow_auto_pay       tinyint default 1 comment '0：允许 1：不允许',
    redirect_url         varchar(100),
    wo_order             tinyint default 0 comment '0：我方初始化订购 
             1：其他代理商订购 
@@ -357,7 +357,6 @@ create table t_s_partner_his_order_resources
    pre_count            bigint default 0 comment '预存订购次数',
    use_count            bigint comment '失效后，使用了的次数',
    charge_count         bigint comment '充值次数',
-   warn_threshold       bigint default 0 comment '告警阈值',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',
    create_user          varchar(50) comment '创建者',
@@ -376,7 +375,6 @@ create table t_s_partner_order_resources
    pre_count            bigint default 0 comment '预存订购次数',
    use_count            bigint default 0 comment '失效后，使用了的次数',
    charge_count         bigint default 0 comment '充值次数',
-   warn_threshold       bigint default 0 comment '告警阈值',
    create_time          timestamp comment '创建时间',
    end_time             timestamp comment '结束时间',
    create_user          varchar(50) comment '创建者',
