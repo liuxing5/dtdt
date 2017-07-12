@@ -1239,7 +1239,7 @@ public class OrderServiceImpl implements IOrderService{
 		
 		String ecode = wojiaJson.getString("ecode");
 		String emsg = wojiaJson.getString("emsg");
-		String msg = null;
+		String msg = "";
 		if("0".equals(ecode)){
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode + " emsg=" + emsg);
