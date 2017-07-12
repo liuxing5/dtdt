@@ -25,7 +25,8 @@ public class OrderRecordProccessTask {
 		orderRecordProccessService.closeOrderTask();
     }
 
-	@Scheduled(cron = "0 0/5 * * * ?")
+	//每月月底/次月月初  执行
+	@Scheduled(cron = "0 0 0 L * ?")
     public void refreshTask() {
 		orderRecordProccessService.closeOrderTask();
     }
