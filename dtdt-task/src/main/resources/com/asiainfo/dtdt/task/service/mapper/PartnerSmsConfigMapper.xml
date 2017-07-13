@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.asiainfo.dtdt.task.entity.PartnerSmsConfig" >
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="partner_code" property="partnerCode" jdbcType="VARCHAR" />
+    <result column="partner_name" property="partnerName" jdbcType="VARCHAR" />
     <result column="contacts" property="contacts" jdbcType="VARCHAR" />
     <result column="mobilephone" property="mobilephone" jdbcType="VARCHAR" />
     <result column="warn_threshold" property="warnThreshold" jdbcType="BIGINT" />
@@ -19,8 +20,10 @@
   </sql>
   
   <select id="loadAll" resultMap="BaseResultMap">
-      select partner_code, mobilephone, warn_threshold, mail
-      from t_s_partner_sms_config 
+      select c.partner_code, c.mobilephone, c.warn_threshold, c.mail,p.partner_name
+      from t_s_partner_sms_config c,
+           t_s_partner p
+      where p.partner_code = c.partner_code
   </select>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >

@@ -28,12 +28,12 @@ public class PartnerOrderResourceTask {
 		partnerORServ.refreshTask();
     }
 
-	@Scheduled(cron = "0/30 * * * * ?")
+	@Scheduled(cron = "0 0 0/1 * * ?")
     public void lookRedisPartnerOR() {
     	partnerORServ.lookRedisPartnerOR();
     }
 
-    @Scheduled(cron = "0 0/2 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void reload() {
     	partnerORServ.refreshTask();
     } 

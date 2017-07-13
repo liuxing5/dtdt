@@ -44,6 +44,8 @@ public class PartnerSMSConfImp implements IPartnerSMSConfService {
 					String hkey = RedisKey.PARTNER_OR_WARN_KEY_PREFIX
 							+ psc.getPartnerCode();
 
+					redis.hset(hkey, RedisKey.PARTNER_OR_WARN_KEY_NAME,
+							psc.getPartnerName());
 					redis.hset(hkey, RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE,
 							psc.getMobilephone());
 					
@@ -53,7 +55,9 @@ public class PartnerSMSConfImp implements IPartnerSMSConfService {
 							RedisKey.PARTNER_OR_WARN_KEY_WARNTHRESHOLD, psc
 									.getWarnThreshold().toString());
 					
-					log.info("hkey:{}|{}:{}|{}:{}|{}:{}", hkey,
+					log.info("hkey:{}|{}:{}|{}:{}|{}:{}|{}:{}", hkey,
+							RedisKey.PARTNER_OR_WARN_KEY_NAME,
+							redis.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_NAME),
 							RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE,
 							redis.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_MOBILEPHONE),
 							RedisKey.PARTNER_OR_WARN_KEY_MAIL,

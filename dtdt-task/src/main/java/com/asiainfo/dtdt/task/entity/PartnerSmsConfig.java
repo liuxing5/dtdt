@@ -15,6 +15,11 @@ public class PartnerSmsConfig {
      * 合作方编码
      */
     private String partnerCode;
+    
+    /**
+     * 合作方名称
+     */
+    private String partnerName;
 
     /**
      * 预存订购次数

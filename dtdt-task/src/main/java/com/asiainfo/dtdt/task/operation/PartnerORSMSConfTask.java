@@ -3,6 +3,7 @@ package com.asiainfo.dtdt.task.operation;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.asiainfo.dtdt.task.service.IPartnerSMSConfService;
@@ -23,6 +24,12 @@ public class PartnerORSMSConfTask {
 	
 	@PostConstruct
     public void init() {
+		partnerSMSConf.loadPartnerSMSConf();
+    }
+	
+	
+	@Scheduled(cron = "0 0 0 * * ?")
+    public void refreshPartnerOR() {
 		partnerSMSConf.loadPartnerSMSConf();
     }
 	
