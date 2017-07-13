@@ -150,7 +150,8 @@ public class OrderResourceServiceImpl implements IOrderResourceService{
 			{
 				content = "";
 			}
-			content = content.replace("{0}", String.valueOf(partnerCode));
+			content = content.replace("{0}", String.valueOf(redisAssistant
+					.hgetString(hkey, RedisKey.PARTNER_OR_WARN_KEY_NAME)));
 			SGIPSendMSGUtil.CONF_PATH = path + File.separator + "sgip.properties";
 			log.info("configPath:{}", SGIPSendMSGUtil.CONF_PATH);
 			
