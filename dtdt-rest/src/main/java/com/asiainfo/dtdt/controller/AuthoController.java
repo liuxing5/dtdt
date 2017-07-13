@@ -119,10 +119,9 @@ public class AuthoController extends BaseController{
 		{
 			result.put(ResponseCode.CODE, ResponseCode.COMMON_ERROR_CODE);
 			result.put(ResponseCode.MSG, "系统异常");
-			log.error("{}|{}|{}|{}|{}",
+			log.error("{}|{}|{}|{}",
 					headers.getString("partnerCode"),
-					headers.getString("appkey"), phone,
-					result.get("smsCode"), e);
+					headers.getString("appkey"), phone, e);
 			return new ResponseData(ResponseCode.CODE, ResponseCode.COMMON_ERROR_CODE);
 		}
 		return new ResponseData(ResponseCode.COMMON_SUCCESS_CODE, "成功");
