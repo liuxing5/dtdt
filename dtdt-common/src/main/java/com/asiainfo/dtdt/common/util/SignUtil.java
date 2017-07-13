@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -70,11 +71,27 @@ public class SignUtil {
 		//2.拼接 eg：key=value&key=value
 		for (int i = 0; i < list.size(); i++)
 		{
-			Object v = parameters.get(list.get(i));
 			Object k = list.get(i);
+			Object v = parameters.get(k);
+			
 			if (null != v && !"".equals(v) && !"appSignature".equals(k)
 					&& !"key".equals(k))//（如果参数的值为空不参与签名）
 			{
+				try
+				{
+					sb.append(k.toString());
+					JSONArray array = parameters.getJSONArray(k.toString());
+					for(int j=0; j<array.size(); j++)
+					{
+						sb.append(array.get(j).toString());
+					}
+					continue;
+				}
+				catch(Exception e)
+				{
+					//
+				}
+				
 				sb.append(k.toString() + v.toString());
 			}
 		}
@@ -95,36 +112,63 @@ public class SignUtil {
 		
 		JSONObject parameters = new JSONObject();
 		
-		parameters.put("partnerCode", "1234543245");
+		/*parameters.put("partnerCode", "1234543245");
 		parameters.put("appkey", "fwerh4356ytrt54");
 		parameters.put("timestamp", "1499235630342");
 		parameters.put("secret", "ewer5retyt");
 		//parameters.put("phone", "18710728340");
 		parameters.put("phone", "18516222335");
-		System.out.println(createSign(parameters, "utf-8"));
+		System.out.println(createSign(parameters, "utf-8"));*/
 		
 		/**
 		 * {
-	"seq":"1234543245",
-	"phone":"18516222338"，
-	"productCode":"100101",
-	"partnerOrderId":"3456432134567543456750",
-	"orderMethod":"1",
-	"partnerCode":"1234543245",
-"appkey":"fwerh4356ytrt54",
-"timestamp":"1499443544141",
-"appSignature":"40BB9846E00D1D1C69B851264315BF8E"
+    "phone": "18610728340",
+    "productCode": "100101",
+    "partnerOrderId": "3456432134567543456750",
+    "orderMethod": "1",
+    "partnerCode": "1234543245",
+    "appkey": "fwerh4356ytrt54",
+    "timestamp": "1499443544141",
+    "appSignature": "40BB9846E00D1D1C69B851264315BF8E"
+264315BF8E"
 }
 		 */
-		parameters.put("partnerCode", "1234543245");
-		parameters.put("appkey", "fwerh4356ytrt54");
-		parameters.put("timestamp", "1499443544141");
-		parameters.put("secret", "ewer5retyt");
-		parameters.put("phone", "18516222338");
-		parameters.put("seq", "1234543245");
+		/*parameters.put("phone", "18610728340");
 		parameters.put("productCode", "100101");
+		parameters.put("partnerCode", "1234543245");
 		parameters.put("partnerOrderId", "3456432134567543456750");
 		parameters.put("orderMethod", "1");
+		parameters.put("appkey", "fwerh4356ytrt54");
+		parameters.put("timestamp", "1499443544141");
+		parameters.put("secret", "ewer5retyt");*/
+		
+		
+		/**
+		 * {
+    "partnerCode": "1234543245",
+    "appkey": "fwerh4356ytrt54",
+    "timestamp": "1499236715439",
+    "appSignature": "350FE98995A09E5EE05E3E1B493E6488",
+    "phones": [
+        "18610728340",
+        "18610728340",
+        "18610728340",
+        "18610728340"
+    ],
+    "productCode": "100101",
+    "orderMethod": "1",
+    "partnerOrderId": "345678907777777"
+}
+
+		 */
+		parameters.put("productCode", "100101");
+		parameters.put("partnerCode", "1234543245");
+		parameters.put("partnerOrderId", "345678907777777");
+		parameters.put("orderMethod", "1");
+		parameters.put("appkey", "fwerh4356ytrt54");
+		parameters.put("timestamp", "1499236715439");
+		parameters.put("secret", "ewer5retyt");
+		parameters.put("phones", "[\"18610728340\",\"]");
 		
 		
 		System.out.println(createSign(parameters, "utf-8"));
