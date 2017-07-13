@@ -22,4 +22,6 @@ public class SMSContentConfig {
 	private String codeContent;
 	// 合作方订购资源监控告警内容
 	private String porMonitorSmsContent;
+	// 订购成功，给用户下发短信内容
+	private String orderSuccessContent;
 }

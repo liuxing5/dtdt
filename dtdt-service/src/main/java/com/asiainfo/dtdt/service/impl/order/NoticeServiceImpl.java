@@ -1,20 +1,23 @@
 package com.asiainfo.dtdt.service.impl.order;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+
+import lombok.extern.log4j.Log4j2;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.RestClient;
 import com.asiainfo.dtdt.common.util.DateUtil;
+import com.asiainfo.dtdt.config.sms.SMSContentConfig;
 import com.asiainfo.dtdt.entity.App;
 import com.asiainfo.dtdt.entity.BatchOrder;
 import com.asiainfo.dtdt.entity.HisOrder;
@@ -33,8 +36,7 @@ import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.ProductMapper;
 import com.asiainfo.dtdt.thread.NoticePartnerOrderThread;
-
-import lombok.extern.log4j.Log4j2;
+import com.huawei.insa2.util.SGIPSendMSGUtil;
 
 /** 
 * @author 作者 : xiangpeng
@@ -77,8 +79,10 @@ public class NoticeServiceImpl implements INoticeService {
 	
 	@Autowired
 	private IProductService productService;
-
 	
+	@Resource
+	private SMSContentConfig smsContentConfig;
+
 	/**
 	 * (非 Javadoc) 
 	* <p>Title: optNoticeOrder</p> 
@@ -215,6 +219,9 @@ public class NoticeServiceImpl implements INoticeService {
 			orderService.insertFromOrderRecordById(order.getOrderId(),product.getCycleType(), "0");
 			orderService.insertOrderBakAndDelOrder(order.getOrderId(), Constant.HISORDER_TYPE_0, "沃家总管订购成功");
 			
+			// 下发订购成功短信
+			sendSuccessSMS(order, product);
+			
 		}else if(resultCode.equals("6")){//订购失败
 			//判断产品类型，后向的加
 			String strProduct = productService.queryProduct(order.getProductCode());
@@ -244,7 +251,7 @@ public class NoticeServiceImpl implements INoticeService {
 			dtdtNoticeOrder(order.getOrderId(), noticeSuccess);
 		}
 	}
-	
+
 	
 
 	/**
@@ -430,5 +437,44 @@ public class NoticeServiceImpl implements INoticeService {
 		case 99:return "8";
 		default:return "";
 		}
+	}
+	
+	private void sendSuccessSMS(Order order, Product product)
+	{
+		// 前向产品发短信，后向产品不发短信
+		if (0 == product.getType())
+		{
+			String content = smsContentConfig.getOrderSuccessContent();
+			if (StringUtils.isEmpty(content))
+			{
+				content = "";
+			}
+			content = content.replace("{0}", product.getProductName());
+
+			if (0 == product.getCycleType())
+			{
+				// 前向包月产品 每月收费
+				content = content.replace("{1}", product.getPrice() + "元/月");
+			} else
+			{
+				// 包年、包半年一次性收费
+				content = content.replace("{1}", product.getPrice() + "元");
+			}
+
+			String path = "";
+			if (System.getProperty("os.name").startsWith("win")
+					|| System.getProperty("os.name").startsWith("Win"))
+			{
+				path = NoticeServiceImpl.class.getResource("/").getPath();
+			} else
+			{
+				path = System.getProperty("user.dir");
+			}
+			SGIPSendMSGUtil.CONF_PATH = path + File.separator
+					+ "sgip.properties";
+			log.info("send warn msg {}", order.getMobilephone());
+			SGIPSendMSGUtil.sendMsg(order.getMobilephone(), content);
+		}
+
 	}
 }
