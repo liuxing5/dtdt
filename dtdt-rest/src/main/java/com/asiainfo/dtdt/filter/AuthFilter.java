@@ -101,13 +101,6 @@ public class AuthFilter implements Filter{
 					requestJson = myRequestWrapper.getBody();
 				} else
 				{
-					requestJson.put("partnerCode",
-							hrequest.getHeader("partnerCode"));
-					requestJson.put("appkey", hrequest.getHeader("appkey"));
-					requestJson.put("timestamp",
-							hrequest.getHeader("timestamp"));
-					requestJson.put("appSignature",
-							hrequest.getHeader("appSignature"));
 					IteratorEnumeration ite = (IteratorEnumeration) hrequest.getParameterNames();
 					while(ite.hasMoreElements())
 					{
@@ -115,8 +108,13 @@ public class AuthFilter implements Filter{
 						String value = hrequest.getParameter(key);
 						requestJson.put(key, value);
 					}
-					//requestJson.putAll(m);
-					//hrequest.getQueryString();
+					requestJson.put("partnerCode",
+							hrequest.getHeader("partnerCode"));
+					requestJson.put("appkey", hrequest.getHeader("appkey"));
+					requestJson.put("timestamp",
+							hrequest.getHeader("timestamp"));
+					requestJson.put("appSignature",
+							hrequest.getHeader("appSignature"));
 				}
 
 				JSONObject checkResult = checkCommonParam(requestJson);
@@ -193,7 +191,7 @@ public class AuthFilter implements Filter{
 			long nowtimestamp = new Date().getTime();
 			if(timestamp > nowtimestamp || (nowtimestamp - timestamp) > validTime)
 			{
-				checkResult.put("code", "30002");
+				checkResult.put("code", "30003");
 				checkResult.put("msg", "请求链接失效！");
 				return checkResult;
 			}
