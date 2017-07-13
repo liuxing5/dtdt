@@ -1,6 +1,5 @@
 package com.asiainfo.dtdt.task.operation;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.springframework.scheduling.annotation.Scheduled;
