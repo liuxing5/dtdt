@@ -474,7 +474,7 @@ alter table t_s_product_price comment '流量产品价格定义表';
 /*==============================================================*/
 create table t_s_vcode
 (
-   ID                   bigint(20) not null,
+   ID                   bigint(20) not null AUTO_INCREMENT,
    order_id             varchar(32) comment '订单ID',
    vcode_send_time      varchar(20) comment '最后一次验证码下发时间',
    lvcode               varchar(6) comment '下发的验证码',
