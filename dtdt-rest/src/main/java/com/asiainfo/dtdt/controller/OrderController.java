@@ -97,7 +97,7 @@ public class OrderController extends BaseController{
 			sb.append(line);
 		}
 		String orderJson = sb.toString(); //接收到通知信息。
-		logger.info("pre-order param data:"+orderJson);
+		logger.info("postfix-order param data:"+orderJson);
 		String result = orderService.postfixOrder(orderJson);
 		return result;
 	}
