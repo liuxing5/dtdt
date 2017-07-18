@@ -1,6 +1,5 @@
 package com.asiainfo.dtdt.service.impl.order;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,13 +14,11 @@ import com.asiainfo.dtdt.entity.HisOrder;
 import com.asiainfo.dtdt.entity.HisOrderRecord;
 import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
-import com.asiainfo.dtdt.entity.Product;
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
 import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
 import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
-import com.asiainfo.dtdt.service.mapper.ProductMapper;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -41,9 +38,6 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	@Autowired
 	private HisOrderMapper hisOrderMapper;
 	
-	@Autowired
-	private ProductMapper productMapper;
-	
 	/**
 	* @Title: queryOrderRecord 
 	* @Description: 查询订购信息服务
@@ -51,7 +45,6 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	* @return String
 	* @throws
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public String queryOrderRecord(String phone, String appkey, String partnerCode) {
 		
 		log.info("OrderServiceImpl queryOrderRecord() phone=" + phone + " appkey=" + appkey);
@@ -61,7 +54,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		if (phone.length() != 11) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": phone不能超过指定长度！", null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG+": phone不符合指定长度！", null);
 		}
 		
 		if (!IsMobileNo.isMobile(phone)) {
@@ -82,24 +75,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 //			log.info("OrderServiceImpl queryOrderState() hisOrderRecordlist=" + hisOrderRecordlist);
 //			data.put("failOrders", hisOrderRecordlist);
 			
-			//拼返回参数
-			JSONObject data = null;
-			List returnList = new ArrayList<>();
-			
-			for (int i = 0; i < orderRecordList.size(); i++) {
-				data = new JSONObject();
-				OrderRecord orderRecord = orderRecordList.get(i);
-				Product product = productMapper.queryProduct(orderRecord.getProductCode());
-				
-				data.put("productCode", orderRecord.getProductCode());
-				data.put("cycleType", orderRecord.getCycleType());
-				data.put("type", product.getType());
-				data.put("validTime", orderRecord.getValidTime());
-				data.put("invalidTime", orderRecord.getInvalidTime());
-				returnList.add(data);
-			}
-			
-			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, returnList);
+			return ReturnUtil.returnJsonList(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, orderRecordList);
 		} catch (Exception e) {
 			log.error("OrderServiceImpl queryOrderRecord() Exception e=" + e);
 			return ReturnUtil.returnJsonList(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
@@ -121,7 +97,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		}
 		
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG + ": orderId不符合指定长度！", null);
 		}
 		
 		try {
@@ -181,6 +157,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			*	状态20：邮箱侧退订中，此时邮箱侧合作方查询该笔订购状态为：退订中；
 			*	状态21：邮箱侧已作废（订购状态在X小时内一直为“未支付”，X小时后将该订单状态设置为“已作废”），此时邮箱侧合作方查询该笔订购状态为：订购作废；
 			*	状态22：服务到期（半年包、年包产品自然达到有效期截止日），此时邮箱侧合作方查询该笔订购状态为：服务到期；
+			*   状态23：wojia通知接口返回退订失败，我方平台记录此状态，并返回给合作方
 			*
 			*	我方返回给合作方state（无 1,2,3,21状态）
 			*	      状态1：待订购；--4
@@ -190,6 +167,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			*	      状态5：退订中；--20
 			*	      状态6：退订成功；--19
 			*	      状态7：服务到期；--22
+			*	      状态9：退订失败；--23
 			 */
 //			case 1:json.put("stateMsg", "未付款");break;
 //			case 2:json.put("stateMsg", "付款中");break;
@@ -220,6 +198,7 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			case 20:json.put("state", "5");json.put("stateMsg", "退订中");break;
 			//case 21:json.put("stateMsg", "订购作废");break;
 			case 22:json.put("state", "7");json.put("stateMsg", "服务到期");break;
+			case 23:json.put("state", "9");json.put("stateMsg", "退订失败");break; //我方状态为23-退订失败，返回给合作方状态9
 			default:json.put("stateMsg", "此订单状态异常");break;
 			}
 			return ReturnUtil.returnJsonObj(Constant.SUCCESS_CODE, Constant.SUCCESS_MSG, json);

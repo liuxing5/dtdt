@@ -1172,7 +1172,7 @@ public class OrderServiceImpl implements IOrderService{
 			return ReturnUtil.returnJsonInfo(Constant.PARAM_NULL_CODE, "orderId" + Constant.PARAM_NULL_MSG, null);
 		}
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不符合指定长度！", null);
 		}
 		
 		//校验合作方信息
@@ -1213,11 +1213,6 @@ public class OrderServiceImpl implements IOrderService{
 		log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder request start" + orderRecord);
 		String wojiaStr = closeOrder(orderRecord.getMobilephone(), product.getWoProductCode(), orderRecord.getWoOrderId(), DateUtil.getSysdateYYYYMMDDHHMMSS(), orderRecord.getOrderChannel());
 		
-		//test data
-//		JSONObject wojiaJson = new JSONObject();
-//		wojiaJson.put("ecode", "0");
-//		wojiaJson.put("emsg", "emsg");
-		
 		JSONObject wojiaJson = JSONObject.parseObject(wojiaStr);
 		log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder response wojiaJson" + wojiaJson);
 		
@@ -1228,7 +1223,6 @@ public class OrderServiceImpl implements IOrderService{
 		
 		String ecode = wojiaJson.getString("ecode");
 		String emsg = wojiaJson.getString("emsg");
-		String msg = "";
 		if("0".equals(ecode)){
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder success ecode=" + ecode + " emsg=" + emsg);
@@ -1241,26 +1235,20 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-		} else if(wojiaJson.getString("ecode").equals("4000")){
-			msg = "产品 不存在或已失效";
-		} else if(wojiaJson.getString("ecode").equals("4003")){
-			msg = "订购关系不存在";
-		} else if(wojiaJson.getString("ecode").equals("4004")){
-			msg = "产品无法退订";
+		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail ecode=" + ecode + " emsg=" + emsg);
-			//wojia返回一种信息： 	emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
+			//wojia返回一种信息： emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
 			try {
 				//t_s_order 表到 t_s_his_order 表
 				insertFromHisOrderById(orderId, "0", "退订失败 ecode=" + ecode + " emsg=" + emsg);
 				orderMapper.deleteByPrimaryKey(orderId);
+				return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrder() OrderMethod.closeOrder order fail Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-			return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
-		} 
-		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG +(msg==""?"":(":" + msg)), null);
+		}
 	}
 	
 	/**
@@ -1284,7 +1272,7 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		if (orderId.length() != 32) {
-			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE,Constant.PARAM_ERROR_MSG+": orderId不能超过指定长度！", null);
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG + ": orderId不符合指定长度！", null);
 		}
 		
 		//校验合作方信息
@@ -1330,11 +1318,6 @@ public class OrderServiceImpl implements IOrderService{
 		log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder request start" + orderRecord);
 		String wojiaStr = closeOrder(orderRecord.getMobilephone(), product.getWoProductCode(), orderRecord.getWoOrderId(), DateUtil.getSysdateYYYYMMDDHHMMSS(), orderRecord.getOrderChannel());
 		
-		//test data
-//		JSONObject wojiaJson = new JSONObject();
-//		wojiaJson.put("ecode", "0");
-//		wojiaJson.put("emsg", "emsg");
-		
 		JSONObject wojiaJson = JSONObject.parseObject(wojiaStr);
 		log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder response wojiaJson" + wojiaJson);
 		
@@ -1345,7 +1328,6 @@ public class OrderServiceImpl implements IOrderService{
 		
 		String ecode = wojiaJson.getString("ecode");
 		String emsg = wojiaJson.getString("emsg");
-		String msg = "";
 		if("0".equals(ecode)){
 			//如果退订成功还需要返回退订详细信息：流量包名称，退订时间，退订生效时间等
 			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order success ecode=" + ecode + " emsg=" + emsg);
@@ -1358,25 +1340,20 @@ public class OrderServiceImpl implements IOrderService{
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder getDateTime Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
-		} else if(wojiaJson.getString("ecode").equals("4000")){
-			msg = "产品 不存在或已失效";
-		} else if(wojiaJson.getString("ecode").equals("4003")){
-			msg = "订购关系不存在";
-		}else if(wojiaJson.getString("ecode").equals("4004")){
-			msg = "产品无法退订";
+		} else {
 			//如果退订失败需返回失败原因
 			log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail ecode=" + ecode + " emsg=" + emsg);
-			//wojia返回一种信息： 	emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
+			//wojia返回一种信息： emsg:产品无法退订： orderId：0f9a7d11-8976-46ff-ad13-4950a1ed600d，这里统一返回给合作伙伴
 			try {
 				//t_s_order 表到 t_s_his_order 表
 				insertFromHisOrderById(orderId, "0", "退订失败 ecode=" + ecode + " emsg=" + emsg);
 				orderMapper.deleteByPrimaryKey(orderId);
+				return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG, buildMsgFromWoReturn(orderRecord.getMobilephone(), product, wojiaJson));
 			} catch (Exception e) {
 				log.info("OrderServiceImpl closeOrderNew() OrderMethod.closeOrder order fail Exception e" + e);
 				return ReturnUtil.returnJsonInfo(Constant.ERROR_CODE, Constant.ERROR_MSG, null);
 			}
 		}
-		return ReturnUtil.returnJsonObj(Constant.CLOSE_ORDER_FAIL_CODE, Constant.CLOSE_ORDER_FAIL_MSG + (msg==""?"":(":" + msg)), null);
 	}
 	
 	/**

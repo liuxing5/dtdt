@@ -61,5 +61,7 @@ public class OrderRecord implements Serializable {
 	private String redirectUrl;
 	
 	private String woOrderId;
+	
+	private Byte type;
 
 }

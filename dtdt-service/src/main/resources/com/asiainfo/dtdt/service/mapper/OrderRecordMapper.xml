@@ -28,6 +28,7 @@
     <result column="invalid_time" property="invalidTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="TINYINT" />
   </resultMap>
   <sql id="Base_Column_List" >
     order_id, wo_order_id,parent_order_id, partner_code, app_key, partner_order_id, cycle_type, 
@@ -95,10 +96,8 @@
   </select>
   <!-- 查询订购信息服务 -->
   <select id="queryOrderRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    	app_key,partner_order_id,cycle_type,product_code,mobilephone,order_channel,
-    	price,count,money,valid_time,invalid_time
-    from t_s_order_record
+  	select o.cycle_type,o.product_code,o.valid_time,o.invalid_time,p.type 
+	from t_s_order_record o left join t_s_product p on o.product_code=p.product_code
     where mobilephone = #{mobilephone,jdbcType=VARCHAR}
     and app_key = #{appkey,jdbcType=VARCHAR}
     and partner_code = #{partnerCode,jdbcType=VARCHAR}

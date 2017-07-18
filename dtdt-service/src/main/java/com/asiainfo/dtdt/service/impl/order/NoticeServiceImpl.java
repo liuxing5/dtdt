@@ -434,6 +434,7 @@ public class NoticeServiceImpl implements INoticeService {
 		case 20:return "5";
 		//case 21:json.put("stateMsg", "订购作废");break;
 		case 22:return "7";
+		case 23:return "9";//我方状态为23-退订失败，返回给合作方状态9
 		case 99:return "8";
 		default:return "";
 		}
