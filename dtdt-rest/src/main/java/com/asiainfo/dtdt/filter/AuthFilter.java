@@ -164,6 +164,8 @@ public class AuthFilter implements Filter{
 				return checkResult;
 			}
 			
+			log.info("request param: {}", requestJson);
+			
 			if ((!requestJson.containsKey("partnerCode") || StringUtils
 					.isEmpty(requestJson.getString("partnerCode")))
 					|| (!requestJson.containsKey("appkey") || StringUtils
@@ -189,7 +191,8 @@ public class AuthFilter implements Filter{
 			long timestamp = Long.valueOf(requestJson.getString("timestamp"));
 			long validTime = Long.valueOf(validTimeStr) * 1000l;
 			long nowtimestamp = new Date().getTime();
-			if(timestamp > nowtimestamp || (nowtimestamp - timestamp) > validTime)
+			log.info("check timestamp now:{},input timestamp:{},validTime:{}", nowtimestamp, timestamp, validTime);
+			if(timestamp > (nowtimestamp + 1000l) || (nowtimestamp - timestamp) > validTime)
 			{
 				checkResult.put("code", "30003");
 				checkResult.put("msg", "请求链接失效！");
