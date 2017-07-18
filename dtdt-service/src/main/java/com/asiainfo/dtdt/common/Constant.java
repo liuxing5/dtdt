@@ -155,11 +155,11 @@ public class Constant {
 	
 	/**定向流量产品第二三位表示产品周期*/
 	/**包月**/
-	public static final String CYCLE_TYPE_01	=	"01";
+	public static final byte CYCLE_TYPE_01	=	1;
 	/**包半年**/
-	public static final String CYCLE_TYPE_02	=	"02";
+	public static final byte CYCLE_TYPE_02	=	2;
 	/**包年**/
-	public static final String CYCLE_TYPE_03	=	"03";
+	public static final byte CYCLE_TYPE_03	=	3;
 	
 	/**订购类型：1-订购**/
 	public static final byte ORDER_OPER_TYPE_0	= 1;
