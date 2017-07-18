@@ -341,6 +341,7 @@ public class OrderServiceImpl implements IOrderService{
 			try {
 				returnStr = orderResourceService.checkCounts(partnerCode);
 			} catch (Exception e) {
+				log.error("checkCounts error {}",e);
 				returnStr =  ReturnUtil.returnJsonError(Constant.ERROR_CODE,
 						Constant.ERROR_MSG, null);
 			}
