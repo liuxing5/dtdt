@@ -27,7 +27,7 @@ public interface OrderMapper {
     * @return Order
     * @throws
      */
-    Order queryOrderState(@Param("orderId")String orderId, @Param("partnerCode")String partnerCode, @Param("appkey")String appkey);
+    String queryOrderState(@Param("orderId")String orderId, @Param("partnerCode")String partnerCode, @Param("appkey")String appkey);
 
     int updateByPrimaryKeySelective(Order record);
     

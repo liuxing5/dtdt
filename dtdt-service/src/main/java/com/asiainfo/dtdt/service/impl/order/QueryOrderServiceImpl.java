@@ -10,13 +10,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dtdt.common.Constant;
 import com.asiainfo.dtdt.common.IsMobileNo;
 import com.asiainfo.dtdt.common.ReturnUtil;
-import com.asiainfo.dtdt.entity.HisOrder;
-import com.asiainfo.dtdt.entity.HisOrderRecord;
-import com.asiainfo.dtdt.entity.Order;
 import com.asiainfo.dtdt.entity.OrderRecord;
 import com.asiainfo.dtdt.interfaces.order.IQueryOrderService;
-import com.asiainfo.dtdt.service.mapper.HisOrderMapper;
-import com.asiainfo.dtdt.service.mapper.HisOrderRecordMapper;
 import com.asiainfo.dtdt.service.mapper.OrderMapper;
 import com.asiainfo.dtdt.service.mapper.OrderRecordMapper;
 
@@ -31,12 +26,6 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 	
 	@Autowired
 	private OrderRecordMapper orderRecordMapper;
-	
-	@Autowired
-	private HisOrderRecordMapper hisOrderRecordMapper;
-	
-	@Autowired
-	private HisOrderMapper hisOrderMapper;
 	
 	/**
 	* @Title: queryOrderRecord 
@@ -103,35 +92,12 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 		try {
 			//先后：order表，order_record表，his_order_record表，his_order表
 			
-			String state = null;
-			Order order = orderMapper.queryOrderState(orderId, partnerCode, appkey);
-			if (null == order) {
-				OrderRecord orderRecord = orderRecordMapper.queryOrderState(orderId, partnerCode, appkey);
-				if (null == orderRecord) {
-					HisOrderRecord hisOrderRecord = hisOrderRecordMapper.queryOrderState(orderId, partnerCode, appkey);
-					if (null == hisOrderRecord) {
-						HisOrder hisOrder = hisOrderMapper.queryOrderState(orderId, partnerCode, appkey);
-						if (null == hisOrder) {
-							return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
-						}else {
-							state = hisOrder.getState();
-						}
-					} else {
-						state = hisOrderRecord.getState();
-					}
-				} else {
-					state = orderRecord.getState();
-				}
-			} else {
-				state = order.getState();
-			} 
-			
-			log.info("OrderServiceImpl queryOrderState() state=" + state);
-			
+			String orderState = orderMapper.queryOrderState(orderId, partnerCode, appkey);
+			log.info("OrderServiceImpl queryOrderState() state=" + orderState);
 			JSONObject json = new JSONObject();
-			json.put("state", state);
+			json.put("state", orderState);
 			
-			switch (Integer.valueOf(state)) {
+			switch (Integer.valueOf(orderState)) {
 			
 			/**
 			 *  wojia 返回 state
@@ -169,26 +135,6 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			*	      状态7：服务到期；--22
 			*	      状态9：退订失败；--23
 			 */
-//			case 1:json.put("stateMsg", "未付款");break;
-//			case 2:json.put("stateMsg", "付款中");break;
-//			case 3:json.put("stateMsg", "付款失败");break;
-//			case 4:json.put("stateMsg", "付款成功，待订购");break;
-//			
-//			case 5:case 6:case 7:case 8:json.put("stateMsg", "订购失败");break;
-//			
-//			case 9:json.put("stateMsg", "订购受理中");break;
-//			
-//			case 10:case 11:case 12:case 13:case 14:case 15:case 16:case 17:case 18:json.put("stateMsg", "订购成功");break;
-//			
-//			case 19:json.put("stateMsg", "退订成功");break;
-//			case 20:json.put("stateMsg", "退订中");break;
-//			case 21:json.put("stateMsg", "订购作废");break;
-//			case 22:json.put("stateMsg", "服务到期");break;
-			
-			//需求：付款取消则状态从4开始，无21状态
-//			case 1:json.put("stateMsg", "未付款");break;
-//			case 2:json.put("stateMsg", "付款中");break;
-//			case 3:json.put("stateMsg", "付款失败");break;
 			case 4:json.put("state", "1");json.put("stateMsg", "待订购");break;
 			case 5:case 6:case 7:case 8:case 15:case 16:case 17:case 18:json.put("state", "4");json.put("stateMsg", "订购失败");break;
 			case 9:json.put("state", "2");json.put("stateMsg", "订购中");break;
