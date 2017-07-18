@@ -465,16 +465,6 @@ public class OrderServiceImpl implements IOrderService{
 			String phone, String productCode, String orderMethod,
 			String partnerOrderId,boolean isBatch,boolean needMobileCheck)
 	{
-		if (StringUtils.isBlank(partnerCode))
-		{
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
-					"partnerCode" + Constant.PARAM_NULL_MSG, null);
-		}
-		if (StringUtils.isBlank(appKey))
-		{
-			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE,
-					"appkey" + Constant.PARAM_NULL_MSG, null);
-		}
 		if (needMobileCheck && StringUtils.isBlank(phone))
 		{
 			return ReturnUtil.returnJsonError(Constant.PARAM_NULL_CODE, "phone"
@@ -502,8 +492,6 @@ public class OrderServiceImpl implements IOrderService{
 				return ReturnUtil.returnJsonError(Constant.PARTNERORDERID_EXIST_CODE, Constant.PARTNERORDERID_EXIST_MSG + partnerOrderId, null);
 			}
 		}
-
-		
 		return null;
 	}
 	
@@ -709,9 +697,9 @@ public class OrderServiceImpl implements IOrderService{
 		order.setAllowAutoPay(Constant.ALLOWAUTOPAY_1);
 		if(product.getType().equals((byte)1)){//包月后向流量
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(new Date()));//包月失效时间
-		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_02)){
+		}else if(product.getCycleType() == Constant.CYCLE_TYPE_02){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),6)));//包半年失效时间
-		}else if(StringUtils.contains(product.getProductCode().substring(2, 4), Constant.CYCLE_TYPE_03)){
+		}else if(product.getCycleType() == Constant.CYCLE_TYPE_03){
 			order.setInvalidTime(DateUtil.getCurrentMonthEndTime(DateUtil.getCurrentNextYear(new Date(),12)));//包年失效时间
 		}
 		order.setPrice(product.getPrice());//产品价格
@@ -882,27 +870,27 @@ public class OrderServiceImpl implements IOrderService{
 	* @throws
 	 */
 	public boolean optOrderRecord(String orderId,String woOrderId,String woOrder,String state,String productCode,byte isNeedCharge,byte isRealRequestWoplat){
-		int num = updateOrder(orderId, woOrderId, state,isNeedCharge,isRealRequestWoplat);
-		if(num > 0){
-			String cycleType = productCode.substring(2, 4);//当前订购流量包
-			byte cycleType2 = 0;
-			if(Constant.CYCLE_TYPE_01.equals(cycleType)){//包月
-				//判断wojia总管订购流量包为包月并且当前也为包月流量包
-				cycleType2 = 0;
-			}else if(Constant.CYCLE_TYPE_02.equals(cycleType)){//包半年
-				//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
-				cycleType2 = 1;
-			}else if(Constant.CYCLE_TYPE_03.equals(cycleType)){//包年
-				//判断wojia总管订购流量包为包年并且当前也为包年流量包
-				cycleType2 = 2;
-			}
-			//沉淀订购关系
-			int count = insertFromOrderRecordById(orderId, cycleType2, woOrder);//0-我方初始化订购
-			if(count > 0){
-				log.info("orderService order product deposit orderRecord data success:orderId="+orderId);
-				return true;
-			}
-		}
+//		int num = updateOrder(orderId, woOrderId, state,isNeedCharge,isRealRequestWoplat);
+//		if(num > 0){
+//			String cycleType = productCode.substring(2, 4);//当前订购流量包
+//			byte cycleType2 = 0;
+////			if(Constant.CYCLE_TYPE_01.equals(cycleType)){//包月
+////				//判断wojia总管订购流量包为包月并且当前也为包月流量包
+////				cycleType2 = 0;
+////			}else if(Constant.CYCLE_TYPE_02.equals(cycleType)){//包半年
+////				//判断wojia总管订购流量包为包半年并且当前也为包半年流量包
+////				cycleType2 = 1;
+////			}else if(Constant.CYCLE_TYPE_03.equals(cycleType)){//包年
+////				//判断wojia总管订购流量包为包年并且当前也为包年流量包
+////				cycleType2 = 2;
+////			}
+//			//沉淀订购关系
+//			int count = insertFromOrderRecordById(orderId, cycleType2, woOrder);//0-我方初始化订购
+//			if(count > 0){
+//				log.info("orderService order product deposit orderRecord data success:orderId="+orderId);
+//				return true;
+//			}
+//		}
 		log.info("orderService order product deposit orderRecord data fail:orderId="+orderId);
 		return false;
 	}
