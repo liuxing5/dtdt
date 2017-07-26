@@ -139,7 +139,7 @@ public class OrderController extends BaseController{
         }
         String orderJson = sb.toString();
         logger.info("closeOrder param data:" + orderJson);
-        return orderService.closeOrder(orderJson, request.getHeader("appkey"), request.getHeader("partnerCode"));
+        return orderService.closeOrder(orderJson);
 	}
 	
 	/**
@@ -163,6 +163,6 @@ public class OrderController extends BaseController{
         }
         String orderJson = sb.toString();
         logger.info("closeOrderNew param data:" + orderJson);
-        return orderService.closeOrderNew(orderJson, request.getHeader("appkey"), request.getHeader("partnerCode"));
+        return orderService.closeOrderNew(orderJson);
 	}
 }

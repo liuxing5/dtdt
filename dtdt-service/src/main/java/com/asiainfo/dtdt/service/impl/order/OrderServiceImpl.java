@@ -1160,12 +1160,29 @@ public class OrderServiceImpl implements IOrderService{
 	* @return
 	* @throws
 	 */
-	public String closeOrder(String orderStr, String appkey, String partnerCode) {
-		log.info("OrderServiceImpl closeOrder() orderStr:" + orderStr + " appkey=" + appkey);
+	public String closeOrder(String orderStr) {
+		log.info("OrderServiceImpl closeOrder() orderStr:" + orderStr);
 		
 		//获取参数
-		JSONObject jsonObject = JSONObject.parseObject(orderStr);
-		String orderId = jsonObject.getString("orderId");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject =JSONObject.parseObject(orderStr);
+		} catch (Exception e) {
+			log.error("OrderServiceImpl closeOrder check param is json error "+e.getMessage(),e);
+			e.printStackTrace();
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		}
+		String partnerCode = null;
+		String appKey = null;
+		String orderId = null;
+		try {
+			partnerCode = jsonObject.getString("partnerCode").toString();
+			appKey = jsonObject.getString("appKey").toString();
+			orderId = jsonObject.getString("orderId").toString();
+		} catch (NullPointerException e) {
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}
 		
 		//参数校验
 		if (StringUtils.isBlank(orderId)) {
@@ -1176,14 +1193,14 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		//校验合作方信息
-		if (!checkPartner(appkey, partnerCode)) {
+		if (!checkPartner(appKey, partnerCode)) {
 			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
 		//查询订购关系表：校验包月类订购为成功，只限包月类产产品
 		OrderRecord orderRecord = null;
 		try {
-			orderRecord = orderRecordMapper.selectMonthProduct(orderId, appkey, partnerCode);
+			orderRecord = orderRecordMapper.selectMonthProduct(orderId, appKey, partnerCode);
 			if (null == orderRecord)
 				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
 		} catch (Exception e) {
@@ -1259,12 +1276,29 @@ public class OrderServiceImpl implements IOrderService{
 	* @return        
 	* @throws
 	 */
-	public String closeOrderNew(String orderStr, String appkey, String partnerCode) {
-		log.info("OrderServiceImpl closeOrderNew() orderStr:" + orderStr + " appkey=" + appkey);
+	public String closeOrderNew(String orderStr) {
+		log.info("OrderServiceImpl closeOrderNew() orderStr:" + orderStr);
 		
 		//获取参数：合作方请求orderId（我方平台的orderId）
-		JSONObject jsonObject = JSONObject.parseObject(orderStr);
-		String orderId = jsonObject.getString("orderId");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject =JSONObject.parseObject(orderStr);
+		} catch (Exception e) {
+			log.error("OrderServiceImpl closeOrder check param is json error "+e.getMessage(),e);
+			e.printStackTrace();
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ILLEGAL_CODE, Constant.PARAM_ILLEGAL_MSG, null);
+		}
+		String partnerCode = null;
+		String appKey = null;
+		String orderId = null;
+		try {
+			partnerCode = jsonObject.getString("partnerCode").toString();
+			appKey = jsonObject.getString("appKey").toString();
+			orderId = jsonObject.getString("orderId").toString();
+		} catch (NullPointerException e) {
+			log.error("get param error is null");
+			return ReturnUtil.returnJsonInfo(Constant.PARAM_ERROR_CODE, Constant.PARAM_ERROR_MSG, null);
+		}
 		
 		//参数校验
 		if (StringUtils.isBlank(orderId)) {
@@ -1276,14 +1310,14 @@ public class OrderServiceImpl implements IOrderService{
 		}
 		
 		//校验合作方信息
-		if (!checkPartner(appkey, partnerCode)) {
+		if (!checkPartner(appKey, partnerCode)) {
 			return ReturnUtil.returnJsonList(Constant.PARTNER_ERROR_CODE, Constant.PARTNER_ERROR_MSG, null);
 		}
 		
 		//查询订购关系表：不校验包月类
 		OrderRecord orderRecord = null;
 		try {
-			orderRecord = orderRecordMapper.selectOrderRecord(orderId, appkey, partnerCode);
+			orderRecord = orderRecordMapper.selectOrderRecord(orderId, appKey, partnerCode);
 			if (null == orderRecord)
 				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
 			
@@ -1359,13 +1393,13 @@ public class OrderServiceImpl implements IOrderService{
 	/**
 	* @Title: checkPartner 
 	* @Description: 校验合作方信息
-	* @param appkey
+	* @param appKey
 	* @param partnerCode
 	* @return boolean
 	* @throws
 	 */
-	private boolean checkPartner(String appkey, String partnerCode) {
-		App app = appMapper.queryAppInfo(appkey);
+	private boolean checkPartner(String appKey, String partnerCode) {
+		App app = appMapper.queryAppInfo(appKey);
 		Partner partner = partnerMapper.selectByPrimaryKey(app.getPartnerId());
 		if (!partner.getPartnerCode().equals(partnerCode)) {
 			return false;
