@@ -159,7 +159,7 @@ public class OrderServiceImpl implements IOrderService{
 		try {
 			seq = jsonObject.getString("seq");
 			partnerCode = jsonObject.getString("partnerCode").toString();
-			appKey = jsonObject.getString("appKey").toString();
+			appKey = jsonObject.getString("appkey").toString();
 			phone = jsonObject.getString("phone").toString();
 			productCode = jsonObject.getString("productCode").toString();
 			orderMethod = jsonObject.get("orderMethod").toString();
@@ -1177,7 +1177,7 @@ public class OrderServiceImpl implements IOrderService{
 		String orderId = null;
 		try {
 			partnerCode = jsonObject.getString("partnerCode").toString();
-			appKey = jsonObject.getString("appKey").toString();
+			appKey = jsonObject.getString("appkey").toString();
 			orderId = jsonObject.getString("orderId").toString();
 		} catch (NullPointerException e) {
 			log.error("get param error is null");
@@ -1293,7 +1293,7 @@ public class OrderServiceImpl implements IOrderService{
 		String orderId = null;
 		try {
 			partnerCode = jsonObject.getString("partnerCode").toString();
-			appKey = jsonObject.getString("appKey").toString();
+			appKey = jsonObject.getString("appkey").toString();
 			orderId = jsonObject.getString("orderId").toString();
 		} catch (NullPointerException e) {
 			log.error("get param error is null");
