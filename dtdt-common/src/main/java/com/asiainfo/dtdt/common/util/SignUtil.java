@@ -90,6 +90,7 @@ public class SignUtil {
 				catch(Exception e)
 				{
 					//
+					
 				}
 				
 				sb.append(k.toString() + v.toString());
@@ -159,18 +160,18 @@ public class SignUtil {
     "orderMethod": "1",
     "partnerOrderId": "345678907777777"
 }
-
+appkeyD31671E8-BA18-4B8A-913F-D36421E05B3BorderId12312312312partnerCodept_0714_jxxytimestamp1500256428868FBDF338*FEB864B37AE34AE2525^66A3
 		 */
-		parameters.put("productCode", "100101");
-		parameters.put("partnerCode", "1234543245");
-		parameters.put("partnerOrderId", "345678907777777");
-		parameters.put("orderMethod", "1");
-		parameters.put("appkey", "fwerh4356ytrt54");
-		parameters.put("timestamp", "1499236715439");
-		parameters.put("secret", "ewer5retyt");
-		parameters.put("phones", "[\"18610728340\",\"]");
 		
-		
+		//parameters.put("productCode", "100101");
+		parameters.put("partnerCode", "pt_0714_jxxy");
+		parameters.put("orderId", "12312312312");
+		//parameters.put("orderMethod", "1");
+		parameters.put("appkey", "D31671E8-BA18-4B8A-913F-D36421E05B3B");
+		parameters.put("timestamp", "1500256428868");
+		parameters.put("secret", "FBDF338*FEB864B37AE34AE2525^66A3");
+		//parameters.put("phones", "[\"18610728340\",\"]");
+
 		System.out.println(createSign(parameters, "utf-8"));
 		System.out.println(new Date().getTime());
 		
