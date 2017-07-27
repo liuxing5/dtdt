@@ -94,6 +94,9 @@ public class QueryOrderServiceImpl implements IQueryOrderService {
 			
 			String orderState = orderMapper.queryOrderState(orderId, partnerCode, appkey);
 			log.info("OrderServiceImpl queryOrderState() state=" + orderState);
+			if ("0".equals(orderState)) {
+				return ReturnUtil.returnJsonInfo(Constant.NO_ORDER_CODE, Constant.NO_ORDER_MSG, null);
+			}
 			JSONObject json = new JSONObject();
 			json.put("state", orderState);
 			
