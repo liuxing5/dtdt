@@ -79,8 +79,8 @@ public class SignUtil {
 			{
 				try
 				{
-					sb.append(k.toString());
 					JSONArray array = parameters.getJSONArray(k.toString());
+					sb.append(k.toString());
 					for(int j=0; j<array.size(); j++)
 					{
 						sb.append(array.get(j).toString());
