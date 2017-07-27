@@ -47,7 +47,6 @@
     <include refid="Base_Column_List" />
     from t_s_order_record
     where state = '20'
-    and cycle_type = 0
     and invalid_time = DATE_FORMAT(LAST_DAY(CURDATE()),'%Y-%m-%d 23:59:59')
   </select>
   
