@@ -42,12 +42,13 @@
     where order_id = #{orderId,jdbcType=VARCHAR}
   </select>
   
+  <!-- 查询上月最后一天 失效时间为 23：59：59的状态为20（退订回调成功）的数据 -->
   <select id="getCloseOrderList" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from t_s_order_record
     where state = '20'
-    and invalid_time = DATE_FORMAT(LAST_DAY(CURDATE()),'%Y-%m-%d 23:59:59')
+    and invalid_time = DATE_SUB(DATE_SUB(DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59'),INTERVAL EXTRACT(DAY FROM NOW()) DAY),INTERVAL 0 MONTH)
   </select>
   
   <delete id="deleteOrderRecord" parameterType="java.lang.String" >
